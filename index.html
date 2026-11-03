@@ -521,6 +521,24 @@ dialog p{font-size:13px;line-height:1.6;color:#7c858e}
 @media(max-width:480px){#multiplayerButton{right:12px;bottom:58px;padding:9px 11px}}
 
 .mp-connection-banner{margin:12px 0 4px;padding:10px 12px;background:#f0f7fd;border:1px solid #d8e8f4;border-radius:10px;font-size:12px;font-weight:720;color:#4f7091;line-height:1.5}
+.food-wrap{position:relative}#foodBuff{position:absolute;top:calc(100% + 7px);left:0;white-space:nowrap;font-size:11px;font-weight:750;padding:7px 10px;border:1px solid #d9c8ee;border-radius:10px;background:#f6eeff;color:#8055a1;box-shadow:0 3px 12px #633b8514}
+.fx-dialog{width:min(820px,calc(100vw - 28px));max-height:88vh;overflow:auto;padding:26px;background:#fbfdfb;border:1px solid #dce9df;color:#344b3e}.fx-dialog[open]{animation:fxIn .22s ease both}.fx-dialog.closing{animation:fxOut .16s ease both}.fx-dialog::backdrop{background:#203c3459;backdrop-filter:blur(6px)}
+@keyframes fxIn{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}@keyframes fxOut{to{opacity:0;transform:translateY(10px) scale(.98)}}
+.fx-dialog button,#tradeActions button{border:1px solid #d7e3db;border-radius:11px;padding:11px 16px;background:#fff;color:#3f6250;font:700 12px system-ui;cursor:pointer;transition:transform .15s,background .15s,box-shadow .15s}.fx-dialog button:hover:not(:disabled),#tradeActions button:hover{transform:translateY(-2px);box-shadow:0 5px 13px #294f3519}.fx-dialog button:active:not(:disabled){transform:scale(.96)}.fx-dialog button:disabled{opacity:.45;cursor:not-allowed}.fx-dialog .primary{background:#35865d;color:white;border-color:#35865d}.fx-dialog .danger{color:#b04b57;background:#fff1f2;border-color:#efd7db}
+.fx-head,.fx-footer,.food-row,.offer-row{display:flex;align-items:center;justify-content:space-between;gap:14px}.fx-head{margin-bottom:18px}.fx-head h2{margin:0}.fx-sub{font-size:12px;color:#819488;line-height:1.6;margin:6px 0 20px}.food-row{border:1px solid #e4d8f0;padding:19px;border-radius:16px;background:linear-gradient(120deg,#f7effe,#fff);margin:10px 0}.food-row h3{font-size:16px;margin-bottom:6px}.food-row small{color:#826a93;line-height:1.5}.food-count{font-size:12px;text-align:center;margin-top:8px;color:#81758b}
+.trade-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.trade-side{position:relative;min-height:240px;border:1px solid #dce8df;border-radius:17px;padding:18px;background:#fff;overflow:hidden}.trade-side h3{font-size:14px;color:#4b6d58;margin-bottom:15px}.trade-side.ready{border-color:#82c99d;background:#f5fff8}.trade-side.ready:after{content:'✓';position:absolute;inset:30px 0 0;display:grid;place-items:center;font:bold 160px system-ui;color:#36ab5c35;pointer-events:none;animation:fxIn .22s}.offer-row{font-size:13px;padding:10px 0;border-bottom:1px solid #edf1ee;animation:fxIn .2s}.offer-row span{flex:1}.offer-row button{padding:4px 8px}.offer-empty{color:#9caaa1;font-size:13px;padding:25px 0}.fx-footer{margin-top:20px}.fx-footer button{min-width:120px}#tradeMessage{min-height:20px;font-size:12px;color:#788b7e;margin:14px 0 0}#tradeItems{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px;max-height:300px;overflow:auto}#tradeItems button{text-align:left}#tradeQuantityRow{display:flex;gap:10px;margin-top:18px}#tradeQuantity{flex:1;min-width:0;border:1px solid #cdddce;border-radius:10px;padding:12px;font:inherit}#tradeActions{position:fixed;z-index:75;padding:8px;display:flex;flex-direction:column;gap:6px;background:#fffffff5;box-shadow:0 8px 30px #24462f24;border:1px solid #dce6df;border-radius:14px;animation:fxIn .18s}.mp-mini{color:#ca7c26}
+@media(max-width:600px){.fx-dialog{padding:18px}.trade-grid{gap:8px}.trade-side{padding:11px;min-height:190px}.trade-side.ready:after{font-size:100px}.food-row{padding:13px}.fx-head h2{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.fx-dialog,.offer-row,#tradeActions{animation:none!important}.fx-dialog button{transition:none}}
+
+#settingsDialog{width:min(580px,calc(100vw - 28px))}.setting-row{display:flex;gap:20px;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid #dfe8e2}.setting-row label{font-size:14px;font-weight:750}.setting-row small{display:block;font-size:11px;font-weight:450;color:#809487;margin-top:5px}.setting-row select{max-width:53%;padding:11px;border:1px solid #d5e2da;border-radius:10px;background:#fff;color:#365341;font:600 12px system-ui}.setting-row input{width:48%;accent-color:#548d71}.music-card{display:flex;gap:18px;align-items:center;padding:20px;margin-top:23px;border:1px solid #d6e5dd;border-radius:16px;background:linear-gradient(130deg,#eaf5ec,#eef1fb)}.music-card strong{font-size:14px}.music-card p,.music-card small{font-size:11px;line-height:1.7;color:#718879}.music-bars{display:flex;gap:4px;height:35px;align-items:center}.music-bars i{width:4px;height:18px;background:#7aa78a;border-radius:4px;animation:musicWave 2s ease-in-out infinite alternate}.music-bars i:nth-child(2){animation-delay:-.7s}.music-bars i:nth-child(3){animation-delay:-1.4s}.music-bars i:nth-child(4){animation-delay:-.3s}.music-bars i:nth-child(5){animation-delay:-1s}@keyframes musicWave{to{height:33px;opacity:.5}}
+html[data-theme="dark"],html[data-theme="dark"] body{background:#141d24;color:#dbe8e0;color-scheme:dark}
+html[data-theme="dark"] :is(.resources .resource,.tool-resource,.empty-inventory,.tree-button,.pause-button,.inventory-toggle,.level-hud,.panel.station,.inventory,.tree-header,.tree-footer,.tree-completion,.tree-tooltip,.mp-roster,.mp-stats,.mp-stat-cell,.mp-player,.mp-roster-entry,.mp-stats-header,.mp-stat-section,dialog,.fx-dialog,#tradeActions){background:#202e36;color:#d4e4dc;border-color:#3c505a;box-shadow:0 6px 24px #0003}
+html[data-theme="dark"] :is(.resource-value,.tool-label,.panel-heading,.panel-heading small,.level-name,.level-percent,.level-unlock,.mp-stat-cell strong,.mp-stat-cell span,.mp-stat-section h3,.fx-dialog h2,.fx-dialog h3,dialog p,.tree-header h2,.tree-tooltip h3,.tree-tooltip p,.completion-heading,.tree-header p,.mp-meta){color:#c0d5cc}
+html[data-theme="dark"] :is(.tree-sidebar,.tree-stage){background-color:#18262e}html[data-theme="dark"] .tree-stage{background-image:radial-gradient(#3a505c 1px,transparent 1px)}html[data-theme="dark"] :is(.tree-control,.requirement,.bulk-footer,.bulk-option,.mp-input,.mp-select,.mp-button,.dialog-actions button,.setting-row select,.fx-dialog button,#tradeActions button,#tradeQuantity){background:#2a3c45;color:#d1e2d8;border-color:#4c626a}html[data-theme="dark"] .tree-label{fill:#d0e1d8}html[data-theme="dark"] .tree-subtitle{fill:#b1c6bc}html[data-theme="dark"] .tree-shape{fill:#354c48;stroke:#688477}html[data-theme="dark"] .tree-node.locked:not(.achieved) .tree-shape{fill:#26363e}
+html[data-theme="dark"] :is(.food-row,.trade-side,.music-card,.auto-status){background:#263b38;border-color:#4c6c5c;color:#d3e8d9}html[data-theme="dark"] .trade-side.ready{background:#244536}html[data-theme="dark"] :is(.fx-sub,.food-row small,.food-count,.setting-row small,.music-card p,.music-card small,#tradeMessage){color:#adc4b7}html[data-theme="dark"] .fx-dialog .primary{background:#3b8865;color:#fff}html[data-theme="dark"] .fx-dialog .danger{background:#51313a;color:#ffc3cb}html[data-theme="dark"] .fish-rate{background:#25382f}html[data-theme="dark"] .pause-badge{background:#413d29;color:#e5d5a4;border-color:#655e3e}
+@media(max-width:480px){.setting-row{gap:8px}.setting-row label{font-size:12px}.music-card{padding:14px}.setting-row select{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.music-bars i{animation:none}}
+
 </style>
 </head>
 
@@ -530,7 +548,7 @@ dialog p{font-size:13px;line-height:1.6;color:#7c858e}
 <div class="top-controls">
   <button id="treeButton" class="tree-button"
     aria-controls="treeSidebar" aria-expanded="false">🌳 Progress Tree</button>
-  <button id="pauseButton" class="pause-button" aria-pressed="false">⏸ Pause</button>
+  <button id="pauseButton" class="pause-button" aria-pressed="false">⚙ Settings</button><div class="food-wrap"><button id="foodButton" class="pause-button" hidden>🧃 Food</button><div id="foodBuff" hidden></div></div>
 </div>
 <div id="pauseBadge" class="pause-badge" hidden>⏸ Game paused</div>
 
@@ -728,23 +746,38 @@ turns:your-server.example:443?transport=tcp"></textarea>
 
 <script>window.__HEX_RELAY_ENABLED__=false;</script>
 <script async src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<div id="tradeActions" hidden><button id="playerStatistics">Statistics</button><button id="playerTrade">Trade</button></div>
+<dialog id="foodDialog" class="fx-dialog" aria-labelledby="foodTitle"><div class="fx-head"><h2 id="foodTitle">🧃 Food & boosts</h2><button data-close="foodDialog" aria-label="Close">✕</button></div><p class="fx-sub">Personal effects · Extra servings add duration, not strength.</p><div class="food-row"><div><h3>🧃 Berry juice</h3><small>−10% production cooldown for 60 seconds.<br>Applies only to your own production.</small></div><div><button id="useJuice" class="primary">Use</button><div id="juiceCount" class="food-count"></div></div></div><p id="foodDuration" class="fx-sub"></p></dialog>
+<dialog id="tradeDialog" class="fx-dialog" aria-labelledby="tradeTitle"><div class="fx-head"><h2 id="tradeTitle">⇄ Trade</h2><button id="tradeAdd">＋ Add</button></div><p class="fx-sub">Your offer is on the left. Items are reserved until completion or cancellation. Changing an offer clears both confirmations.</p><div class="trade-grid"><section id="tradeMine" class="trade-side"><h3>Your offer</h3><div id="tradeMyItems"></div></section><section id="tradeTheirs" class="trade-side"><h3 id="tradeOtherName">Their offer</h3><div id="tradeOtherItems"></div></section></div><p id="tradeMessage" role="status"></p><div class="fx-footer"><button id="tradeDecline" class="danger">Decline</button><button id="tradeConfirm" class="primary">Accept</button></div></dialog>
+<dialog id="tradeAddDialog" class="fx-dialog" aria-labelledby="tradeAddTitle"><div class="fx-head"><h2 id="tradeAddTitle">Add items</h2><button data-close="tradeAddDialog" aria-label="Close">✕</button></div><div id="tradeItems"></div><div id="tradeQuantityRow" hidden><input id="tradeQuantity" type="number" min="1" step="1" inputmode="numeric" aria-label="Quantity"><button id="tradeQuantityOK" class="primary">OK</button></div><p id="tradeAddInfo" class="fx-sub" role="status"></p></dialog>
+
+<dialog id="settingsDialog" class="fx-dialog" aria-labelledby="settingsTitle"><div class="fx-head"><div><h2 id="settingsTitle">⚙ Settings</h2><p class="fx-sub" style="margin:5px 0 0">Your world is paused while this window is open.</p></div><button id="settingsClose" aria-label="Close settings">✕</button></div><div class="setting-row"><label for="themeChoice">Appearance<small>Choose your preferred palette</small></label><select id="themeChoice"><option value="light">Light</option><option value="dark">Dark</option></select></div><div class="setting-row"><label for="musicVolume">Music volume<small id="musicVolumeLabel">35%</small></label><input id="musicVolume" type="range" min="0" max="100" value="35"></div><div class="setting-row"><label for="musicChoice">Soundtrack<small>Five original ambient compositions</small></label><select id="musicChoice"><option value="0">Morning Orchard</option><option value="1">Rain on the Lake</option><option value="2">Amber Fields</option><option value="3">Moonlit Forest</option><option value="4">Quiet Horizon</option></select></div><div class="music-card"><div class="music-bars"><i></i><i></i><i></i><i></i><i></i></div><div><strong id="musicTitle">Morning Orchard</strong><p id="musicDescription"></p><small id="musicState">Music starts after your first click.</small></div></div><div class="fx-footer"><small class="fx-sub">Settings are saved automatically.</small><button id="settingsResume" class="primary">Return to game</button></div></dialog>
+
 <script>
 const $=id=>document.getElementById(id);
 const canvas=$("map"),ctx=canvas.getContext("2d");
+const tradeIncoming=new Map(),tradeSessions=new Map(),tradeRequests=new Map();
+let tradeCurrent=null,tradeEscrow={},tradePending=false,tradeSelected=null;
+const tradeFinished=new Set();
+const preferences={theme:'light',volume:35,track:0};
+try{const p=JSON.parse(localStorage.getItem('wildlife-settings-v1')||'{}');preferences.theme=p.theme==='dark'?'dark':'light';preferences.volume=Number.isFinite(p.volume)?Math.max(0,Math.min(100,p.volume)):35;preferences.track=Number.isInteger(p.track)?Math.max(0,Math.min(4,p.track)):0}catch(e){}
+let settingsPreviousPause=false;
 const SAVE_KEY="hex-world-progress-v1"; // Existing singleplayer save key stays untouched.
 let worldMode="singleplayer";
 let singleplayerSnapshot=null;
 const HEX_SIZE=42,HEX_WIDTH=Math.sqrt(3)*HEX_SIZE,MAP_RADIUS=9;
-const PRICE_MULTIPLIER=1.3,EPS=0.000001;
+const PRICE_MULTIPLIER=1.25,EPS=0.000001;
 
 const resources={wood:5,stone:5,fish:0};
-const inventory={
+let juiceSeconds=0;
+const inventory={wildBerry:0,berryJuice:0,
   axe:0,pickaxe:0,fishingRod:0,plank:0,iron:0,
   ironAxe:0,ironPickaxe:0,hammer:0,essence:0,
   shovel:0,wheat:0,carrot:0,bread:0,animalFeed:0,fur:0,leather:0,
   clay:0,brick:0,bellows:0,improvedPickaxe:0,improvedAxe:0,coal:0,oak:0,oakPlank:0,steel:0,jacket:0,gloves:0,gold:0
 };
 const ITEMS={
+  wildBerry:{emoji:"🍇",label:"wild berry"},berryJuice:{emoji:"🧃",label:"berry juice"},
   wood:{emoji:"🪵",label:"wood"},
   stone:{emoji:"🪨",label:"stone"},
   fish:{emoji:"🐟",label:"fish"},
@@ -772,7 +805,7 @@ const ITEMS={
 };
 const BIOMES={
   forest:{label:"Forest",emoji:"🌲",baseCost:{wood:5},color:[54,173,89],
-    note:"+1 wood / 5s",buildings:["sawmill","improvedSawmill"]},
+    note:"+1 wood / 5s",buildings:["sawmill","berryBush","improvedSawmill"]},
   meadow:{label:"Meadow",emoji:"🌱",baseCost:{wood:3},color:[176,232,106],
     note:"Crafting and support buildings",buildings:["carpenter","forge","house","farm","animalPen","advancedForge"]},
   lake:{label:"Lake",emoji:"🌊",baseCost:{stone:3},color:[115,202,250],
@@ -781,6 +814,7 @@ const BIOMES={
     note:"+1 stone / 5s",buildings:["mine","improvedMine"]}
 };
 const BUILDINGS={
+  berryBush:{label:"Berry bush",emoji:"🫐",baseCost:{wheat:10,wood:50},requiredLevel:3,note:"+1 wild berry / 25s · Craft berry juice"},
   sawmill:{label:"Sawmill",emoji:"🪚",baseCost:{wood:10,stone:5,axe:1},
     note:"+1 wood / 3.5s"},
   mine:{label:"Mine",emoji:"⛏️",baseCost:{wood:10,stone:10,pickaxe:1},
@@ -814,6 +848,7 @@ const BUILDINGS={
     note:"Assign Residential or Kitchen",requiredLevel:2}
 };
 const RECIPES={
+  berryJuice:{label:"Berry juice",emoji:"🧃",cost:{wildBerry:10},station:"berryBush",requiredLevel:3},
   axe:{label:"Axe",emoji:"🪓",cost:{wood:5,stone:5},station:"carpenter"},
   pickaxe:{label:"Pickaxe",emoji:"⛏️",cost:{wood:5,stone:5},station:"carpenter"},
   fishingRod:{label:"Fishing rod",emoji:"🎣",cost:{wood:10,fish:3},station:"carpenter"},
@@ -827,15 +862,15 @@ const RECIPES={
   animalFeed:{label:"Animal feed",emoji:"🐾",cost:{carrot:3},station:"farm",requiredLevel:3},
   leather:{label:"Leather",emoji:"🟤",cost:{fur:3},station:"animalPen",requiredLevel:3},
   brick:{label:"Brick",emoji:"🧱",cost:{clay:5},station:"forge",requiredLevel:4},
-  bellows:{label:"Blacksmith bellows",emoji:"💨",cost:{leather:15,plank:50,iron:10},station:"forge",requiredLevel:4},
+  bellows:{label:"Blacksmith bellows",emoji:"💨",cost:{leather:8,plank:50,iron:10},station:"forge",requiredLevel:4},
   improvedPickaxe:{label:"Improved pickaxe",emoji:"⛏️",
-    cost:{leather:5,ironPickaxe:1,clay:5,iron:5},station:"advancedForge",requiredLevel:4},
+    cost:{leather:3,ironPickaxe:1,clay:5,iron:5},station:"advancedForge",requiredLevel:4},
   improvedAxe:{label:"Improved axe",emoji:"🪓",
-    cost:{leather:5,ironAxe:1,clay:5,iron:5},station:"advancedForge",requiredLevel:4},
+    cost:{leather:3,ironAxe:1,clay:5,iron:5},station:"advancedForge",requiredLevel:4},
   oakPlank:{label:"Oak plank",emoji:"🟫",cost:{oak:5},station:"carpenter",requiredLevel:4},
   steel:{label:"Steel",emoji:"🔘",cost:{coal:10,iron:5},station:"advancedForge",requiredLevel:4},
-  jacket:{label:"Jacket",emoji:"🧥",cost:{leather:20,fur:5},station:"tailor",requiredLevel:4},
-  gloves:{label:"Gloves",emoji:"🧤",cost:{fur:15,leather:5},station:"tailor",requiredLevel:4}
+  jacket:{label:"Jacket",emoji:"🧥",cost:{leather:10,fur:5},station:"tailor",requiredLevel:4},
+  gloves:{label:"Gloves",emoji:"🧤",cost:{fur:15,leather:3},station:"tailor",requiredLevel:4}
 };
 // Trades are deliberately separate from recipes: gold purchases must not create
 // recursive crafting cycles or allow automatic sales of a player's stock.
@@ -850,9 +885,9 @@ const PORT_TRADES={
 };
 const AUTOMATION={
   carpenter:{label:"Auto Carpenter",item:"plank",interval:5,
-    upgradeCost:{plank:50,ironAxe:3,hammer:1},recipe:{wood:3,fish:2}},
+    upgradeCost:{plank:30,ironAxe:2,hammer:1},recipe:{wood:3,fish:2}},
   forge:{label:"Auto Forge",item:"iron",interval:45,
-    upgradeCost:{iron:15,plank:30,ironPickaxe:2,hammer:2},recipe:{stone:20,fish:2}}
+    upgradeCost:{iron:10,plank:20,ironPickaxe:1,hammer:1},recipe:{stone:20,fish:2}}
 };
 const HOUSE_MODES={
   residential:{label:"Residential",emoji:"🏡",upkeep:1,limit:10,requiredLevel:2,cost:{},
@@ -862,21 +897,23 @@ const HOUSE_MODES={
   tailor:{label:"Tailor",emoji:"🧵",upkeep:0,limit:Infinity,requiredLevel:4,
     cost:{leather:10,fur:5},note:"Craft jackets and gloves · No upkeep"}
 };
-const TREASURE_UPGRADE={plank:40,fishingRod:10,hammer:1,iron:5};
+const TREASURE_UPGRADE={plank:25,fishingRod:5,hammer:1,iron:5};
+const TREASURE_UPGRADE_3={plank:60,fishingRod:10,hammer:2,iron:20,brick:10};
 const TREASURE_LOOT={
+  3:[["fish",50],["iron",35],["improvedPickaxe",5],["improvedAxe",5],["essence",5]],
   1:[["fish",50],["wood",22.5],["stone",22.5],["pickaxe",2.5],["axe",2.5]],
   2:[["fish",45],["wood",13],["stone",13],["plank",11],["iron",7.5],
     ["ironAxe",4],["ironPickaxe",4],["essence",2.5]]
 };
 const FISHING_UPGRADE_COSTS=[
-  {fishingRod:25,hammer:1,plank:50,iron:5},
-  {fishingRod:50,hammer:1,plank:80,iron:10},
-  {fishingRod:75,hammer:1,plank:115,iron:15}
+  {fishingRod:6,hammer:1,plank:25,iron:3},
+  {fishingRod:12,hammer:1,plank:45,iron:6},
+  {fishingRod:20,hammer:2,plank:70,iron:10}
 ];
 const PRODUCER_UPGRADE_COSTS=[
-  {plank:40,hammer:1,tools:2,iron:5,fish:50},
-  {plank:75,hammer:2,tools:4,iron:10,fish:75},
-  {plank:125,hammer:3,tools:5,iron:15,fish:100}
+  {plank:25,hammer:1,tools:1,iron:3,fish:25},
+  {plank:45,hammer:1,tools:2,iron:6,fish:45},
+  {plank:75,hammer:2,tools:3,iron:10,fish:70}
 ];
 const LEVEL_REQUIREMENTS={
   1:{wood:150,stone:150,fish:75,sawmill:1,mine:1,fishingHut:1,carpenter:1},
@@ -1013,7 +1050,7 @@ function updateLevelHUD(){
     :"Next: Advanced Forge, improved producers, oak planks and steel";
 }
 function updatePauseUI(){
-  $("pauseButton").textContent=isPaused?"▶ Resume":"⏸ Pause";
+  $("pauseButton").textContent="⚙ Settings";
   $("pauseButton").classList.toggle("active",isPaused);
   $("pauseButton").setAttribute("aria-pressed",String(isPaused));
   $("pauseBadge").hidden=!isPaused;
@@ -1021,11 +1058,12 @@ function updatePauseUI(){
   $("treePause").setAttribute("aria-label",isPaused?"Resume game":"Pause game");
 }
 function togglePause(){
+  if($("settingsDialog").open)return;
   if(isPaused){isPaused=false;lastSimulation=performance.now();lastFrame=null}
   else{synchronize();isPaused=true;resetInput()}
   updatePauseUI();refreshMenus();saveGame();
 }
-$("pauseButton").addEventListener("click",togglePause);
+$("pauseButton").addEventListener("click",openSettings);
 $("treePause").addEventListener("click",togglePause);
 
 function updateInventoryDrawerState(){
@@ -1139,9 +1177,11 @@ function buildingLabel(t){
   return t.building==="mine"&&t.upgradeLevel>=2?"Clay Canyon":BUILDINGS[t.building]?.label||"";
 }
 function productionTimeFactor(t,effects=supportEffects()){
+  if(!mpOwnsTile(t))return 1;
   return effects.timeFactor*(t.building==="farm"?(7.5-effects.farmReduction)/7.5:1);
 }
 function production(t){
+  if(t.building==="berryBush")return{resource:"wildBerry",amount:1,interval:25};
   if(t.building==="improvedSawmill")return{resource:"oak",amount:1,interval:7.5};
   if(t.building==="improvedMine")return{resource:"coal",amount:1,interval:7.5};
   if(t.building==="farm")return{resource:"wheat",amount:1,interval:7.5,randomCrop:true};
@@ -1175,7 +1215,7 @@ function supportEffects(){
     if(t.houseMode==="kitchen")kitchens++;
   }
   return{
-    timeFactor:1-Math.min(.5,residential*.05),
+    timeFactor:(1-Math.min(.5,residential*.05))*(juiceSeconds>EPS?.9:1),
     doubleChance:Math.min(.25,kitchens*.05),
     farmReduction:Math.min(2.5,kitchens*.5)
   };
@@ -1193,7 +1233,7 @@ function producerUpgradeCost(building,level){
 function upgradeCost(t){return producerUpgradeCost(t.building,t.upgradeLevel)}
 function treasureRoll(level){
   let value=Math.random()*100;
-  for(const[item,chance]of TREASURE_LOOT[level>=2?2:1]){
+  for(const[item,chance]of TREASURE_LOOT[Math.max(1,Math.min(3,level))]){
     value-=chance;if(value<0)return item;
   }
   return"fish";
@@ -1223,6 +1263,7 @@ function collectAchievements(){
       if(t.building==="mine"&&t.upgradeLevel>=2)achievements.add("clayCanyon");
     }
     if(t.building==="treasure"&&t.treasureLevel>=2)achievements.add("treasure2");
+    if(t.building==="treasure"&&t.treasureLevel>=3)achievements.add("treasure3");
     if(t.building==="house"&&t.houseMode)achievements.add(t.houseMode);
   }
 }
@@ -1239,7 +1280,7 @@ function resourceBalancePerMinute(resource){
       income+=chance*60*p.amount/(p.interval*productionTimeFactor(t,effects));
     }
     if(t.building==="treasure"){
-      const chance=TREASURE_LOOT[t.treasureLevel>=2?2:1]
+      const chance=TREASURE_LOOT[Math.max(1,Math.min(3,t.treasureLevel))]
         .find(([item])=>item===resource)?.[1]||0;
       income+=60/15/effects.timeFactor*chance/100;
     }
@@ -1265,7 +1306,7 @@ function updateFishRate(){
 }
 function updateResources(){
   updateFishRate();
-  collectAchievements();
+  collectAchievements();foodUI();
   for(const k of["wood","stone","fish","plank","iron","essence","gold"]){
     $(`${k}Count`).textContent=String(balance(k));
   }
@@ -1295,7 +1336,7 @@ function simulate(elapsed,animate=true){
     const effects=supportEffects();
     const tasks=[];
     const homes=[];
-    let step=remaining;
+    let step=juiceSeconds>EPS?Math.min(remaining,juiceSeconds):remaining;
 
     for(const t of tiles){
       if(!mpOwnsTile(t))continue;
@@ -1328,6 +1369,7 @@ function simulate(elapsed,animate=true){
       if(task.kind==="auto")task.t.autoRemaining=Math.max(0,task.t.autoRemaining-work);
     }
     remaining=Math.max(0,remaining-step);
+    juiceSeconds=Math.max(0,juiceSeconds-step);
 
     // A house starts providing its bonus after its first successful upkeep.
     for(const t of homes){
@@ -1514,7 +1556,7 @@ function refreshButton(e){
   e.essenceButton.hidden=!o.essenceEligible||inventory.essence<1||locked||maxed||blocked||isPaused;
   e.essenceButton.textContent=`✨ Use essence (${inventory.essence})`;
   e.button.title=locked?`Unlocks at Level ${o.requiredLevel||2}`
-    :o.scaling?"Each next construction of this type costs 30% more.":o.label;
+    :o.scaling?"Each next construction of this type costs 25% more.":o.label;
 }
 function makeInventory(menu){
   const anchor=document.createElement("div");anchor.className="inventory-anchor";
@@ -1681,7 +1723,7 @@ function openMenu(tile){
       }
     });
 
-    if(["carpenter","forge","farm","animalPen","advancedForge","tailor"].includes(stationFor(tile))){
+    if(["carpenter","forge","farm","animalPen","advancedForge","tailor","berryBush"].includes(stationFor(tile))){
       const station=stationFor(tile);
       const title=tile.automated
         ?AUTOMATION[tile.building].label:stationDefinition(station).label;
@@ -1690,7 +1732,7 @@ function openMenu(tile){
         menu.autoStatus=document.createElement("div");
         menu.autoStatus.className="auto-status";right.appendChild(menu.autoStatus);
       }
-      for(const[type,r]of Object.entries(RECIPES)){
+      for(const[type,r]of Object.entries(RECIPES).sort((a,b)=>(a[1].requiredLevel||1)-(b[1].requiredLevel||1))){
         if(r.station!==station)continue;
         const requiredLevel=r.requiredLevel||1;
         makeButton(menu,right,{
@@ -1727,16 +1769,15 @@ function openMenu(tile){
         menu,"right",buildingLabel(tile),"Production upgrades"
       ),tile);
     }else if(tile.building==="treasure"){
-      if(tile.treasureLevel<2){
-        const right=makePanel(menu,"right","Treasures","Upgrade the loot table");
+      const right=makePanel(menu,"right","Treasures",`Level ${tile.treasureLevel} · One reward / 15 base seconds`);
+      const info=document.createElement('div');info.className='auto-status';info.style.whiteSpace='pre-line';info.textContent=lootDescription(tile.treasureLevel);right.append(info);
+      if(tile.treasureLevel<3){
+        const next=tile.treasureLevel+1,required=next===3?4:2;
         makeButton(menu,right,{
-          label:"Upgrade to Level 2",emoji:"🧰",color:"treasure",reopen:true,
-          requiredLevel:2,locked:()=>playerLevel<2,cost:()=>TREASURE_UPGRADE,
-          note:"Unlock planks, iron, iron tools and XP essence",
-          action(cost){
-            tile.treasureLevel=2;addCost(tile.buildingPaid,cost);
-            achievements.add("treasure2");
-          }
+          label:`Upgrade to Level ${next}`,emoji:"🧰",color:"treasure",reopen:true,
+          requiredLevel:required,locked:()=>playerLevel<required,cost:()=>next===3?TREASURE_UPGRADE_3:TREASURE_UPGRADE,
+          note:next===3?"50% fish · 35% iron · 5% improved pickaxe · 5% improved axe · 5% XP essence":"Unlock planks, iron, iron tools and XP essence",
+          action(cost){tile.treasureLevel=next;addCost(tile.buildingPaid,cost);achievements.add(`treasure${next}`)}
         });
       }
     }else if(["improvedSawmill","improvedMine"].includes(tile.building)){
@@ -1761,7 +1802,7 @@ function openMenu(tile){
       }
     }else if(!tile.building){
       const right=makePanel(menu,"right","Build","Choose a building");
-      for(const type of BIOMES[tile.biome].buildings)addBuildButton(menu,right,tile,type);
+      for(const type of [...BIOMES[tile.biome].buildings].sort((a,b)=>(BUILDINGS[a].requiredLevel||1)-(BUILDINGS[b].requiredLevel||1)))addBuildButton(menu,right,tile,type);
     }
   }
   menus.add(menu);activeMenu=menu;refreshMenus();positionMenu(menu);
@@ -1824,7 +1865,7 @@ canvas.addEventListener("pointerleave",()=>{pointer=null;canvas.style.cursor="de
 function resetInput(){keys.clear();camera.vx=0;camera.vy=0}
 window.addEventListener("blur",resetInput);
 window.addEventListener("keydown",e=>{
-  if($("resetDialog").open)return;
+  if(document.querySelector("dialog[open]"))return;
   if(e.target instanceof HTMLElement&&e.target.closest("input,textarea,select,[contenteditable]"))return;
   if(e.code==="Escape"){if(treeOpen)setTreeOpen(false);else closeMenu();return}
   if(isPaused||treeOpen||!movementCodes.has(e.code))return;
@@ -1893,14 +1934,14 @@ function drawBuildingBadge(t){
   ctx.fillStyle="#344b40";ctx.fillText(label,t.x,t.y-24.5);ctx.restore();
 }
 function draw(){
-  ctx.fillStyle="#fff";ctx.fillRect(0,0,width,height);
+  ctx.fillStyle=preferences.theme==="dark"?"#141d24":"#fff";ctx.fillRect(0,0,width,height);
   ctx.save();ctx.translate(width/2-camera.x,height/2-camera.y);
   const factor=supportEffects().timeFactor;
   for(const t of tiles){
-    ctx.fillStyle=`rgb(${t.color.join(",")})`;ctx.fill(t.path);
+    ctx.fillStyle=preferences.theme==="dark"?(t.biome?`rgb(${t.color.map(v=>Math.round(v*.55)).join(",")})`:"#24323b"):`rgb(${t.color.join(",")})`;ctx.fill(t.path);
     if(t.flash){ctx.fillStyle=`rgba(255,255,255,${t.flash*.25})`;ctx.fill(t.path)}
   }
-  ctx.strokeStyle="#b5b5b5";ctx.lineWidth=1;
+  ctx.strokeStyle=preferences.theme==="dark"?"#52616a":"#b5b5b5";ctx.lineWidth=1;
   ctx.lineJoin="round";ctx.lineCap="round";ctx.stroke(borders);
   if(multiplayer.started){
     for(const t of tiles){
@@ -1954,6 +1995,11 @@ const BRANCH_COLORS={
 // Curated, multi-branch layout. Coordinates are intentional: no automatic
 // topological row packing, which previously flattened the whole tree.
 const treeNodes=[
+  {id:"treasure2",kind:"treasureUpgrade",level:2,branch:"lake",x:510,y:1800},
+  {id:"treasure3",kind:"treasureUpgrade",level:3,branch:"lake",x:510,y:2090},
+  {id:"berryBush",kind:"building",branch:"meadow",x:2350,y:2650},
+  {id:"wildBerry",kind:"resource",branch:"meadow",x:2350,y:2930},
+  {id:"berryJuice",kind:"recipe",branch:"meadow",x:2350,y:3210},
   // Early resources and fishing
   {id:"lake",kind:"biome",branch:"lake",x:280,y:380},
   {id:"fish",kind:"resource",branch:"lake",x:280,y:640},
@@ -2029,6 +2075,8 @@ function addTreeEdge(from,to){
   if(!treeEdgeKeys.has(key)){treeEdgeKeys.add(key);treeEdges.push([from,to])}
 }
 const primaryChains=[
+  ["treasure","treasure2","treasure3"],
+  ["wheat","berryBush","wildBerry","berryJuice"],
   ["lake","fish","fishingRod","fishingHut"],
   ["lake","treasure","essence"],
   ["forest","wood","axe","sawmill"],
@@ -2067,7 +2115,7 @@ function treeDefinition(n){
     label:AUTOMATION[n.building].label,emoji:"⚙️",requiredLevel:3
   };
   if(n.kind==="houseMode")return HOUSE_MODES[n.id];
-  if(n.kind==="treasureUpgrade")return{label:"Treasures Level 2",emoji:"🧰",requiredLevel:2};
+  if(n.kind==="treasureUpgrade")return{label:`Treasures Level ${n.level||2}`,emoji:"🧰",requiredLevel:n.level===3?4:2};
   if(n.kind==="essence")return{label:"XP essence",emoji:"✨",requiredLevel:2};
   return{
     label:`${BUILDINGS[n.building].label} upgrades`,
@@ -2077,7 +2125,7 @@ function treeDefinition(n){
 function nodeLevel(n){
   if(["oak","coal","gold"].includes(n.id))return 4;
   if(n.id==="clay")return 2;
-  if(["wheat","carrot","fur"].includes(n.id))return 3;
+  if(["wheat","carrot","fur","wildBerry"].includes(n.id))return 3;
   return n.kind==="level"?n.level:treeDefinition(n).requiredLevel||1;
 }
 function treeUnlocked(n){return playerLevel>=nodeLevel(n)}
@@ -2086,7 +2134,7 @@ function treeCost(n){
   if(n.kind==="building")return constructionCost("building",n.id);
   if(n.kind==="recipe")return recipeCost(n.id);
   if(n.kind==="automation")return AUTOMATION[n.building].upgradeCost;
-  if(n.kind==="treasureUpgrade")return TREASURE_UPGRADE;
+  if(n.kind==="treasureUpgrade")return n.level===3?TREASURE_UPGRADE_3:TREASURE_UPGRADE;
   if(n.kind==="houseMode")return HOUSE_MODES[n.id].cost;
   return null;
 }
@@ -2238,6 +2286,9 @@ function lootDescription(level){
     ([k,chance])=>`${ITEMS[k].emoji} ${ITEMS[k].label}: ${chance}%`).join("\n");
 }
 function treeDescription(n){
+  if(n.id==="berryBush")return "Build on a Forest at Level 3 for 10 wheat and 50 wood (before construction scaling). Produces 1 wild berry every 25 base seconds. Craft berry juice here.";
+  if(n.id==="wildBerry")return "Berry bushes produce wild berries. Craft 10 berries into 1 berry juice.";
+  if(n.id==="berryJuice")return "Craft 10 wild berries into 1 berry juice. Use it in Food for −10% production cooldown for 60 seconds. Extra servings extend the duration. The effect is personal.";
   if(n.kind==="upgrade"&&n.building==="fishingHut")return "Three Fishing hut upgrades, available from Level 2. Each adds 1 fish per harvest and reduces the base interval by exactly 1⅓ seconds: 1 / 7.5s → 2 / 6⅙s → 3 / 4⅚s → 4 / 3.5s. Residential speed and Kitchen doubling apply. Costs are shown below.";
   if(n.kind==="biome")return{
     forest:"Produces 1 wood every 5 seconds. Supports a Sawmill or, at Level 4, an Improved Sawmill producing oak.",
@@ -2281,13 +2332,13 @@ function treeDescription(n){
     ironAxe:"Craft at the Forge. Used for Sawmill production upgrades and Carpenter automation.",
     ironPickaxe:"Craft at the Forge. Used for Mine production upgrades and Forge automation.",
     oakPlank:"Level 4. Craft at the Carpenter: 5 oak for 1 oak plank.",
-    jacket:"Level 4. Craft at a Tailor house: 20 leather + 5 fur. Sell 3 jackets for 5 gold bags at the Port.",
-    gloves:"Level 4. Craft at a Tailor house: 15 fur + 5 leather. Sell 3 gloves for 3 gold bags at the Port.",
+    jacket:"Level 4. Craft at a Tailor house: 10 leather + 5 fur. Sell 3 jackets for 5 gold bags at the Port.",
+    gloves:"Level 4. Craft at a Tailor house: 15 fur + 3 leather. Sell 3 gloves for 3 gold bags at the Port.",
     steel:"Level 4. Craft at the Advanced Forge: 10 coal + 5 iron for 1 steel.",
     brick:"Level 4. Craft at the Forge: 5 clay.",
-    bellows:"Level 4. Craft at the Forge: 15 leather, 50 planks and 10 iron. Required for the Advanced Forge.",
-    improvedPickaxe:"Level 4. Craft at the Advanced Forge: 5 leather, 1 iron pickaxe, 5 clay and 5 iron.",
-    improvedAxe:"Level 4. Craft at the Advanced Forge: 5 leather, 1 iron axe, 5 clay and 5 iron.",
+    bellows:"Level 4. Craft at the Forge: 8 leather, 50 planks and 10 iron. Required for the Advanced Forge.",
+    improvedPickaxe:"Level 4. Craft at the Advanced Forge: 3 leather, 1 iron pickaxe, 5 clay and 5 iron.",
+    improvedAxe:"Level 4. Craft at the Advanced Forge: 3 leather, 1 iron axe, 5 clay and 5 iron.",
     shovel:"Level 3. Craft at the Forge: 5 iron + 10 planks. Required for Farms.",
     bread:"Level 3. Craft at a Farm: 5 wheat. Used to assign a Kitchen.",
     animalFeed:"Level 3. Craft at a Farm: 3 carrots. Used to build Animal pens.",
@@ -2301,6 +2352,7 @@ function treeDescription(n){
       :"Consumes 3 fish every 5 seconds. Costs 5 bread to assign at Level 3. Each powered Kitchen reduces Farm base intervals by 0.5 seconds (up to 2.5s) and adds a 5% chance to double each individual production, treasure or automation payout. Maximum 25%, from 5 Kitchens. Upkeep itself cannot be doubled. No fish: bonus stops.";
   }
   if(n.kind==="treasureUpgrade"){
+    return `One reward every 15 base seconds.\n\nLevel ${n.level||2}:\n`+lootDescription(n.level||2);
     return"Unlocks an improved loot table. The interval remains 15 seconds before residential bonuses.\n\nLevel 2:\n"+lootDescription(2);
   }
   if(n.kind==="essence"){
@@ -2701,6 +2753,7 @@ function mpSetNickname(){
 }
 function mpStopSync(){if(multiplayer.syncTimer){clearInterval(multiplayer.syncTimer);multiplayer.syncTimer=null}}
 function mpCleanup(){
+  tradeReset();
   mpStopSync();if(multiplayer.joinTimeout){clearTimeout(multiplayer.joinTimeout);multiplayer.joinTimeout=null}
   if(multiplayer.joinRetryTimer){clearTimeout(multiplayer.joinRetryTimer);multiplayer.joinRetryTimer=null}
   // Reset state before closing connections to prevent their close callbacks from re-entering.
@@ -2759,9 +2812,9 @@ function mpRenderRoster(){
     if(multiplayer.selectedStatsId===id)b.classList.add("active");
     const dot=document.createElement("span");dot.className="mp-dot";
     const label=document.createElement("span");label.textContent=name+(id===multiplayer.playerId?" (You)":"");
-    const mini=document.createElement("span");mini.className="mp-mini";mini.textContent=id==="host"?"HOST":"";
+    const mini=document.createElement("span");mini.className="mp-mini";mini.textContent=tradeIncoming.has(id)?"❗":id==="host"?"HOST":"";
     b.append(dot,label,mini);b.addEventListener("click",()=>{
-      if(multiplayer.selectedStatsId===id)mpCloseStats();else mpOpenStats(id);
+      tradeSelect(id,b);
     });root.append(b);
   }
 }
@@ -2850,7 +2903,7 @@ function mpRecordsSignature(records){return JSON.stringify(records)}
 function mpApplySharedTile(t,s){
   if(!s||!has(BIOMES,s.biome))return;
   const oldBuilding=t.building,oldBiome=t.biome;
-  t.biome=s.biome;
+  t.biome=s.building==="berryBush"&&s.biome==="meadow"?"forest":s.biome;
   t.building=BIOMES[t.biome].buildings.includes(s.building)?s.building:null;
   t.owner=typeof s.owner==="string"?s.owner:null;
   t.color=[...BIOMES[t.biome].color];t.targetColor=[...t.color];
@@ -2858,7 +2911,7 @@ function mpApplySharedTile(t,s){
   t.biomePaid=cleanCost(s.biomePaid,BIOMES[t.biome].baseCost);
   t.buildingPaid=t.building?cleanCost(s.buildingPaid,BUILDINGS[t.building].baseCost):{};
   t.automated=s.automated===true&&!!AUTOMATION[t.building];
-  t.treasureLevel=Math.max(1,Math.min(2,validCount(s.treasureLevel,1)));
+  t.treasureLevel=Math.max(1,Math.min(3,validCount(s.treasureLevel,1)));
   t.houseMode=t.building==="house"&&has(HOUSE_MODES,s.houseMode)?s.houseMode:null;
   t.housePowered=!!t.houseMode&&s.housePowered===true;
   if(t.building){t.buildingEmoji=t.houseMode?HOUSE_MODES[t.houseMode].emoji:BUILDINGS[t.building].emoji;t.iconOpacity=1;t.iconProgress=1}
@@ -2961,6 +3014,7 @@ function mpStartSync(){
   },600);
 }
 function mpHandleHostData(conn,msg){
+  if(msg?.type==="TRADE"&&multiplayer.connections.has(conn)){tradeHost(conn.mpPlayerId,msg);return;}
   if(msg?.type==="LEAVE"){
     try{conn.close()}catch(e){}
   }else if(msg?.type==="TILES"&&multiplayer.started)mpAcceptPlayerTiles(conn,msg.tiles);
@@ -2992,6 +3046,7 @@ function mpHostConnection(conn){
   conn.on("data",msg=>mpHandleHostData(conn,msg));
   conn.on("close",()=>{
     if(!multiplayer.connections.delete(conn))return;
+    tradeDepart(conn.mpPlayerId);
     multiplayer.remotePlayers.delete(conn.mpPlayerId);multiplayer.stats.delete(conn.mpPlayerId);
     // Leave remaining players' constructions visible until the session ends.
     mpBroadcastRoster();
@@ -3114,6 +3169,7 @@ function mpJoinLobby(){
     });
     conn.on('data',msg=>{
       if(multiplayer.peer!==peer||multiplayer.hostConnection!==conn)return;
+      if(msg?.type==='TRADE_EVENT'){tradeEvent(msg);return;}
       if(msg?.type==='FULL'){
         fail('This lobby is full or the match has already started.');return;
       }
@@ -3239,7 +3295,7 @@ function saveGame(){
   if(!multiplayer.started||multiplayer.host)synchronize(false);collectAchievements();
   const data={
     version:1,producerUpgradeVersion:2,savedAt:Date.now(),resources,inventory,constructionCounts,craftCounts,
-    playerLevel,levelProgress,resourcesExpanded,craftMultiplier,isPaused,
+    playerLevel,levelProgress,resourcesExpanded,craftMultiplier,isPaused:$("settingsDialog").open?settingsPreviousPause:isPaused,juiceSeconds,
     achievements:[...achievements],camera:{x:camera.x,y:camera.y},
     tiles:tiles.filter(t=>t.biome&&(!multiplayer.started||t.owner===multiplayer.playerId)).map(t=>({
       q:t.q,r:t.r,biome:t.biome,building:t.building,owner:t.owner||null,
@@ -3265,6 +3321,7 @@ function loadGame(skipOffline=false){
     if(data?.version!==1||!Array.isArray(data.tiles)||!data.resources||!data.inventory){
       throw new Error("Invalid save");
     }
+    juiceSeconds=Number.isFinite(data.juiceSeconds)?Math.max(0,data.juiceSeconds):0;
     for(const k of Object.keys(resources))resources[k]=validCount(data.resources[k],resources[k]);
     for(const k of Object.keys(inventory))inventory[k]=validCount(data.inventory[k]);
     for(const k of Object.keys(craftCounts))craftCounts[k]=validCount(data.craftCounts?.[k]);
@@ -3286,7 +3343,7 @@ function loadGame(skipOffline=false){
     for(const s of data.tiles){
       if(!s||!has(BIOMES,s.biome))continue;
       const t=tileMap.get(tileKey(s.q,s.r));if(!t)continue;
-      t.biome=s.biome;t.owner=typeof s.owner==="string"?s.owner:null;
+      t.biome=s.building==="berryBush"&&s.biome==="meadow"?"forest":s.biome;t.owner=typeof s.owner==="string"?s.owner:null;
       t.building=BIOMES[t.biome].buildings.includes(s.building)?s.building:null;
       t.color=[...BIOMES[t.biome].color];t.targetColor=[...t.color];
       const up=["mine","sawmill","fishingHut"].includes(t.building);
@@ -3296,7 +3353,7 @@ function loadGame(skipOffline=false){
       t.buildingPaid=t.building?cleanCost(s.buildingPaid,BUILDINGS[t.building].baseCost):{};
       t.automated=s.automated===true&&!!AUTOMATION[t.building];
       t.autoRemaining=validTimer(s.autoRemaining,AUTOMATION[t.building]?.interval||5);
-      t.treasureLevel=Math.max(1,Math.min(2,validCount(s.treasureLevel,1)));
+      t.treasureLevel=Math.max(1,Math.min(3,validCount(s.treasureLevel,1)));
       t.treasureRemaining=validTimer(s.treasureRemaining,15);
       t.houseMode=t.building==="house"&&has(HOUSE_MODES,s.houseMode)?s.houseMode:null;
       t.houseRemaining=validTimer(s.houseRemaining,5);
@@ -3340,6 +3397,7 @@ function loadGame(skipOffline=false){
   }
 }
 function clearWorldState(deleteSave=false,notify=false){
+  juiceSeconds=0;
   if(deleteSave&&worldMode==="singleplayer")try{localStorage.removeItem(SAVE_KEY)}catch(e){console.warn(e)}
   for(const m of menus){
     if(m.revealFrame!==null)cancelAnimationFrame(m.revealFrame);
@@ -3381,10 +3439,254 @@ function animate(time){
   const dt=Math.min(.05,Math.max(0,(time-lastFrame)/1000));lastFrame=time;
   synchronize();updateCamera(dt);updateTiles(dt);draw();positionMenus();
   if(activeMenu)updateAutomationStatus(activeMenu);
-  updateFishRate();
+  updateFishRate();foodUI();
   if(pointer)canvas.style.cursor=tileAt(pointer.x,pointer.y)?"pointer":"default";
   requestAnimationFrame(animate);
 }
+/* Food uses simulation time: pause freezes it; offline simulation consumes it exactly. */
+function foodUI(){
+  const unlocked=achievements.has('berryBush')||inventory.berryJuice>0||juiceSeconds>EPS;
+  $('foodButton').hidden=!unlocked;$('foodBuff').hidden=juiceSeconds<=EPS;
+  const secs=Math.ceil(juiceSeconds),time=`${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}`;
+  $('foodBuff').textContent=`🧃 −10% · ${time}${isPaused?' · Paused':''}`;
+  $('juiceCount').textContent=`Owned: ${inventory.berryJuice}`;$('useJuice').disabled=inventory.berryJuice<1;
+  $('foodDuration').textContent=juiceSeconds>EPS?`Active: ${time} remaining. Each juice adds 60 seconds.`:'No active food boost.';
+}
+function fxOpen(id){const d=$(id);clearTimeout(d.fxTimer);d.classList.remove('closing');resetInput();if(!d.open)d.showModal()}
+function fxClose(id){const d=$(id);if(!d.open)return;d.classList.add('closing');clearTimeout(d.fxTimer);d.fxTimer=setTimeout(()=>{d.close();d.classList.remove('closing')},160)}
+$('foodButton').onclick=()=>{foodUI();fxOpen('foodDialog')};
+$('useJuice').onclick=()=>{synchronize();if(inventory.berryJuice<1)return;inventory.berryJuice--;juiceSeconds+=60;updateResources();saveGame();showToast('Berry juice: +60s of −10% production cooldown.')};
+for(const b of document.querySelectorAll('[data-close]'))b.onclick=()=>fxClose(b.dataset.close);
+for(const id of ['foodDialog','tradeAddDialog'])$(id).addEventListener('cancel',e=>{e.preventDefault();fxClose(id)});
+function tradeSelect(id,button){
+  if(tradeSelected===id&&!$('tradeActions').hidden){$('tradeActions').hidden=true;tradeSelected=null;return;}
+  tradeSelected=id;const r=button.getBoundingClientRect(),panel=$('tradeActions');
+  panel.hidden=false;panel.style.left=Math.max(8,r.left-148)+'px';panel.style.top=Math.min(innerHeight-115,r.top)+'px';
+  $('playerTrade').hidden=id===multiplayer.playerId;
+  $('playerTrade').textContent=tradeIncoming.has(id)?'Accept trade':'Trade';
+}
+$('playerStatistics').onclick=()=>{const id=tradeSelected;$('tradeActions').hidden=true;if(multiplayer.selectedStatsId===id)mpCloseStats();else mpOpenStats(id)};
+$('playerTrade').onclick=()=>{const target=tradeSelected;$('tradeActions').hidden=true;if(!target||target===multiplayer.playerId)return;tradeSend({action:tradeIncoming.has(target)?'inviteAccept':'request',target})};
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('#tradeActions,#mpRoster'))$('tradeActions').hidden=true});
+function tradeSend(msg){
+  if(!multiplayer.started)return;
+  const packet={type:'TRADE',...msg};
+  if(multiplayer.host)tradeHost(multiplayer.playerId,packet);
+  else if(multiplayer.hostConnection?.open)multiplayer.hostConnection.send(packet);
+  else showToast('Connection lost. Trade cannot continue.');
+}
+function tradeDeliver(id,event){
+  const packet={type:'TRADE_EVENT',...event};
+  if(id===multiplayer.playerId)tradeEvent(packet);
+  else{const c=[...multiplayer.connections].find(c=>c.mpPlayerId===id);if(c?.open)c.send(packet)}
+}
+function tradeBusy(id){return [...tradeSessions.values()].some(s=>s.ids.includes(id))}
+function tradeState(s){return{id:s.id,ids:[...s.ids],offers:structuredClone(s.offers),ready:{...s.ready},revision:s.revision}}
+function tradePublish(s){const state=tradeState(s);for(const id of s.ids)tradeDeliver(id,{event:'state',state})}
+function tradeCancel(s,reason){tradeSessions.delete(s.id);for(const id of s.ids)tradeDeliver(id,{event:'cancel',id:s.id,reason})}
+function tradeHost(actor,m){
+  if(!multiplayer.host||!multiplayer.started||!multiplayer.roster.has(actor))return;
+  const target=m.target;
+  const notice=text=>tradeDeliver(actor,{event:'notice',text});
+  if(m.action==='request'){
+    if(!multiplayer.roster.has(target)||target===actor)return;
+    if(tradeBusy(actor)||tradeBusy(target)){notice('One of you is already trading.');return;}
+    const key=actor+'|'+target;if(tradeRequests.has(key)){notice('Invitation already sent.');return;}
+    tradeRequests.set(key,{from:actor,to:target,at:Date.now()});
+    tradeDeliver(target,{event:'invite',from:actor});notice('Trade invitation sent.');return;
+  }
+  if(m.action==='inviteAccept'){
+    const key=target+'|'+actor,invite=tradeRequests.get(key);
+    if(!invite||Date.now()-invite.at>60000){notice('This invitation has expired.');return;}
+    if(tradeBusy(actor)||tradeBusy(target)){notice('One of you is already trading.');return;}
+    const ids=[target,actor],s={id:crypto.randomUUID(),ids,offers:{[actor]:{},[target]:{}},ready:{},revision:0};
+    tradeSessions.set(s.id,s);
+    for(const[k,r]of tradeRequests)if(ids.includes(r.from)||ids.includes(r.to)){tradeRequests.delete(k);tradeDeliver(r.to,{event:'uninvite',from:r.from})}
+    tradePublish(s);return;
+  }
+  const s=tradeSessions.get(m.id);if(!s||!s.ids.includes(actor))return;
+  if(m.action==='cancel'){tradeCancel(s,'Trade declined. Reserved items returned.');return;}
+  if(m.action==='offer'){
+    const offer=m.offer;
+    if(!offer||typeof offer!=='object'||Array.isArray(offer)||Object.entries(offer).some(([k,n])=>!has(ITEMS,k)||!Number.isSafeInteger(n)||n<1||n>1e12)){tradeCancel(s,'Invalid offer. Trade cancelled.');return;}
+    s.offers[actor]={...offer};s.ready={};s.revision++;tradePublish(s);return;
+  }
+  if(m.action==='confirm'){
+    if(m.revision!==s.revision){tradePublish(s);return;}
+    s.ready[actor]=true;
+    if(s.ids.every(id=>s.ready[id])){
+      tradeSessions.delete(s.id);
+      // Escrow was deducted on each owner before its offer was published.
+      // A unique terminal ID makes duplicate commit packets harmless.
+      for(const id of s.ids){const other=s.ids.find(x=>x!==id);tradeDeliver(id,{event:'commit',id:s.id,receive:s.offers[other]})}
+    }else tradePublish(s);
+  }
+}
+function tradeEvent(m){
+  if(!multiplayer.started)return;
+  if(m.event==='notice'){showToast(m.text);return;}
+  if(m.event==='invite'){tradeIncoming.set(m.from,true);mpRenderRoster();showToast(`${multiplayer.roster.get(m.from)||'Player'} invited you to trade.`);return;}
+  if(m.event==='uninvite'){tradeIncoming.delete(m.from);mpRenderRoster();return;}
+  if(m.event==='state'){
+    const s=m.state;if(!s?.ids?.includes(multiplayer.playerId)||tradeFinished.has(s.id))return;
+    if(tradeCurrent&&tradeCurrent.id!==s.id)return;
+    tradeCurrent=s;tradePending=false;tradeRender();fxOpen('tradeDialog');return;
+  }
+  if(!tradeCurrent||m.id!==tradeCurrent.id||tradeFinished.has(m.id))return;
+  if(m.event==='cancel'||m.event==='commit'){
+    tradeFinished.add(m.id);
+    if(m.event==='cancel')refund(tradeEscrow);
+    else for(const[k,n]of Object.entries(m.receive||{}))if(has(ITEMS,k)&&Number.isSafeInteger(n)&&n>0)(has(resources,k)?resources:inventory)[k]+=n;
+    tradeEscrow={};tradeCurrent=null;tradePending=false;fxClose('tradeAddDialog');fxClose('tradeDialog');updateResources();
+    showToast(m.event==='commit'?'Trade completed! Items received.':m.reason||'Trade cancelled.');
+  }
+}
+function tradeRender(){
+  if(!tradeCurrent)return;
+  const me=multiplayer.playerId,other=tradeCurrent.ids.find(id=>id!==me);
+  $('tradeOtherName').textContent=`${multiplayer.roster.get(other)||'Player'}’s offer`;
+  for(const[id,rootId,side]of [[me,'tradeMyItems','tradeMine'],[other,'tradeOtherItems','tradeTheirs']]){
+    const root=$(rootId);root.replaceChildren();$(side).classList.toggle('ready',!!tradeCurrent.ready[id]);
+    const offer=tradeCurrent.offers[id]||{};
+    for(const[k,n]of Object.entries(offer)){
+      const row=document.createElement('div');row.className='offer-row';
+      const label=document.createElement('span');label.textContent=`${ITEMS[k].emoji} ${ITEMS[k].label}`;
+      const count=document.createElement('b');count.textContent=n;row.append(label,count);
+      if(id===me){const remove=document.createElement('button');remove.textContent='×';remove.title='Remove from offer';remove.disabled=tradePending||!!tradeCurrent.ready[me];remove.onclick=()=>tradeRemove(k);row.append(remove)}root.append(row);
+    }
+    if(!root.children.length){const empty=document.createElement('div');empty.className='offer-empty';empty.textContent='No items offered';root.append(empty)}
+  }
+  $('tradeConfirm').disabled=tradePending||!!tradeCurrent.ready[me];$('tradeAdd').disabled=tradePending||!!tradeCurrent.ready[me];
+  $('tradeConfirm').textContent=tradeCurrent.ready[me]?'Accepted ✓':'Accept';
+  $('tradeMessage').textContent=tradePending?'Synchronizing offer…':tradeCurrent.ready[me]?'Accepted. Your offer is locked until the other player changes their offer or the trade ends.':'Review both offers before accepting.';
+}
+function tradeOffer(){tradePending=true;tradeRender();tradeSend({action:'offer',id:tradeCurrent.id,offer:{...tradeEscrow}})}
+function tradeRemove(k){if(!tradeCurrent||tradePending||tradeCurrent.ready[multiplayer.playerId])return;refund({[k]:tradeEscrow[k]||0});delete tradeEscrow[k];updateResources();tradeOffer()}
+let tradeItem=null;
+$('tradeAdd').onclick=()=>{
+  if(!tradeCurrent||tradePending||tradeCurrent.ready[multiplayer.playerId])return;
+  tradeItem=null;$('tradeQuantityRow').hidden=true;$('tradeAddInfo').textContent='Choose an item, then enter a whole-number quantity.';
+  const root=$('tradeItems');root.replaceChildren();
+  for(const[k,item]of Object.entries(ITEMS))if(balance(k)>0){const b=document.createElement('button');b.textContent=`${item.emoji} ${item.label} · ${balance(k)}`;b.onclick=()=>{tradeItem=k;$('tradeQuantityRow').hidden=false;$('tradeQuantity').value=1;$('tradeQuantity').max=balance(k);$('tradeAddInfo').textContent=`${item.label} · Available: ${balance(k)}`;$('tradeQuantity').focus()};root.append(b)}
+  if(!root.children.length)$('tradeAddInfo').textContent='No unreserved items available.';fxOpen('tradeAddDialog');
+};
+$('tradeQuantityOK').onclick=()=>{
+  if(!tradeCurrent||tradePending||tradeCurrent.ready[multiplayer.playerId]||!tradeItem)return;
+  synchronize();const n=Number($('tradeQuantity').value),k=tradeItem;
+  if(!Number.isSafeInteger(n)||n<1||n>balance(k)||n+(tradeEscrow[k]||0)>1e12){$('tradeAddInfo').textContent='Enter a positive whole number no greater than your available stock.';return;}
+  spend({[k]:n});tradeEscrow[k]=(tradeEscrow[k]||0)+n;updateResources();fxClose('tradeAddDialog');tradeOffer();
+};
+$('tradeConfirm').onclick=()=>{if(!tradeCurrent||tradePending)return;tradePending=true;tradeRender();tradeSend({action:'confirm',id:tradeCurrent.id,revision:tradeCurrent.revision})};
+function tradeDecline(){if(tradeCurrent)tradeSend({action:'cancel',id:tradeCurrent.id})}
+$('tradeDecline').onclick=tradeDecline;$('tradeDialog').addEventListener('cancel',e=>{e.preventDefault();tradeDecline()});
+function tradeDepart(id){
+  for(const s of [...tradeSessions.values()])if(s.ids.includes(id))tradeCancel(s,'Player disconnected. Reserved items returned.');
+  for(const[k,r]of tradeRequests)if(r.from===id||r.to===id){tradeRequests.delete(k);tradeDeliver(r.to,{event:'uninvite',from:r.from})}
+}
+function tradeReset(){
+  // Multiplayer state is discarded on disconnect; singleplayer is restored separately.
+  if(tradeCurrent)refund(tradeEscrow);
+  tradeCurrent=null;tradeEscrow={};tradePending=false;tradeSelected=null;tradeIncoming.clear();tradeRequests.clear();tradeSessions.clear();tradeFinished.clear();
+  $('tradeActions').hidden=true;for(const id of ['tradeDialog','tradeAddDialog','foodDialog','settingsDialog']){clearTimeout($(id).fxTimer);$(id).close()}
+}
+setInterval(()=>{
+  if(!multiplayer.host)return;
+  for(const[k,r]of tradeRequests)if(Date.now()-r.at>60000){tradeRequests.delete(k);tradeDeliver(r.to,{event:'uninvite',from:r.from})}
+},1000);
+
+/* Original scored ambient music: warm additive piano, nylon plucks, soft pads and bass.
+   No samples or external downloads. Audio is scheduled against the audio clock. */
+const MUSIC_SCORES=[
+ {name:'Morning Orchard',description:'Warm piano · airy strings · gentle nylon arpeggios',bpm:68,root:48,mode:[0,2,4,5,7,9,11],chords:[0,5,3,4,0,2,3,4,5,3,0,4,1,3,4,0],melody:[[4,6,8,6],[5,4,2,-1],[3,5,7,5],[4,3,1,-1],[2,4,6,8],[6,5,4,-1],[3,2,1,3],[4,2,1,-1]],tone:0},
+ {name:'Rain on the Lake',description:'Felt piano · floating minor chords · spacious echoes',bpm:58,root:50,mode:[0,2,3,5,7,8,10],chords:[0,5,2,6,0,3,5,4,2,6,3,0,5,3,4,0],melody:[[6,-1,4,2],[3,5,4,-1],[2,-1,1,0],[1,3,2,-1],[4,6,5,4],[2,1,-1,3],[5,4,2,1],[0,-1,2,-1]],tone:1},
+ {name:'Amber Fields',description:'Nylon guitar · mellow piano · unhurried pastoral harmonies',bpm:76,root:43,mode:[0,2,4,5,7,9,11],chords:[0,3,0,4,5,3,1,4,0,2,5,3,1,4,3,0],melody:[[2,4,6,4],[3,2,0,-1],[4,6,9,8],[6,4,3,-1],[5,7,6,4],[3,5,4,2],[1,3,4,6],[4,2,0,-1]],tone:2},
+ {name:'Moonlit Forest',description:'Velvet strings · delicate piano · a quiet nocturnal melody',bpm:60,root:45,mode:[0,2,3,5,7,8,10],chords:[0,3,5,6,0,2,3,4,5,6,2,0,3,5,4,0],melody:[[0,2,4,-1],[3,-1,5,4],[5,7,6,-1],[6,4,2,1],[0,4,6,8],[7,6,4,-1],[3,2,1,2],[0,-1,-1,-1]],tone:3},
+ {name:'Quiet Horizon',description:'Slow piano · soft sustained chords · a spacious closing theme',bpm:54,root:46,mode:[0,2,4,5,7,9,11],chords:[0,4,5,3,0,2,1,4,5,4,3,0,1,3,4,0],melody:[[4,-1,2,0],[1,2,4,-1],[5,-1,4,2],[3,5,4,-1],[6,4,2,-1],[2,4,6,8],[7,5,3,1],[2,-1,0,-1]],tone:4}
+];
+const soundtrack={context:null,bus:null,master:null,timer:null,beat:0,next:0,track:-1};
+function scoreNote(score,degree,octave=0){return score.root+score.mode[((degree%7)+7)%7]+12*Math.floor(degree/7)+octave*12}
+function musicVoice(midi,time,length,kind,velocity=.1,pan=0){
+ const a=soundtrack.context,bus=soundtrack.bus;if(!a||!bus)return;
+ const gain=a.createGain(),filter=a.createBiquadFilter(),stereo=a.createStereoPanner();
+ const hz=440*2**((midi-69)/12),pad=kind==='pad',bass=kind==='bass';
+ filter.type='lowpass';filter.frequency.value=pad?1500:bass?650:kind==='pluck'?2400:3400;filter.Q.value=.35;
+ gain.gain.setValueAtTime(0,time);gain.gain.linearRampToValueAtTime(velocity,time+(pad?.85:.018));
+ gain.gain.exponentialRampToValueAtTime(Math.max(.0001,velocity*(pad?.6:.12)),time+Math.max(1,length*.7));
+ gain.gain.exponentialRampToValueAtTime(.0001,time+length+1.3);
+ stereo.pan.value=pan;gain.connect(filter);filter.connect(stereo);stereo.connect(bus);
+ const harmonics=pad?[1,2,3]:bass?[1,2]:[1,2,3,4,6];
+ for(let i=0;i<harmonics.length;i++){
+  const osc=a.createOscillator(),level=a.createGain();osc.type='sine';osc.frequency.value=hz*harmonics[i];
+  osc.detune.value=pad?(i-1)*4:0;level.gain.value=(pad?[.62,.2,.08]:bass?[.8,.15]:[.62,.24,.1,.035,.015])[i];
+  osc.connect(level);level.connect(gain);osc.start(time);osc.stop(time+length+1.4);
+  osc.onended=()=>{osc.disconnect();level.disconnect()};
+ }
+ setTimeout(()=>{gain.disconnect();filter.disconnect();stereo.disconnect()},Math.max(0,(time-a.currentTime+length+1.6)*1000));
+}
+function musicSchedule(){
+ const a=soundtrack.context;if(!a||a.state!=='running'||!soundtrack.bus)return;
+ const score=MUSIC_SCORES[soundtrack.track],beatTime=60/score.bpm;
+ if(soundtrack.next<a.currentTime-.3)soundtrack.next=a.currentTime+.08;
+ while(soundtrack.next<a.currentTime+1.2){
+  const b=soundtrack.beat,bar=Math.floor(b/4)%16,beat=b%4,chord=score.chords[bar],t=soundtrack.next;
+  const section=Math.floor(b/64)%3,soft=section===1?.82:1;
+  if(beat===0){
+   for(const[d,i]of [chord,chord+2,chord+4,chord+6].map((d,i)=>[d,i]))musicVoice(scoreNote(score,d),t,beatTime*4.2,'pad',.035*soft,(i-1.5)*.27);
+   musicVoice(scoreNote(score,chord,-1),t,beatTime*3.6,'bass',.12*soft,0);
+  }
+  const arp=[0,4,2,6][beat]+chord;
+  musicVoice(scoreNote(score,arp,1),t+.025,beatTime*1.3,score.tone===2?'pluck':'piano',.07*soft,beat%2?.3:-.3);
+  const degree=score.melody[bar%8][beat];
+  if(degree>=0&&(section!==1||beat%2===0))musicVoice(scoreNote(score,degree,1),t+.05,beatTime*1.8,'piano',.13*soft,-.08);
+  if(score.tone===2&&beat===2)musicVoice(scoreNote(score,chord+4,1),t+beatTime*.5,beatTime,'pluck',.04,.4);
+  soundtrack.beat++;soundtrack.next+=beatTime;
+ }
+}
+function musicChange(){
+ const a=soundtrack.context;if(!a)return;
+ const old=soundtrack.bus;
+ if(old){old.gain.cancelScheduledValues(a.currentTime);old.gain.setValueAtTime(old.gain.value,a.currentTime);old.gain.linearRampToValueAtTime(0,a.currentTime+1.2);setTimeout(()=>old.disconnect(),1600)}
+ soundtrack.bus=a.createGain();soundtrack.bus.gain.setValueAtTime(0,a.currentTime);soundtrack.bus.gain.linearRampToValueAtTime(.72,a.currentTime+1.6);soundtrack.bus.connect(soundtrack.master);
+ soundtrack.bus.connect(soundtrack.reverbSend);
+ soundtrack.track=preferences.track;soundtrack.beat=0;soundtrack.next=a.currentTime+.08;musicSchedule();
+}
+async function musicStart(){
+ try{
+  if(!soundtrack.context){
+   const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio){$('musicState').textContent='Audio is not supported in this browser.';return}
+   const a=soundtrack.context=new Audio(),master=soundtrack.master=a.createGain(),limiter=a.createDynamicsCompressor();
+   limiter.threshold.value=-18;limiter.ratio.value=4;limiter.attack.value=.02;limiter.release.value=.3;
+   master.gain.value=(preferences.volume/100)**1.6*.65;master.connect(limiter);limiter.connect(a.destination);
+   const convolver=a.createConvolver(),send=soundtrack.reverbSend=a.createGain(),wet=a.createGain();
+   const size=Math.floor(a.sampleRate*3.4),impulse=a.createBuffer(2,size,a.sampleRate);
+   for(let ch=0;ch<2;ch++){const data=impulse.getChannelData(ch);let smooth=0;for(let i=0;i<size;i++){smooth=.65*smooth+.35*(Math.random()*2-1);data[i]=smooth*(1-i/size)**3*.65}}
+   convolver.buffer=impulse;send.gain.value=.3;wet.gain.value=.45;send.connect(convolver);convolver.connect(wet);wet.connect(master);
+   soundtrack.timer=setInterval(musicSchedule,180);musicChange();
+  }
+  await soundtrack.context.resume();musicSchedule();$('musicState').textContent=preferences.volume?'Now playing · seamless ambient score':'Muted';
+ }catch(e){$('musicState').textContent='Click Settings again to enable audio.';console.warn('Audio unavailable',e)}
+}
+function preferencesSave(){try{localStorage.setItem('wildlife-settings-v1',JSON.stringify(preferences))}catch(e){}}
+function settingsUI(){
+ document.documentElement.dataset.theme=preferences.theme;
+ $('themeChoice').value=preferences.theme;$('musicVolume').value=preferences.volume;$('musicVolumeLabel').textContent=preferences.volume+'%';$('musicChoice').value=preferences.track;
+ const score=MUSIC_SCORES[preferences.track];$('musicTitle').textContent=score.name;$('musicDescription').textContent=score.description;
+}
+function openSettings(){
+ if($('settingsDialog').open)return;
+ synchronize();settingsPreviousPause=isPaused;isPaused=true;resetInput();closeMenu();updatePauseUI();settingsUI();fxOpen('settingsDialog');musicStart();
+}
+function closeSettings(){fxClose('settingsDialog')}
+$('settingsClose').onclick=closeSettings;$('settingsResume').onclick=closeSettings;
+$('settingsDialog').addEventListener('cancel',e=>{e.preventDefault();closeSettings()});
+$('settingsDialog').addEventListener('close',()=>{isPaused=settingsPreviousPause;lastSimulation=performance.now();lastFrame=null;updatePauseUI();refreshMenus();saveGame()});
+$('themeChoice').onchange=e=>{preferences.theme=e.target.value;settingsUI();preferencesSave()};
+$('musicVolume').oninput=e=>{preferences.volume=Number(e.target.value);settingsUI();preferencesSave();if(soundtrack.master)soundtrack.master.gain.setTargetAtTime((preferences.volume/100)**1.6*.65,soundtrack.context.currentTime,.08);$('musicState').textContent=preferences.volume?'Now playing · seamless ambient score':'Muted'};
+$('musicChoice').onchange=e=>{preferences.track=Number(e.target.value);settingsUI();preferencesSave();if(soundtrack.context)musicChange();else musicStart()};
+document.addEventListener('pointerdown',()=>{if(!soundtrack.context||soundtrack.context.state==='suspended')musicStart()});
+document.addEventListener('keydown',()=>{if(!soundtrack.context||soundtrack.context.state==='suspended')musicStart()},{once:true});
+settingsUI();
+
 loadGame();
 lastSimulation=performance.now();
 updatePauseUI();updateResources();resize();saveGame();
