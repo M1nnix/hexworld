@@ -1,0 +1,3395 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hex World — Global Multiplayer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#fff}
+body,button{font-family:system-ui,sans-serif}
+canvas{display:block;width:100%;height:100%}
+[hidden]{display:none!important}
+button{-webkit-tap-highlight-color:transparent}
+
+.top-controls{
+  position:fixed;left:20px;top:20px;z-index:35;
+  display:flex;gap:8px;align-items:center
+}
+.tree-button,.pause-button{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 15px;border:1px solid #dce7df;border-radius:13px;
+  background:#f6fff8f5;color:#477155;font-size:12px;font-weight:750;
+  box-shadow:0 4px 18px #2f654615;cursor:pointer;
+  transition:transform .2s ease,background .2s ease
+}
+.tree-button:hover,.pause-button:hover{transform:translateY(-2px)}
+.tree-button.open{visibility:hidden}
+.pause-button{background:#f3f8fff5;border-color:#dbe6f3;color:#527797}
+.pause-button.active{background:#fff3db;border-color:#ead9b5;color:#96713a}
+.pause-badge{
+  position:fixed;top:85px;left:50%;z-index:32;
+  transform:translateX(-50%);pointer-events:none;
+  padding:10px 20px;border:1px solid #e9dabb;border-radius:13px;
+  background:#fffaedf2;color:#9b7943;font-size:13px;font-weight:750
+}
+
+.resources-wrap{
+  position:fixed;top:20px;right:20px;z-index:30;
+  display:flex;flex-direction:column;align-items:flex-end;
+  max-width:calc(100vw - 40px);user-select:none
+}
+.resources{
+  display:flex;align-items:center;justify-content:flex-end;gap:8px;
+  max-width:100%;flex-wrap:wrap;pointer-events:none
+}
+.resource{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  min-width:78px;height:46px;padding:0 13px;
+  border:1px solid #00000012;border-radius:14px;background:#fffffff2;
+  box-shadow:inset 0 1px 0 #fff,0 4px 16px #0000000f;
+  backdrop-filter:blur(12px)
+}
+.resource.fish-stat{position:relative;margin-bottom:19px}
+.fish-rate{position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  margin-top:3px;white-space:nowrap;font-size:11px;font-weight:800;
+  padding:2px 6px;border-radius:6px;background:#fffffff2;color:#348658}
+.fish-rate.negative{color:#c34452}
+.action-card{display:flex;flex-wrap:wrap;align-items:stretch;gap:5px}
+.action-card>.action{flex:1;min-width:0;width:auto}
+.craft-rest-button{flex:0 0 76px;border:1px solid #b7d7c3;border-radius:12px;
+  padding:8px 5px;background:#e7f6ec;color:#36734c;font-size:10px;
+  font-weight:800;cursor:pointer}
+.craft-rest-button:hover{background:#d4efdf}
+.action-card>.essence-button{flex-basis:calc(100% - 12px)}
+.resource.essence{background:#f7effff5;border-color:#e6d7f6}
+.resource-emoji{font-size:23px;line-height:1}
+.resource-value{
+  color:#39423c;font-size:16px;font-weight:750;
+  font-variant-numeric:tabular-nums
+}
+.resource.gain{animation:gain .42s ease}
+@keyframes gain{
+  0%,100%{transform:scale(1)}
+  40%{transform:scale(1.08);background:#eef8eb}
+}
+.inventory-drawer{
+  width:min(500px,100%);max-height:0;overflow:hidden;
+  opacity:0;transform:translateY(-9px);
+  transition:max-height .32s ease,opacity .24s ease,transform .32s ease
+}
+.resources-wrap.expanded .inventory-drawer{
+  max-height:300px;opacity:1;transform:translateY(0)
+}
+.inventory-drawer-inner{
+  display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px;
+  padding:2px 2px 12px
+}
+.tool-resource{
+  display:flex;align-items:center;gap:8px;padding:9px 11px;
+  border:1px solid #e4e9ef;border-radius:12px;background:#fffffff5;
+  box-shadow:0 3px 12px #1b35480c;color:#455466;
+  font-size:13px;font-weight:750
+}
+.tool-emoji{font-size:21px}
+.tool-label{font-size:10px;font-weight:650;color:#82909c}
+.empty-inventory{
+  padding:10px 13px;border:1px solid #e7ebef;border-radius:11px;
+  background:#fffffff2;color:#85939f;font-size:11px
+}
+.inventory-toggle{
+  align-self:center;display:grid;place-items:center;
+  width:42px;height:24px;margin-top:6px;
+  border:1px solid #e3e9ef;border-radius:8px;
+  background:#fffffff0;color:#6d8499;cursor:pointer
+}
+.inventory-toggle svg{
+  width:17px;height:17px;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  transition:transform .28s ease
+}
+.resources-wrap.expanded .inventory-toggle svg{transform:rotate(180deg)}
+
+.panel-anchor{position:fixed;top:0;left:0;z-index:10;pointer-events:none}
+.panel{
+  width:284px;display:flex;flex-direction:column;gap:9px;
+  opacity:0;filter:blur(3px);transform:translateX(-14px) scale(.92);
+  transform-origin:left center;
+  transition:opacity .18s ease,transform .22s ease,filter .18s ease
+}
+.left .panel{transform:translateX(14px) scale(.92);transform-origin:right center}
+.panel-anchor.open{pointer-events:auto}
+.panel-anchor.open .panel{
+  opacity:1;filter:blur(0);transform:translateX(0) scale(1);
+  transition:opacity .23s ease,
+    transform .34s cubic-bezier(.18,.85,.25,1.15),filter .23s ease
+}
+.panel.station{
+  padding:10px;gap:8px;border:1px solid #e8e4db;border-radius:18px;
+  background:#fffffff5;box-shadow:0 10px 35px #31271b16;
+  max-height:min(65vh,650px);overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:#d9d3c6 transparent
+}
+.panel-heading{padding:3px 4px 6px;color:#615746}
+.panel-heading strong{display:block;font-size:14px}
+.panel-heading small{font-size:10px;color:#968b79}
+.action-card{border-radius:13px}
+.action{
+  position:relative;display:flex;align-items:flex-start;gap:10px;
+  width:100%;padding:12px;border:1px solid #ffffff80;border-radius:13px;
+  overflow:hidden;
+  background:linear-gradient(145deg,#ffffff32,transparent 70%),var(--bg);
+  color:var(--fg);text-align:left;
+  box-shadow:inset 0 1px 0 #ffffff70,0 4px 11px var(--shadow);
+  cursor:pointer;user-select:none;
+  transition:transform .16s ease,box-shadow .16s ease,opacity .16s ease
+}
+.action:not(:disabled):hover{
+  transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 #ffffff80,0 7px 17px var(--shadow)
+}
+.action:not(:disabled):active{transform:scale(.97)}
+.action:disabled{cursor:not-allowed;opacity:.64}
+.action:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.icon-column{
+  display:flex;flex-direction:column;align-items:center;
+  gap:5px;width:33px;flex-shrink:0
+}
+.icon{
+  display:grid;place-items:center;width:31px;height:31px;
+  border:1px solid #ffffff40;border-radius:9px;background:#ffffff38;
+  font-size:20px;line-height:1
+}
+.owned-count{
+  min-width:28px;max-width:100%;padding:3px 5px;
+  border:1px solid #ffffff30;border-radius:6px;background:#ffffff30;
+  font-size:10px;font-weight:800;line-height:1;text-align:center;
+  font-variant-numeric:tabular-nums;overflow-wrap:anywhere
+}
+.content{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
+.title{font-size:14px;font-weight:750}
+.cost{
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:5px;font-size:10px;font-weight:700;line-height:1.4
+}
+.cost-row{
+  display:flex;align-items:baseline;justify-content:flex-start;
+  flex-wrap:wrap;gap:2px 5px
+}
+.cost-required{white-space:nowrap}
+.cost-owned{
+  white-space:nowrap;font-size:9px;font-weight:600;opacity:.8;
+  font-variant-numeric:tabular-nums
+}
+.cost-row.missing{color:#8c2634}
+.note,.status{font-size:10px;font-weight:600;line-height:1.4;opacity:.88}
+.status{color:#8c2634}
+.level-row{
+  display:flex;align-items:center;justify-content:space-between;gap:5px
+}
+.level-label{font-size:10px;font-weight:750;opacity:.8}
+.segments{display:flex;gap:4px;margin-top:3px}
+.segment{flex:1;height:6px;border-radius:4px;background:#00000016}
+.segment.filled{background:var(--fg);opacity:.65}
+.action.level-locked:disabled{opacity:1}
+.action.level-locked>.icon-column,
+.action.level-locked>.content{opacity:.38;filter:saturate(.35)}
+.lock-overlay{
+  position:absolute;inset:0;z-index:2;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:5px;background:rgba(17,25,34,.58);
+  color:#fff;text-align:center;pointer-events:none
+}
+.lock-emoji{font-size:29px;line-height:1.1}
+.lock-text{
+  padding:3px 8px;border:1px solid #ffffff28;
+  border-radius:7px;background:#ffffff13;font-size:11px;font-weight:800
+}
+.essence-button{
+  display:block;width:calc(100% - 12px);margin:5px 6px 0;padding:8px;
+  border:1px solid #dbc8f0;border-radius:9px;background:#f4eaff;
+  color:#8058a3;font-size:11px;font-weight:750;cursor:pointer;
+  transition:background .16s ease,transform .16s ease
+}
+.essence-button:hover{background:#ead8ff;transform:translateY(-1px)}
+
+.forest{--bg:#36ad59;--fg:#103d22;--shadow:#1f743730}
+.meadow{--bg:#b0e86a;--fg:#35551c;--shadow:#65912b2b}
+.lake{--bg:#73cafa;--fg:#174d70;--shadow:#2980b32e}
+.mountains{--bg:#a4aab3;--fg:#303943;--shadow:#48526030}
+.craft{--bg:#edd2a3;--fg:#654723;--shadow:#93632c22}
+.forge{--bg:#c9ced8;--fg:#384253;--shadow:#38425322}
+.speed{--bg:#c7e7f3;--fg:#24546b;--shadow:#24546b22}
+.profit{--bg:#f3dc9a;--fg:#74511c;--shadow:#74511c22}
+.automation{--bg:#bfdfd3;--fg:#285448;--shadow:#28544822}
+.treasure{--bg:#f1cf81;--fg:#77571b;--shadow:#77571b22}
+.house{--bg:#e2c8af;--fg:#71513b;--shadow:#71513b22}
+.delete{--bg:#ef626b;--fg:#fff;--shadow:#c2334033}
+
+.bulk-footer{
+  position:sticky;bottom:-10px;z-index:3;
+  margin:3px -10px -10px;padding:12px 10px;
+  border-top:1px solid #e9e3d9;border-radius:0 0 17px 17px;
+  background:#fffdf8f5;backdrop-filter:blur(12px)
+}
+.bulk-heading{margin-bottom:7px;color:#8b806d;font-size:10px;font-weight:750}
+.bulk-options{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.bulk-option{
+  padding:8px 0;border:1px solid #e6e0d5;border-radius:9px;
+  background:#f5f2ec;color:#82735c;font-size:12px;font-weight:750;cursor:pointer
+}
+.bulk-option.active{border-color:#c3a772;background:#e8d5b2;color:#624b24}
+.auto-status{
+  padding:9px 10px;border:1px solid #cfe5da;border-radius:10px;
+  background:#edf8f1;color:#47765e;font-size:10px;line-height:1.6
+}
+.auto-status.paused{border-color:#eadfc5;background:#fff9e9;color:#9b8050}
+
+.inventory-anchor{position:fixed;top:0;left:0;z-index:20;pointer-events:none}
+.inventory{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:5px;
+  width:max-content;max-width:310px;padding:5px;
+  border:1px solid #00000010;border-radius:12px;background:#fffffff5;
+  box-shadow:0 5px 18px #00000012;user-select:none;
+  opacity:0;transform:translateY(9px) scale(.9);
+  transition:opacity .18s ease,transform .22s ease
+}
+.inventory-anchor.open .inventory{opacity:1;transform:translateY(0) scale(1)}
+.inventory-item{
+  display:flex;align-items:center;gap:5px;padding:4px 7px;
+  border-radius:8px;background:#f4f5f1;color:#485042;
+  font-size:12px;font-weight:750;font-variant-numeric:tabular-nums
+}
+.inventory-item i{font-style:normal;font-size:17px;line-height:1}
+
+.level-hud{
+  position:fixed;bottom:20px;left:50%;z-index:25;
+  transform:translateX(-50%);width:min(740px,calc(100vw - 350px));
+  padding:13px 16px 14px;border:1px solid #e4eaf0;border-radius:17px;
+  background:#fffffff2;box-shadow:0 6px 24px #203b5610;
+  backdrop-filter:blur(12px);pointer-events:none;user-select:none
+}
+.level-top{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:8px
+}
+.level-name{font-size:13px;font-weight:800;color:#315b7c}
+.level-percent{font-size:11px;font-weight:750;color:#7a93a6}
+.requirements{display:flex;flex-wrap:wrap;gap:5px 7px;margin-bottom:10px}
+.requirement{
+  padding:4px 7px;border:1px solid #e9edf2;border-radius:7px;
+  background:#f5f8fb;color:#5f7486;font-size:10px;font-weight:650
+}
+.requirement.done{color:#368050;background:#edf8ef;border-color:#dfefdf}
+.level-track{height:10px;overflow:hidden;border-radius:8px;background:#e8eff7}
+.level-fill{
+  width:0;height:100%;border-radius:inherit;
+  background:linear-gradient(90deg,#58b4ff,#3187ef);transition:width .45s ease
+}
+.level-unlock{margin-top:7px;font-size:10px;color:#91a0ac}
+.reset-button{
+  position:fixed;right:20px;bottom:20px;z-index:30;
+  padding:12px 17px;border:1px solid #f0cccc;border-radius:12px;
+  background:#fff5f5;color:#b44b54;font-size:12px;font-weight:750;cursor:pointer
+}
+
+.tree-sidebar{
+  position:fixed;left:0;top:0;bottom:0;z-index:50;
+  width:min(1160px,88vw);display:flex;flex-direction:column;
+  border-right:1px solid #dce5e8;background:#f8fbfc;
+  box-shadow:20px 0 70px #23394c20;
+  transform:translateX(-105%);visibility:hidden;
+  transition:transform .42s cubic-bezier(.22,.8,.2,1),visibility .42s
+}
+.tree-sidebar.open{transform:translateX(0);visibility:visible}
+.tree-header{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:19px 22px;background:#ffffffed;
+  border-bottom:1px solid #e4ebef;flex-shrink:0
+}
+.tree-header h2{font-size:19px;color:#344c5b}
+.tree-header p{font-size:11px;color:#91a0a9;margin-top:4px}
+.tree-header-actions{display:flex;gap:6px}
+ .tree-branch-select{
+  min-width:145px;max-width:175px;height:34px;padding:0 8px;
+  border:1px solid #d7e4e9;border-radius:10px;background:#f5fafb;
+  color:#456678;font-size:11px;font-weight:750;cursor:pointer
+}
+.tree-control{
+  width:34px;height:34px;border:1px solid #e0e8ed;border-radius:10px;
+  background:#fff;color:#577181;font-size:17px;font-weight:700;cursor:pointer
+}
+.tree-stage{
+  position:relative;flex:1;min-height:0;overflow:hidden;
+  background:#f8fbfc radial-gradient(#dce6eb 1px,transparent 1px);
+  background-size:22px 22px
+}
+#treeSvg{
+  width:100%;height:100%;display:block;cursor:grab;
+  touch-action:none;user-select:none
+}
+#treeSvg.dragging{cursor:grabbing}
+.tree-link{fill:none;stroke-width:2.5;stroke-linecap:round;opacity:.4}
+.tree-link.available{opacity:.95}
+.tree-node{cursor:help;animation:treeNodeIn .5s ease both}
+@keyframes treeNodeIn{from{opacity:0}to{opacity:1}}
+.tree-shape{
+  stroke:#d9e4e8;stroke-width:2;
+  filter:drop-shadow(0 4px 8px #233d4d0c)
+}
+.tree-node:hover .tree-shape{stroke:#69a7cc}
+.tree-node.achieved .tree-shape{stroke:#4da56c;stroke-width:3.5}
+.tree-node.locked:not(.achieved) .tree-shape{fill:#e5e9ed}
+.tree-label{fill:#405664;font-size:14px;font-weight:750}
+.tree-subtitle{fill:#8b9ca6;font-size:11px}
+.tree-emoji{font-size:29px}
+.achievement-badge circle{fill:#4aa86b;stroke:#fff;stroke-width:3}
+.achievement-badge text{
+  fill:#fff;font-size:15px;font-weight:900;
+  text-anchor:middle;dominant-baseline:central
+}
+.unlock-badge rect{fill:#edf3fa;stroke:#d4e0ed}
+.unlock-badge text{
+  fill:#5a7c9c;font-size:10px;font-weight:800;
+  text-anchor:middle;dominant-baseline:central
+}
+.tree-node.locked .unlock-badge rect{fill:#455464;stroke:#455464}
+.tree-node.locked .unlock-badge text{fill:#fff}
+.tree-footer{
+  padding:9px 20px;background:#fff;color:#8b9da8;font-size:10px;flex-shrink:0
+}
+.tree-completion{
+  flex-shrink:0;padding:14px 20px 17px;background:#fff;border-top:1px solid #e4ebef
+}
+.completion-heading{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:15px;margin-bottom:7px
+}
+.completion-heading strong{font-size:12px;color:#426655}
+.completion-heading b{font-size:17px;color:#3c9a68}
+.completion-track{height:9px;border-radius:8px;overflow:hidden;background:#e9f2ed}
+.completion-fill{
+  width:0;height:100%;border-radius:inherit;
+  background:linear-gradient(90deg,#83d5a2,#39a86a);transition:width .45s ease
+}
+.completion-detail{margin-top:6px;font-size:10px;color:#93a398}
+.tree-tooltip{
+  position:fixed;z-index:70;width:310px;max-width:calc(100vw - 24px);
+  max-height:calc(100vh - 24px);overflow:hidden;
+  padding:15px;border:1px solid #dfe8ed;border-radius:15px;
+  background:#fffffff9;box-shadow:0 12px 40px #233a5224;
+  pointer-events:none;opacity:0;transform:translateY(5px);
+  transition:opacity .14s ease,transform .14s ease;
+  backdrop-filter:blur(12px)
+}
+.tree-tooltip.show{opacity:1;transform:translateY(0)}
+.tree-tooltip h3{font-size:14px;color:#385363;margin-bottom:7px}
+.tree-tooltip p{font-size:11px;line-height:1.6;color:#7a8c98;white-space:pre-line}
+.tooltip-cost{
+  margin-top:9px;padding-top:9px;border-top:1px solid #edf1f4;
+  display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:650;color:#4d6574
+}
+.tooltip-lock,.tooltip-achieved{display:block;margin-top:8px;font-size:10px;font-weight:750}
+.tooltip-lock{color:#a37c3d}
+.tooltip-achieved{color:#409661}
+
+dialog{
+  margin:auto;width:min(390px,calc(100vw - 36px));padding:25px;
+  border:1px solid #e9e9e9;border-radius:22px;
+  box-shadow:0 20px 90px #00000026;color:#39424b
+}
+dialog::backdrop{background:#24303b55;backdrop-filter:blur(5px)}
+.dialog-icon{font-size:32px;margin-bottom:10px}
+dialog h2{font-size:20px;margin-bottom:9px}
+dialog p{font-size:13px;line-height:1.6;color:#7c858e}
+.dialog-actions{display:flex;gap:9px;margin-top:22px}
+.dialog-actions button{
+  flex:1;padding:12px;border:0;border-radius:11px;
+  font-size:12px;font-weight:750;cursor:pointer
+}
+.cancel-reset{background:#edf1f4;color:#5b6975}
+.confirm-reset{background:#e9606b;color:#fff}
+.toast{
+  position:fixed;top:140px;left:50%;z-index:80;
+  transform:translate(-50%,-12px);opacity:0;pointer-events:none;
+  padding:13px 20px;border:1px solid #cee3fa;border-radius:14px;
+  background:#f2f9ff;color:#3676af;font-size:13px;font-weight:750;
+  transition:opacity .25s ease,transform .25s ease
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.save-warning{
+  position:fixed;top:130px;left:20px;z-index:80;
+  padding:9px 14px;border:1px solid #f2c7c7;border-radius:10px;
+  background:#fff1f1;color:#973b3b;font-size:12px
+}
+@media(max-width:900px){
+  .level-hud{width:calc(100vw - 32px);bottom:76px}
+  .reset-button{bottom:15px;right:16px}
+  .tree-sidebar{width:100vw}
+  .top-controls{top:80px}
+}
+@media(max-width:480px){
+  .resources-wrap{top:12px;right:12px;max-width:calc(100vw - 24px)}
+  .resources{gap:5px}
+  .resource{min-width:0;height:37px;padding:0 7px;gap:4px}
+  .resource-emoji{font-size:17px}
+  .resource-value{font-size:12px}
+  .top-controls{left:12px;top:86px}
+  .tree-button,.pause-button{padding:9px 11px}
+  .tree-header{padding:15px 12px}
+  .tree-header h2{font-size:16px}
+  .tree-control{width:29px;height:31px}
+  .tree-branch-select{min-width:100px;max-width:112px;height:31px;font-size:10px}
+  .pause-badge{top:132px}
+}
+
+/* Multiplayer player directory and statistics */
+.mp-name-label{display:block;margin:0 0 6px;font-size:11px;font-weight:800;color:#577186}
+.mp-nickname{width:100%;height:43px;border:1px solid #dce6ef;border-radius:11px;
+ padding:0 13px;background:#f7faff;color:#304b62;font-size:15px;font-weight:700;outline:none}
+.mp-nickname:focus{border-color:#75aaca;box-shadow:0 0 0 3px #75aaca25}
+.mp-name-wrap{margin:0 0 15px}
+.mp-roster{position:fixed;right:20px;top:153px;z-index:34;width:206px;
+ max-height:calc(100vh - 320px);overflow:auto;padding:11px;
+ background:#ffffffef;border:1px solid #dfebf5;border-radius:16px;
+ box-shadow:0 10px 33px #1d4c7720;backdrop-filter:blur(12px)}
+.mp-roster-title{font-size:12px;font-weight:850;color:#436787;margin:1px 4px 9px}
+.mp-roster-entry{display:flex;align-items:center;gap:8px;width:100%;padding:10px 9px;
+ border:1px solid #e3edf5;border-radius:10px;background:#f5faff;color:#3c5a72;
+ text-align:left;font-size:12px;font-weight:780;cursor:pointer;margin-bottom:6px}
+.mp-roster-entry:hover,.mp-roster-entry.active{background:#e4f1ff;border-color:#95c2ed}
+.mp-roster-entry .mp-dot{width:8px;height:8px;flex:none;border-radius:50%;background:#4db87d}
+.mp-roster-entry .mp-mini{font-size:10px;font-weight:700;color:#879aab;margin-left:auto}
+.mp-roster-empty{font-size:12px;color:#91a1b0;padding:8px}
+.mp-stat-sidebar{position:fixed;top:0;bottom:0;left:0;z-index:45;
+ width:min(365px,92vw);padding:19px 18px 30px;
+ background:#fffffffa;border-right:1px solid #dae5ed;
+ box-shadow:12px 0 45px #233c5126;overflow:auto;visibility:hidden;
+ transform:translateX(-105%);transition:transform .32s ease,visibility .32s}
+.mp-stat-sidebar.open{visibility:visible;transform:translateX(0)}
+.mp-stat-head{display:flex;justify-content:space-between;align-items:start;gap:10px;
+ padding:4px 0 15px;border-bottom:1px solid #e9eef3}
+.mp-stat-head h2{color:#355573;font-size:21px;overflow-wrap:anywhere}
+.mp-stat-head p{font-size:12px;color:#91a0b0;margin-top:4px}
+.mp-stat-close{border:1px solid #dbe5eb;border-radius:9px;background:#f6fafc;
+ color:#51718a;cursor:pointer;width:33px;height:33px;flex:none;font-size:20px}
+.mp-stat-section{padding:16px 0 5px;border-bottom:1px solid #ecf0f4}
+.mp-stat-section h3{font-size:12px;color:#7b8d9d;text-transform:uppercase;
+ letter-spacing:.65px;margin-bottom:10px}
+.mp-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.mp-stat-cell{padding:11px;border:1px solid #e6edf3;border-radius:11px;background:#f6f9fc;
+ color:#4c667a;font-size:11px}
+.mp-stat-cell strong{display:block;margin-top:5px;color:#263e50;font-size:16px;
+ overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+@media(max-width:900px){.mp-roster{top:148px;right:10px;width:160px;max-height:35vh}}
+@media(max-width:480px){.mp-roster{top:165px;width:142px;padding:7px}}
+/* Multiplayer lobby */
+#multiplayerButton{
+  position:fixed;right:20px;bottom:82px;z-index:31;padding:12px 17px;
+  border:1px solid #cbdcf0;border-radius:12px;background:#f1f7ff;
+  color:#426b91;font-size:12px;font-weight:800;cursor:pointer;
+  box-shadow:0 4px 16px #27476514
+}
+#multiplayerButton:hover{background:#e4f0ff;transform:translateY(-1px)}
+#multiplayerDialog{width:min(430px,calc(100vw - 30px));padding:0;overflow:hidden}
+.mp-shell{padding:22px}
+.mp-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.mp-heading h2{margin:0;font-size:19px;color:#344c5b}
+.mp-close{width:30px;height:30px;border:1px solid #e2e8ee;border-radius:9px;background:#fff;color:#667987;cursor:pointer}
+.mp-actions{display:grid;gap:9px;margin-top:17px}
+.mp-action{padding:13px;border:1px solid #dce8f1;border-radius:12px;background:#f4f9ff;color:#426b91;font-weight:800;cursor:pointer}
+.mp-action.primary{background:#eaf6ed;border-color:#cfe7d5;color:#39734d}
+.mp-action:disabled{opacity:.45;cursor:not-allowed}
+.mp-subview{display:grid;gap:12px}
+.mp-code{padding:15px;border:1px dashed #b8cce0;border-radius:13px;background:#f5f9fd;text-align:center}
+.mp-code small{display:block;color:#7e91a1;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.mp-code strong{display:block;margin-top:4px;color:#345e82;font-size:32px;letter-spacing:7px;font-variant-numeric:tabular-nums}
+.mp-input{width:100%;padding:13px;border:1px solid #dce4eb;border-radius:11px;font-size:20px;letter-spacing:5px;text-align:center;outline:none}
+.mp-input:focus{border-color:#8eb6d8;box-shadow:0 0 0 3px #8eb6d822}
+.mp-meta{font-size:12px;color:#7c8994;line-height:1.5}
+.mp-player-list{display:grid;gap:6px;max-height:130px;overflow:auto}
+.mp-player{padding:9px 11px;border:1px solid #e8edf1;border-radius:9px;background:#fafcfd;color:#536574;font-size:12px}
+.mp-status{min-height:18px;color:#9a6b3d;font-size:11px;font-weight:700}
+.mp-network-settings{margin-top:15px;padding-top:12px;border-top:1px solid #e6edf3}
+.mp-network-settings summary{color:#54718a;font-size:12px;font-weight:800;cursor:pointer}
+.mp-network-settings>p{margin:10px 0}
+.mp-network-settings label{display:block;margin:9px 0 5px}
+.mp-turn-input{min-height:72px;resize:vertical;font:12px/1.4 ui-monospace,monospace;letter-spacing:0;text-align:left}
+.mp-turn-text{font-size:13px;letter-spacing:0;text-align:left}
+@media(max-width:900px){#multiplayerButton{bottom:15px;right:145px}}
+@media(max-width:480px){#multiplayerButton{right:12px;bottom:58px;padding:9px 11px}}
+
+.mp-connection-banner{margin:12px 0 4px;padding:10px 12px;background:#f0f7fd;border:1px solid #d8e8f4;border-radius:10px;font-size:12px;font-weight:720;color:#4f7091;line-height:1.5}
+</style>
+</head>
+
+<body>
+<canvas id="map" aria-label="Hex world map"></canvas>
+
+<div class="top-controls">
+  <button id="treeButton" class="tree-button"
+    aria-controls="treeSidebar" aria-expanded="false">🌳 Progress Tree</button>
+  <button id="pauseButton" class="pause-button" aria-pressed="false">⏸ Pause</button>
+</div>
+<div id="pauseBadge" class="pause-badge" hidden>⏸ Game paused</div>
+
+<aside id="treeSidebar" class="tree-sidebar"
+  aria-label="Progress tree" aria-hidden="true" inert>
+  <header class="tree-header">
+    <div><h2>🌳 Progress Tree</h2><p>Recipes, resources, buildings and unlock levels</p></div>
+    <div class="tree-header-actions">
+      <button id="treePause" class="tree-control" aria-label="Pause game">⏸</button>
+        <select id="treeBranchSelect" class="tree-branch-select" aria-label="Jump to progress branch">
+          <option value="start">🌱 Early game</option>
+          <option value="lake">🌊 Fishing</option>
+          <option value="forest">🌲 Forestry</option>
+          <option value="mountains">⛰️ Mining</option>
+          <option value="meadow">⚒️ Crafting</option>
+          <option value="farming">🌾 Farming</option>
+          <option value="housing">🏠 Housing</option>
+          <option value="industry">🏭 Advanced industry</option>
+          <option value="port">⚓ Port</option>
+          <option value="all">⌖ Overview</option>
+        </select>
+      <button id="treeZoomOut" class="tree-control" aria-label="Zoom out">−</button>
+      <button id="treeZoomIn" class="tree-control" aria-label="Zoom in">+</button>
+      <button id="treeFit" class="tree-control" aria-label="Fit tree">⌖</button>
+      <button id="treeClose" class="tree-control" aria-label="Close tree">×</button>
+    </div>
+  </header>
+  <div id="treeStage" class="tree-stage">
+    <svg id="treeSvg" xmlns="http://www.w3.org/2000/svg" aria-label="Progress diagram">
+      <defs id="treeDefs"></defs><g id="treeWorld"></g>
+    </svg>
+  </div>
+  <footer class="tree-footer">
+    Select a branch to jump · Drag to move · Scroll to zoom · Hover for all required ingredients · ✓ Achieved
+  </footer>
+  <div class="tree-completion">
+    <div class="completion-heading">
+      <strong>Game completion</strong><b id="completionPercent">0%</b>
+    </div>
+    <div id="completionTrack" class="completion-track" role="progressbar"
+      aria-label="Game completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div id="completionFill" class="completion-fill"></div>
+    </div>
+    <div id="completionDetail" class="completion-detail"></div>
+  </div>
+</aside>
+<div id="treeTooltip" class="tree-tooltip" role="tooltip"></div>
+
+<div id="resourcesWrap" class="resources-wrap">
+  <div id="inventoryDrawer" class="inventory-drawer" inert aria-hidden="true">
+    <div id="inventoryDrawerItems" class="inventory-drawer-inner"></div>
+  </div>
+  <div class="resources" role="group" aria-label="Resources">
+    <div id="woodIndicator" class="resource fish-stat" aria-label="Wood">
+      <span class="resource-emoji">🪵</span><span id="woodCount" class="resource-value">5</span><span id="woodRate" class="fish-rate" aria-label="Net wood per minute">+0 / min</span>
+    </div>
+    <div id="stoneIndicator" class="resource fish-stat" aria-label="Stone">
+      <span class="resource-emoji">🪨</span><span id="stoneCount" class="resource-value">5</span><span id="stoneRate" class="fish-rate" aria-label="Net stone per minute">+0 / min</span>
+    </div>
+    <div id="goldIndicator" class="resource" aria-label="Gold bags" hidden>
+      <span class="resource-emoji">💰</span><span id="goldCount" class="resource-value">0</span>
+    </div>
+    <div id="fishIndicator" class="resource fish-stat" aria-label="Fish">
+      <span class="resource-emoji">🐟</span><span id="fishCount" class="resource-value">0</span><span id="fishRate" class="fish-rate" aria-label="Net fish per minute">+0 / min</span>
+    </div>
+    <div id="plankIndicator" class="resource" aria-label="Planks" hidden>
+      <span class="resource-emoji">🟫</span><span id="plankCount" class="resource-value">0</span>
+    </div>
+    <div id="ironIndicator" class="resource" aria-label="Iron" hidden>
+      <span class="resource-emoji">⬜</span><span id="ironCount" class="resource-value">0</span>
+    </div>
+    <div id="essenceIndicator" class="resource essence" aria-label="Experience essence" hidden>
+      <span class="resource-emoji">✨</span><span id="essenceCount" class="resource-value">0</span>
+    </div>
+  </div>
+  <button id="inventoryToggle" class="inventory-toggle"
+    aria-label="Expand inventory" aria-controls="inventoryDrawer" aria-expanded="false" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+  </button>
+</div>
+
+<div class="level-hud">
+  <div class="level-top">
+    <span id="levelName" class="level-name"></span><span id="levelPercent" class="level-percent"></span>
+  </div>
+  <div id="requirements" class="requirements"></div>
+  <div id="levelTrack" class="level-track" role="progressbar"
+    aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div id="levelFill" class="level-fill"></div>
+  </div>
+  <div id="levelUnlock" class="level-unlock"></div>
+</div>
+
+<button id="resetButton" class="reset-button">↻ Reset progress</button>
+<dialog id="resetDialog">
+  <div class="dialog-icon">🗑️</div><h2>Reset all progress?</h2>
+  <p>This removes your world, resources, items, upgrades, levels and achievements.
+    You will start with 5 wood and 5 stone.</p>
+  <div class="dialog-actions">
+    <button id="cancelReset" class="cancel-reset" autofocus>Cancel</button>
+    <button id="confirmReset" class="confirm-reset">Reset everything</button>
+  </div>
+</dialog>
+
+<button id="multiplayerButton" type="button">🌐 Multiplayer</button>
+<dialog id="multiplayerDialog">
+  <div class="mp-shell">
+    <div class="mp-heading"><h2>🌐 Multiplayer</h2><button class="mp-close" id="mpClose" aria-label="Close">×</button></div>
+    <div class="mp-name-wrap">
+      <label class="mp-name-label" for="mpNickname">Your nickname</label>
+      <input id="mpNickname" class="mp-nickname" maxlength="20" autocomplete="nickname" placeholder="Enter nickname">
+    </div>
+    <section id="mpHome">
+      <p class="mp-meta">Create a lobby or join a friend using a 5-digit code. Everyone plays in the same shared world.</p>
+       <div class="mp-connection-banner" id="mpConnectionBanner">Checking multiplayer mode…</div>
+      <div class="mp-actions">
+        <button class="mp-action primary" id="mpCreate">Create lobby</button>
+        <button class="mp-action" id="mpFind">Find lobby</button>
+      </div>
+      <details class="mp-network-settings">
+        <summary>Network & server settings</summary>
+        <label class="mp-meta" for="mpNetworkMode">Multiplayer connection mode</label>
+        <select id="mpNetworkMode" class="mp-input" style="font-size:13px;letter-spacing:0;text-align:left;padding:10px">
+          <option value="auto">Auto (global server if hosted; otherwise PeerJS)</option>
+          <option value="cloud">PeerJS Cloud (free, direct connection)</option>
+          <option value="relay">Custom global WebSocket server</option>
+        </select>
+        <div id="mpRelayUrlWrap" hidden>
+          <label class="mp-meta" for="mpRelayUrl">Global WebSocket URL (same for every player)</label>
+          <input id="mpRelayUrl" class="mp-input mp-turn-text" style="letter-spacing:0;text-align:left" placeholder="wss://your-game.example/ws" spellcheck="false" autocomplete="off">
+        </div>
+        <p id="mpNetworkHelp" class="mp-meta"></p>
+        <p class="mp-meta">TURN and STUN settings below apply only to the direct PeerJS Cloud mode. Global relay mode needs no TURN settings.</p>
+        <label class="mp-meta" for="mpTurnUrls">TURN URL(s), one per line</label>
+        <textarea id="mpTurnUrls" class="mp-input mp-turn-input" rows="3" placeholder="turn:your-server.example:3478
+turns:your-server.example:443?transport=tcp"></textarea>
+        <label class="mp-meta" for="mpTurnUsername">TURN username</label>
+        <input id="mpTurnUsername" class="mp-input mp-turn-text" autocomplete="off" placeholder="TURN username">
+        <label class="mp-meta" for="mpTurnCredential">TURN credential / password</label>
+        <input id="mpTurnCredential" class="mp-input mp-turn-text" type="password" autocomplete="off" placeholder="TURN credential">
+        <button class="mp-action" id="mpSaveNetwork">Save connection settings on this device</button>
+        <div class="mp-status" id="mpNetworkStatus" aria-live="polite">No custom TURN server configured.</div>
+      </details>
+    </section>
+    <section id="mpCreateView" class="mp-subview" hidden>
+      <div class="mp-code"><small>Lobby code</small><strong id="mpCode">-----</strong></div>
+      <label class="mp-meta" for="mpCapacity">Maximum players (including you)</label>
+      <select id="mpCapacity" class="mp-input" style="font-size:15px;letter-spacing:0">
+        <option value="2">2 players</option><option value="3">3 players</option>
+        <option value="4" selected>4 players</option><option value="5">5 players</option>
+        <option value="6">6 players</option><option value="8">8 players</option>
+      </select>
+      <div class="mp-meta" id="mpHostCount">Players: 1 / 4</div>
+      <div class="mp-player-list" id="mpPlayers"><div class="mp-player">You · Host</div></div>
+      <div class="mp-status" id="mpHostStatus">Waiting for players…</div>
+      <div class="mp-meta" id="mpHostNetwork">Connection: preparing…</div>
+      <button class="mp-action primary" id="mpStart">Start game</button>
+      <button class="mp-action" id="mpCancelHost">Close lobby</button>
+    </section>
+    <section id="mpConnectedView" class="mp-subview" hidden>
+      <div class="mp-code"><small>Connected to multiplayer</small><strong id="mpActiveCode">-----</strong></div>
+      <div id="mpConnectedInfo" class="mp-meta">Playing in a separate multiplayer world.</div>
+      <button id="mpDisconnect" class="mp-action" style="background:#fff0f0;color:#ac4553;border-color:#f3d0d0">Disconnect and return to singleplayer</button>
+    </section>
+    <section id="mpFindView" class="mp-subview" hidden>
+      <label class="mp-meta" for="mpJoinCode">Enter the 5-digit lobby code</label>
+      <input id="mpJoinCode" class="mp-input" inputmode="numeric" maxlength="5" placeholder="12345" autocomplete="off">
+      <div class="mp-status" id="mpFindStatus">Only currently open lobbies can be joined.</div>
+      <div class="mp-meta" id="mpJoinNetwork">Connection: preparing…</div>
+      <button class="mp-action primary" id="mpJoin">Find and join</button>
+      <button class="mp-action" id="mpBack">Back</button>
+    </section>
+    <section id="mpJoinedView" class="mp-subview" hidden>
+      <div class="mp-code"><small>Connected to lobby</small><strong id="mpJoinedCode">-----</strong></div>
+      <div class="mp-meta" id="mpJoinedInfo">Waiting for the host to start the game…</div>
+      <div class="mp-status" id="mpJoinedStatus">Connected.</div>
+      <button class="mp-action" id="mpLeave">Leave lobby</button>
+    </section>
+  </div>
+</dialog>
+
+<aside id="mpRoster" class="mp-roster" hidden aria-label="Multiplayer players">
+  <div id="mpRosterTitle" class="mp-roster-title">👥 Players</div>
+  <div id="mpRosterEntries"></div>
+</aside>
+<aside id="mpStats" class="mp-stat-sidebar" aria-hidden="true">
+  <div class="mp-stat-head">
+    <div><h2 id="mpStatsName">Player</h2><p id="mpStatsSubtitle">Multiplayer statistics</p></div>
+    <button id="mpStatsClose" class="mp-stat-close" aria-label="Close statistics">×</button>
+  </div>
+  <div id="mpStatsContent"></div>
+</aside>
+<div id="toast" class="toast" role="status"></div>
+<div id="saveWarning" class="save-warning" role="status" hidden></div>
+
+<script>window.__HEX_RELAY_ENABLED__=false;</script>
+<script async src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const canvas=$("map"),ctx=canvas.getContext("2d");
+const SAVE_KEY="hex-world-progress-v1"; // Existing singleplayer save key stays untouched.
+let worldMode="singleplayer";
+let singleplayerSnapshot=null;
+const HEX_SIZE=42,HEX_WIDTH=Math.sqrt(3)*HEX_SIZE,MAP_RADIUS=9;
+const PRICE_MULTIPLIER=1.3,EPS=0.000001;
+
+const resources={wood:5,stone:5,fish:0};
+const inventory={
+  axe:0,pickaxe:0,fishingRod:0,plank:0,iron:0,
+  ironAxe:0,ironPickaxe:0,hammer:0,essence:0,
+  shovel:0,wheat:0,carrot:0,bread:0,animalFeed:0,fur:0,leather:0,
+  clay:0,brick:0,bellows:0,improvedPickaxe:0,improvedAxe:0,coal:0,oak:0,oakPlank:0,steel:0,jacket:0,gloves:0,gold:0
+};
+const ITEMS={
+  wood:{emoji:"🪵",label:"wood"},
+  stone:{emoji:"🪨",label:"stone"},
+  fish:{emoji:"🐟",label:"fish"},
+  axe:{emoji:"🪓",label:"axe"},
+  pickaxe:{emoji:"⛏️",label:"pickaxe"},
+  fishingRod:{emoji:"🎣",label:"rod"},
+  plank:{emoji:"🟫",label:"plank"},
+  iron:{emoji:"⬜",label:"iron"},
+  ironAxe:{emoji:"🪓",label:"iron axe"},
+  ironPickaxe:{emoji:"⛏️",label:"iron pickaxe"},
+  hammer:{emoji:"🔨",label:"hammer"},
+  shovel:{emoji:"🪏",label:"shovel"},
+  wheat:{emoji:"🌾",label:"wheat"},carrot:{emoji:"🥕",label:"carrot"},
+  bread:{emoji:"🍞",label:"bread"},animalFeed:{emoji:"🐾",label:"animal feed"},
+  fur:{emoji:"🧣",label:"fur"},leather:{emoji:"🟤",label:"leather"},
+  clay:{emoji:"🟫",label:"clay"},brick:{emoji:"🧱",label:"brick"},
+  bellows:{emoji:"💨",label:"blacksmith bellows"},
+  improvedPickaxe:{emoji:"⛏️",label:"improved pickaxe"},
+  improvedAxe:{emoji:"🪓",label:"improved axe"},
+  coal:{emoji:"⚫",label:"coal"},oak:{emoji:"🌳",label:"oak"},
+  oakPlank:{emoji:"🟫",label:"oak plank"},steel:{emoji:"🔘",label:"steel"},
+  jacket:{emoji:"🧥",label:"jacket"},gloves:{emoji:"🧤",label:"gloves"},
+  gold:{emoji:"💰",label:"gold bag"},
+  essence:{emoji:"✨",label:"XP essence"}
+};
+const BIOMES={
+  forest:{label:"Forest",emoji:"🌲",baseCost:{wood:5},color:[54,173,89],
+    note:"+1 wood / 5s",buildings:["sawmill","improvedSawmill"]},
+  meadow:{label:"Meadow",emoji:"🌱",baseCost:{wood:3},color:[176,232,106],
+    note:"Crafting and support buildings",buildings:["carpenter","forge","house","farm","animalPen","advancedForge"]},
+  lake:{label:"Lake",emoji:"🌊",baseCost:{stone:3},color:[115,202,250],
+    note:"+1 fish / 15s",buildings:["fishingHut","treasure","port"]},
+  mountains:{label:"Mountains",emoji:"⛰️",baseCost:{stone:5},color:[164,170,179],
+    note:"+1 stone / 5s",buildings:["mine","improvedMine"]}
+};
+const BUILDINGS={
+  sawmill:{label:"Sawmill",emoji:"🪚",baseCost:{wood:10,stone:5,axe:1},
+    note:"+1 wood / 3.5s"},
+  mine:{label:"Mine",emoji:"⛏️",baseCost:{wood:10,stone:10,pickaxe:1},
+    note:"+1 stone / 3.5s"},
+  fishingHut:{label:"Fishing hut",emoji:"🎣",
+    baseCost:{wood:15,stone:10,fishingRod:1},note:"+1 fish / 7.5s"},
+  carpenter:{label:"Carpenter",emoji:"🛠️",baseCost:{wood:5,stone:5},
+    note:"Craft tools and planks"},
+  forge:{label:"Forge",emoji:"⚒️",baseCost:{plank:10,pickaxe:2,axe:2},
+    note:"Craft iron tools",requiredLevel:2},
+  treasure:{label:"Treasures",emoji:"🧰",
+    baseCost:{plank:15,hammer:1,fishingRod:3,wood:25},
+    note:"Random item every 15s",requiredLevel:2},
+  farm:{label:"Farm",emoji:"🌾",baseCost:{plank:20,stone:50,shovel:1},
+    requiredLevel:3,note:"Every 7.5s: 80% wheat · 20% carrot"},
+  animalPen:{label:"Animal pen",emoji:"🐄",baseCost:{plank:20,hammer:1,iron:3,animalFeed:3},
+    requiredLevel:3,note:"+1 fur / 30s · Craft leather"},
+  advancedForge:{label:"Advanced Forge",emoji:"🏭",
+    baseCost:{brick:25,bellows:1,iron:40,hammer:1,ironPickaxe:1},requiredLevel:4,
+    note:"Craft improved tools and steel"},
+  improvedSawmill:{label:"Improved Sawmill",emoji:"🪚",
+    baseCost:{brick:15,iron:20,improvedAxe:1,leather:10},requiredLevel:4,
+    note:"+1 oak / 7.5s"},
+  improvedMine:{label:"Improved Mine",emoji:"⛏️",
+    baseCost:{brick:15,iron:20,improvedPickaxe:1,leather:10},requiredLevel:4,
+    note:"+1 coal / 7.5s"},
+  port:{label:"Port",emoji:"⚓",requiredLevel:4,
+    baseCost:{oakPlank:25,steel:30,hammer:3,fishingRod:25},
+    note:"Sell goods for gold bags · Buy supplies"},
+  house:{label:"House",emoji:"🏠",baseCost:{stone:40,plank:25,hammer:1},
+    note:"Assign Residential or Kitchen",requiredLevel:2}
+};
+const RECIPES={
+  axe:{label:"Axe",emoji:"🪓",cost:{wood:5,stone:5},station:"carpenter"},
+  pickaxe:{label:"Pickaxe",emoji:"⛏️",cost:{wood:5,stone:5},station:"carpenter"},
+  fishingRod:{label:"Fishing rod",emoji:"🎣",cost:{wood:10,fish:3},station:"carpenter"},
+  plank:{label:"Plank",emoji:"🟫",cost:{wood:3},station:"carpenter",requiredLevel:2},
+  iron:{label:"Iron",emoji:"⬜",cost:{stone:20},station:"forge",requiredLevel:2},
+  ironAxe:{label:"Iron axe",emoji:"🪓",cost:{plank:10,iron:3},station:"forge",requiredLevel:2},
+  ironPickaxe:{label:"Iron pickaxe",emoji:"⛏️",cost:{plank:10,iron:3},station:"forge",requiredLevel:2},
+  hammer:{label:"Hammer",emoji:"🔨",cost:{plank:5,iron:5},station:"forge",requiredLevel:2},
+  shovel:{label:"Shovel",emoji:"🪏",cost:{iron:5,plank:10},station:"forge",requiredLevel:3},
+  bread:{label:"Bread",emoji:"🍞",cost:{wheat:5},station:"farm",requiredLevel:3},
+  animalFeed:{label:"Animal feed",emoji:"🐾",cost:{carrot:3},station:"farm",requiredLevel:3},
+  leather:{label:"Leather",emoji:"🟤",cost:{fur:3},station:"animalPen",requiredLevel:3},
+  brick:{label:"Brick",emoji:"🧱",cost:{clay:5},station:"forge",requiredLevel:4},
+  bellows:{label:"Blacksmith bellows",emoji:"💨",cost:{leather:15,plank:50,iron:10},station:"forge",requiredLevel:4},
+  improvedPickaxe:{label:"Improved pickaxe",emoji:"⛏️",
+    cost:{leather:5,ironPickaxe:1,clay:5,iron:5},station:"advancedForge",requiredLevel:4},
+  improvedAxe:{label:"Improved axe",emoji:"🪓",
+    cost:{leather:5,ironAxe:1,clay:5,iron:5},station:"advancedForge",requiredLevel:4},
+  oakPlank:{label:"Oak plank",emoji:"🟫",cost:{oak:5},station:"carpenter",requiredLevel:4},
+  steel:{label:"Steel",emoji:"🔘",cost:{coal:10,iron:5},station:"advancedForge",requiredLevel:4},
+  jacket:{label:"Jacket",emoji:"🧥",cost:{leather:20,fur:5},station:"tailor",requiredLevel:4},
+  gloves:{label:"Gloves",emoji:"🧤",cost:{fur:15,leather:5},station:"tailor",requiredLevel:4}
+};
+// Trades are deliberately separate from recipes: gold purchases must not create
+// recursive crafting cycles or allow automatic sales of a player's stock.
+const PORT_TRADES={
+  sellJackets:{label:"Sell jackets",cost:{jacket:3},item:"gold",amount:5},
+  sellGloves:{label:"Sell gloves",cost:{gloves:3},item:"gold",amount:3},
+  sellPickaxes:{label:"Sell improved pickaxes",cost:{improvedPickaxe:3},item:"gold",amount:1},
+  sellAxes:{label:"Sell improved axes",cost:{improvedAxe:3},item:"gold",amount:1},
+  buyOakPlanks:{label:"Buy oak planks",cost:{gold:1},item:"oakPlank",amount:3},
+  buySteel:{label:"Buy steel",cost:{gold:1},item:"steel",amount:3},
+  buyFish:{label:"Buy fish",cost:{gold:1},item:"fish",amount:50}
+};
+const AUTOMATION={
+  carpenter:{label:"Auto Carpenter",item:"plank",interval:5,
+    upgradeCost:{plank:50,ironAxe:3,hammer:1},recipe:{wood:3,fish:2}},
+  forge:{label:"Auto Forge",item:"iron",interval:45,
+    upgradeCost:{iron:15,plank:30,ironPickaxe:2,hammer:2},recipe:{stone:20,fish:2}}
+};
+const HOUSE_MODES={
+  residential:{label:"Residential",emoji:"🏡",upkeep:1,limit:10,requiredLevel:2,cost:{},
+    note:"1 fish / 5s · −5% station time"},
+  kitchen:{label:"Kitchen",emoji:"🍳",upkeep:3,limit:5,requiredLevel:3,cost:{bread:5},
+    note:"3 fish / 5s · +5% double loot · −0.5s farm time (max −2.5s)"},
+  tailor:{label:"Tailor",emoji:"🧵",upkeep:0,limit:Infinity,requiredLevel:4,
+    cost:{leather:10,fur:5},note:"Craft jackets and gloves · No upkeep"}
+};
+const TREASURE_UPGRADE={plank:40,fishingRod:10,hammer:1,iron:5};
+const TREASURE_LOOT={
+  1:[["fish",50],["wood",22.5],["stone",22.5],["pickaxe",2.5],["axe",2.5]],
+  2:[["fish",45],["wood",13],["stone",13],["plank",11],["iron",7.5],
+    ["ironAxe",4],["ironPickaxe",4],["essence",2.5]]
+};
+const FISHING_UPGRADE_COSTS=[
+  {fishingRod:25,hammer:1,plank:50,iron:5},
+  {fishingRod:50,hammer:1,plank:80,iron:10},
+  {fishingRod:75,hammer:1,plank:115,iron:15}
+];
+const PRODUCER_UPGRADE_COSTS=[
+  {plank:40,hammer:1,tools:2,iron:5,fish:50},
+  {plank:75,hammer:2,tools:4,iron:10,fish:75},
+  {plank:125,hammer:3,tools:5,iron:15,fish:100}
+];
+const LEVEL_REQUIREMENTS={
+  1:{wood:150,stone:150,fish:75,sawmill:1,mine:1,fishingHut:1,carpenter:1},
+  2:{wood:500,stone:500,fish:250,plank:50,iron:30,
+    upgradedProducer:1,residential:1},
+  3:{wood:1500,stone:1500,fish:750,farm:3,animalPen:2,leather:10,kitchen:1}
+};
+const EXTRA_GOALS={
+  upgradedProducer:{emoji:"📈",label:"Production upgrade 1",verb:"Reach"},
+  residential:{emoji:"🏡",label:"Residential",verb:"Assign"},
+  kitchen:{emoji:"🍳",label:"Kitchen",verb:"Assign"}
+};
+
+let playerLevel=1,resourcesExpanded=false,craftMultiplier=1,isPaused=false;
+const levelProgress={
+  wood:0,stone:0,fish:0,plank:0,iron:0,
+  sawmill:0,mine:0,fishingHut:0,carpenter:0,
+  upgradedProducer:0,residential:0,kitchen:0,farm:0,animalPen:0,leather:0
+};
+const constructionCounts={
+  biome:Object.fromEntries(Object.keys(BIOMES).map(k=>[k,0])),
+  building:Object.fromEntries(Object.keys(BUILDINGS).map(k=>[k,0]))
+};
+const craftCounts=Object.fromEntries(Object.keys(RECIPES).map(k=>[k,0]));
+const achievements=new Set();
+const camera={x:0,y:0,vx:0,vy:0};
+const keys=new Set(),movementCodes=new Set(["KeyW","KeyA","KeyS","KeyD"]);
+const tiles=[],tileMap=new Map(),menus=new Set(),borders=new Path2D(),edges=new Set();
+
+let activeMenu=null,width=innerWidth,height=innerHeight,lastFrame=null;
+let lastSimulation=performance.now(),pointer=null,toastTimer=null,savingAllowed=true;
+let treeOpen=false,treeBuilt=false,treeHasFit=false,treeDrag=null;
+
+const has=(o,k)=>Object.hasOwn(o,k);
+const balance=k=>has(resources,k)?resources[k]:inventory[k];
+const tileKey=(q,r)=>`${q},${r}`;
+const vertices=Array.from({length:6},(_,i)=>{
+  const a=(i*60-30)*Math.PI/180;
+  return{x:Math.cos(a)*HEX_SIZE,y:Math.sin(a)*HEX_SIZE};
+});
+function freshTileState(){
+  return{
+    biome:null,building:null,color:[255,255,255],targetColor:[255,255,255],
+    buildingEmoji:null,iconOpacity:0,iconProgress:0,productionRemaining:5,
+    flash:0,upgradeLevel:0,biomePaid:{},buildingPaid:{},owner:null,
+    automated:false,autoRemaining:5,treasureLevel:1,treasureRemaining:15,
+    houseMode:null,houseRemaining:5,housePowered:false
+  };
+}
+for(let q=-MAP_RADIUS;q<=MAP_RADIUS;q++){
+  for(let r=Math.max(-MAP_RADIUS,-q-MAP_RADIUS);
+    r<=Math.min(MAP_RADIUS,-q+MAP_RADIUS);r++){
+    const x=HEX_WIDTH*(q+r/2),y=HEX_SIZE*1.5*r;
+    const points=vertices.map(v=>({x:x+v.x,y:y+v.y})),path=new Path2D();
+    path.moveTo(points[0].x,points[0].y);
+    for(let i=1;i<6;i++)path.lineTo(points[i].x,points[i].y);
+    path.closePath();
+    const t={q,r,x,y,path,...freshTileState()};
+    tiles.push(t);tileMap.set(tileKey(q,r),t);
+    for(let i=0;i<6;i++){
+      const a=points[i],b=points[(i+1)%6];
+      const k=`${Math.round((a.x+b.x)*500)},${Math.round((a.y+b.y)*500)}`;
+      if(edges.has(k))continue;
+      edges.add(k);borders.moveTo(a.x,a.y);borders.lineTo(b.x,b.y);
+    }
+  }
+}
+
+function showToast(text){
+  clearTimeout(toastTimer);$("toast").textContent=text;
+  $("toast").classList.add("show");
+  toastTimer=setTimeout(()=>$("toast").classList.remove("show"),4000);
+}
+function recordProgress(amounts){
+  for(const[k,n]of Object.entries(amounts)){
+    if(n>0&&has(ITEMS,k))achievements.add(k);
+  }
+  if(playerLevel>=4)return;
+  for(const[k,n]of Object.entries(amounts)){
+    if(has(levelProgress,k)&&n>0)levelProgress[k]+=n;
+  }
+  if(Object.entries(LEVEL_REQUIREMENTS[playerLevel]).every(
+    ([k,n])=>levelProgress[k]>=n
+  )){
+    playerLevel++;achievements.add(`level${playerLevel}`);
+    for(const k of Object.keys(levelProgress))levelProgress[k]=0;
+    showToast(playerLevel===2
+      ?"Level 2 reached! New buildings, crafting and upgrades unlocked."
+      :playerLevel===3?"Level 3 reached! Farming, animals, Kitchens and automation unlocked!"
+      :"Level 4 reached! Bricks, bellows, Advanced Forge, improved tools, oak and coal production unlocked!");
+    refreshMenus();
+  }
+  updateLevelHUD();
+}
+function updateLevelHUD(){
+  $("goldIndicator").hidden=playerLevel<4&&!achievements.has("gold");
+  $("plankIndicator").hidden=playerLevel<2;
+  $("ironIndicator").hidden=playerLevel<2;
+  $("essenceIndicator").hidden=!achievements.has("essence");
+  updateInventoryDrawerState();$("requirements").replaceChildren();
+  if(playerLevel>=4){
+    $("levelName").textContent="Level 4";$("levelPercent").textContent="MAX LEVEL";
+    $("levelFill").style.width="100%";$("levelTrack").setAttribute("aria-valuenow","100");
+    const chip=document.createElement("span");chip.className="requirement done";
+    chip.textContent="Advanced Forge, improved producers, oak planks and steel unlocked";$("requirements").appendChild(chip);
+    $("levelUnlock").textContent="Keep exploring the Progress Tree";
+    return;
+  }
+  $("levelName").textContent=`Level ${playerLevel} → Level ${playerLevel+1}`;
+  let earned=0,total=0;
+  for(const[k,n]of Object.entries(LEVEL_REQUIREMENTS[playerLevel])){
+    const current=levelProgress[k],remaining=Math.max(0,n-current);
+    earned+=Math.min(current,n);total+=n;
+    const item=EXTRA_GOALS[k]||BUILDINGS[k]||ITEMS[k];
+    const verb=EXTRA_GOALS[k]?.verb||
+      (BUILDINGS[k]?"Build":RECIPES[k]?"Craft":"Gather");
+    const chip=document.createElement("span");
+    chip.className=`requirement${remaining===0?" done":""}`;
+    chip.textContent=remaining===0?`${item.emoji} ${item.label} ✓`:
+      `${verb} ${remaining} ${item.label}`;
+    chip.title=`${Math.min(current,n)} / ${n}`;
+    if(k==="upgradedProducer"){
+      chip.title="Reach production upgrade 1 on a Sawmill or Mine.";
+    }
+    $("requirements").appendChild(chip);
+  }
+  const p=earned/total*100;
+  $("levelPercent").textContent=`${Math.floor(p)}%`;
+  $("levelFill").style.width=`${p}%`;
+  $("levelTrack").setAttribute("aria-valuenow",String(Math.floor(p)));
+  $("levelUnlock").textContent=playerLevel===1
+    ?"Next: Forge, Treasures, Houses and building upgrades"
+    :playerLevel===2?"Next: Farms, Animal pens, Kitchens, Shovels and automation"
+    :"Next: Advanced Forge, improved producers, oak planks and steel";
+}
+function updatePauseUI(){
+  $("pauseButton").textContent=isPaused?"▶ Resume":"⏸ Pause";
+  $("pauseButton").classList.toggle("active",isPaused);
+  $("pauseButton").setAttribute("aria-pressed",String(isPaused));
+  $("pauseBadge").hidden=!isPaused;
+  $("treePause").textContent=isPaused?"▶":"⏸";
+  $("treePause").setAttribute("aria-label",isPaused?"Resume game":"Pause game");
+}
+function togglePause(){
+  if(isPaused){isPaused=false;lastSimulation=performance.now();lastFrame=null}
+  else{synchronize();isPaused=true;resetInput()}
+  updatePauseUI();refreshMenus();saveGame();
+}
+$("pauseButton").addEventListener("click",togglePause);
+$("treePause").addEventListener("click",togglePause);
+
+function updateInventoryDrawerState(){
+  const expanded=playerLevel>=2&&resourcesExpanded;
+  $("inventoryToggle").hidden=playerLevel<2;
+  $("inventoryToggle").setAttribute("aria-expanded",String(expanded));
+  $("inventoryToggle").setAttribute("aria-label",expanded?"Collapse inventory":"Expand inventory");
+  $("resourcesWrap").classList.toggle("expanded",expanded);
+  $("inventoryDrawer").inert=!expanded;
+  $("inventoryDrawer").setAttribute("aria-hidden",String(!expanded));
+}
+function renderInventoryDrawer(){
+  const container=$("inventoryDrawerItems");container.replaceChildren();
+  for(const[k,n]of Object.entries(inventory)){
+    if(n<=0||["plank","iron","essence","gold"].includes(k))continue;
+    const item=document.createElement("div");item.className="tool-resource";
+    const emoji=document.createElement("span");emoji.className="tool-emoji";
+    emoji.textContent=ITEMS[k].emoji;
+    const label=document.createElement("span");label.className="tool-label";
+    label.textContent=RECIPES[k]?.label||ITEMS[k].label;
+    const count=document.createElement("span");count.textContent=String(n);
+    item.append(emoji,label,count);container.appendChild(item);
+  }
+  if(!container.childElementCount){
+    const empty=document.createElement("div");empty.className="empty-inventory";
+    empty.textContent="No items yet";container.appendChild(empty);
+  }
+  updateInventoryDrawerState();
+}
+$("inventoryToggle").addEventListener("click",()=>{
+  if(playerLevel<2)return;
+  resourcesExpanded=!resourcesExpanded;renderInventoryDrawer();saveGame();
+});
+
+function stationFor(t){return t.building==="house"&&t.houseMode==="tailor"?"tailor":t.building}
+function stationDefinition(station){return BUILDINGS[station]||HOUSE_MODES[station]}
+function tradePlan(trade){
+  const quantity=craftMultiplier==="all"?Math.max(0,Math.min(...Object.entries(trade.cost)
+    .map(([k,n])=>Math.floor(balance(k)/n)))):craftMultiplier;
+  return{quantity,cost:Object.fromEntries(Object.entries(trade.cost).map(([k,n])=>[k,n*quantity])),
+    note:`Receive ${trade.amount*quantity} ${ITEMS[trade.item].emoji} ${ITEMS[trade.item].label} · ${quantity} trade${quantity===1?"":"s"}`};
+}
+function canAfford(cost){
+  return Object.entries(cost).every(
+    ([k,n])=>Number.isFinite(n)&&n>=0&&balance(k)>=n);
+}
+function addCost(target,cost){
+  for(const[k,n]of Object.entries(cost))target[k]=(target[k]||0)+n;
+}
+function spend(cost){
+  for(const[k,n]of Object.entries(cost))(has(resources,k)?resources:inventory)[k]-=n;
+}
+function refund(cost){
+  for(const[k,n]of Object.entries(cost))(has(resources,k)?resources:inventory)[k]+=n;
+}
+function constructionCost(category,type){
+  const base=(category==="biome"?BIOMES[type]:BUILDINGS[type]).baseCost;
+  const m=PRICE_MULTIPLIER**constructionCounts[category][type];
+  return Object.fromEntries(Object.entries(base).map(([k,n])=>[k,Math.ceil(n*m)]));
+}
+function recipeCost(type){return{...RECIPES[type].cost}}
+function craftPlan(type){
+  const unit=RECIPES[type].cost;
+  let quantity=craftMultiplier;
+  if(quantity==="all"){
+    quantity=Math.max(0,Math.min(...Object.entries(unit).map(
+      ([k,n])=>Math.floor(balance(k)/n))));
+  }
+  return{
+    quantity,
+    cost:Object.fromEntries(Object.entries(unit).map(([k,n])=>[k,n*quantity]))
+  };
+}
+// Plan against a private stock ledger. Reserving every target ingredient prevents
+// the same wood, plank or iron from being promised to multiple missing items.
+function missingCraftPlan(cost){
+  if(canAfford(cost))return null;
+  const stock={...resources,...inventory},steps=[];
+  const stations=new Set(tiles.map(stationFor).filter(Boolean));
+  function reserve(item,amount,path=new Set()){
+    if(!Number.isSafeInteger(amount)||amount<0)return false;
+    const used=Math.min(stock[item]||0,amount);
+    stock[item]=(stock[item]||0)-used;
+    const missing=amount-used;
+    if(!missing)return true;
+    const recipe=RECIPES[item];
+    if(!recipe||playerLevel<(recipe.requiredLevel||1)||
+       !stations.has(recipe.station)||path.has(item))return false;
+    const next=new Set(path);next.add(item);
+    for(const [ingredient,n]of Object.entries(recipe.cost)){
+      if(!reserve(ingredient,n*missing,next))return false;
+    }
+    steps.push({item,quantity:missing});
+    return true;
+  }
+  for(const [item,n]of Object.entries(cost))if(!reserve(item,n))return null;
+  return steps.length?{steps}:null;
+}
+function craftMissing(plan){
+  const progress={};
+  for(const {item,quantity}of plan.steps){
+    const cost=Object.fromEntries(Object.entries(RECIPES[item].cost)
+      .map(([k,n])=>[k,n*quantity]));
+    spend(cost);inventory[item]+=quantity;craftCounts[item]+=quantity;
+    achievements.add(item);pulse(item);
+    progress[item]=(progress[item]||0)+quantity;
+  }
+  recordProgress(progress);
+}
+function buildingLabel(t){
+  return t.building==="mine"&&t.upgradeLevel>=2?"Clay Canyon":BUILDINGS[t.building]?.label||"";
+}
+function productionTimeFactor(t,effects=supportEffects()){
+  return effects.timeFactor*(t.building==="farm"?(7.5-effects.farmReduction)/7.5:1);
+}
+function production(t){
+  if(t.building==="improvedSawmill")return{resource:"oak",amount:1,interval:7.5};
+  if(t.building==="improvedMine")return{resource:"coal",amount:1,interval:7.5};
+  if(t.building==="farm")return{resource:"wheat",amount:1,interval:7.5,randomCrop:true};
+  if(t.building==="animalPen")return{resource:"fur",amount:1,interval:30};
+  if(t.biome==="forest")return t.building==="sawmill"
+    ?{resource:"wood",amount:1+t.upgradeLevel,interval:3.5-.5*t.upgradeLevel}
+    :{resource:"wood",amount:1,interval:5};
+  if(t.biome==="mountains")return t.building==="mine"
+    ?{resource:"stone",amount:1+t.upgradeLevel,interval:3.5-.5*t.upgradeLevel,randomClay:t.upgradeLevel>=2}
+    :{resource:"stone",amount:1,interval:5};
+  if(t.biome==="lake"&&t.building!=="treasure"&&t.building!=="port")return{
+    resource:"fish",amount:t.building==="fishingHut"?1+t.upgradeLevel:1,
+    interval:t.building==="fishingHut"?7.5-(4/3)*t.upgradeLevel:15
+  };
+  return null;
+}
+function mpOwnsTile(t){
+  return !multiplayer.started||t.owner===multiplayer.playerId;
+}
+function automationFor(t){
+  return mpOwnsTile(t)&&t.automated&&playerLevel>=3?AUTOMATION[t.building]||null:null;
+}
+function assignedCount(mode){
+  return tiles.filter(t=>mpOwnsTile(t)&&t.building==="house"&&t.houseMode===mode).length;
+}
+function supportEffects(){
+  let residential=0,kitchens=0;
+  for(const t of tiles){
+    if(!mpOwnsTile(t)||t.building!=="house"||!t.housePowered)continue;
+    if(t.houseMode==="residential")residential++;
+    if(t.houseMode==="kitchen")kitchens++;
+  }
+  return{
+    timeFactor:1-Math.min(.5,residential*.05),
+    doubleChance:Math.min(.25,kitchens*.05),
+    farmReduction:Math.min(2.5,kitchens*.5)
+  };
+}
+function resetProduction(t){
+  t.productionRemaining=production(t)?.interval||5;t.flash=0;
+}
+function producerUpgradeCost(building,level){
+  if(level>=3)return{};
+  if(building==="fishingHut")return{...FISHING_UPGRADE_COSTS[level]};
+  const {tools,...cost}=PRODUCER_UPGRADE_COSTS[level];
+  cost[building==="sawmill"?"ironAxe":"ironPickaxe"]=tools;
+  return cost;
+}
+function upgradeCost(t){return producerUpgradeCost(t.building,t.upgradeLevel)}
+function treasureRoll(level){
+  let value=Math.random()*100;
+  for(const[item,chance]of TREASURE_LOOT[level>=2?2:1]){
+    value-=chance;if(value<0)return item;
+  }
+  return"fish";
+}
+function pulse(k){
+  const el=$(`${k}Indicator`);if(!el)return;
+  el.classList.remove("gain");void el.offsetWidth;el.classList.add("gain");
+}
+function collectAchievements(){
+  for(let i=1;i<=playerLevel;i++)achievements.add(`level${i}`);
+  for(const k of Object.keys(BIOMES)){
+    if(constructionCounts.biome[k]>0)achievements.add(k);
+  }
+  for(const k of Object.keys(BUILDINGS)){
+    if(constructionCounts.building[k]>0)achievements.add(k);
+  }
+  for(const k of Object.keys(ITEMS)){
+    if(balance(k)>0||(craftCounts[k]||0)>0)achievements.add(k);
+  }
+  for(const t of tiles){
+    if(!mpOwnsTile(t))continue;
+    if(t.biome)achievements.add(t.biome);
+    if(t.building)achievements.add(t.building);
+    if(t.automated)achievements.add(t.building==="carpenter"?"autoCarpenter":"autoForge");
+    if(["sawmill","mine","fishingHut"].includes(t.building)){
+      if(t.upgradeLevel>0)achievements.add(`${t.building}Upgrade`);
+      if(t.building==="mine"&&t.upgradeLevel>=2)achievements.add("clayCanyon");
+    }
+    if(t.building==="treasure"&&t.treasureLevel>=2)achievements.add("treasure2");
+    if(t.building==="house"&&t.houseMode)achievements.add(t.houseMode);
+  }
+}
+function resourceBalancePerMinute(resource){
+  const effects=supportEffects();
+  let income=0,upkeep=0,automation=0;
+  for(const t of tiles){
+    if(!mpOwnsTile(t))continue;
+    const p=production(t);
+    if(p){
+      const chance=p.randomClay?(resource==="stone"?.8:resource==="clay"?.2:0)
+        :p.randomCrop?(resource==="wheat"?.8:resource==="carrot"?.2:0)
+        :p.resource===resource?1:0;
+      income+=chance*60*p.amount/(p.interval*productionTimeFactor(t,effects));
+    }
+    if(t.building==="treasure"){
+      const chance=TREASURE_LOOT[t.treasureLevel>=2?2:1]
+        .find(([item])=>item===resource)?.[1]||0;
+      income+=60/15/effects.timeFactor*chance/100;
+    }
+    if(resource==="fish"&&t.building==="house"&&t.houseMode)
+      upkeep+=HOUSE_MODES[t.houseMode].upkeep*12;
+    const a=automationFor(t);
+    // Include recurring demand even if this resource itself is depleted.
+    if(a&&Object.entries(a.recipe).every(([k,n])=>k===resource||balance(k)>=n))
+      automation+=(a.recipe[resource]||0)*60/(a.interval*effects.timeFactor);
+  }
+  income*=1+effects.doubleChance;
+  return{income,upkeep,automation,net:income-upkeep-automation};
+}
+function fishBalancePerMinute(){return resourceBalancePerMinute("fish")}
+function updateFishRate(){
+  for(const resource of ["wood","stone","fish"]){
+    const rate=resourceBalancePerMinute(resource),net=isPaused?0:rate.net;
+    const rounded=Math.round(net*10)/10,el=$(`${resource}Rate`);
+    el.textContent=`${rounded<0?"−":"+"}${Math.abs(rounded).toLocaleString("en-US",{maximumFractionDigits:1})} / min`;
+    el.classList.toggle("negative",rounded<0);
+    el.title=isPaused?"Game paused":`Expected ${resource} / min: +${rate.income.toFixed(1)} production, −${rate.upkeep.toFixed(1)} houses, −${rate.automation.toFixed(1)} automation`;
+  }
+}
+function updateResources(){
+  updateFishRate();
+  collectAchievements();
+  for(const k of["wood","stone","fish","plank","iron","essence","gold"]){
+    $(`${k}Count`).textContent=String(balance(k));
+  }
+  renderInventoryDrawer();refreshMenus();updateLevelHUD();refreshTreeStates();
+}
+
+/*
+  Timers store base work remaining.
+  Residential bonuses accelerate production, treasures and automation.
+  House upkeep remains a fixed 5-second wall-clock interval.
+*/
+function simulate(elapsed,animate=true){
+  if(isPaused||elapsed<=0)return;
+  const gathered={wood:0,stone:0,fish:0};
+  const crafted={plank:0,iron:0};
+  const changedItems=new Set();
+  let remaining=elapsed,changed=false;
+
+  function give(item,amount,kind){
+    (has(resources,item)?resources:inventory)[item]+=amount;
+    achievements.add(item);changedItems.add(item);changed=true;
+    if(kind==="gather"&&has(gathered,item))gathered[item]+=amount;
+    if(kind==="craft"&&has(crafted,item))crafted[item]+=amount;
+  }
+
+  while(remaining>EPS){
+    const effects=supportEffects();
+    const tasks=[];
+    const homes=[];
+    let step=remaining;
+
+    for(const t of tiles){
+      if(!mpOwnsTile(t))continue;
+      if(t.building==="house"&&t.houseMode&&HOUSE_MODES[t.houseMode].upkeep>0){
+        homes.push(t);
+        step=Math.min(step,Math.max(EPS,t.houseRemaining));
+      }
+
+      const p=production(t);
+      if(p){
+        tasks.push({t,kind:"gather",p});
+        step=Math.min(step,Math.max(EPS,t.productionRemaining*productionTimeFactor(t,effects)));
+      }
+      if(t.building==="treasure"){
+        tasks.push({t,kind:"treasure"});
+        step=Math.min(step,Math.max(EPS,t.treasureRemaining*effects.timeFactor));
+      }
+      const a=automationFor(t);
+      if(a&&canAfford(a.recipe)){
+        tasks.push({t,kind:"auto",a});
+        step=Math.min(step,Math.max(EPS,t.autoRemaining*effects.timeFactor));
+      }
+    }
+
+    const work=step/effects.timeFactor;
+    for(const t of homes)t.houseRemaining-=step;
+    for(const task of tasks){
+      if(task.kind==="gather")task.t.productionRemaining-=step/productionTimeFactor(task.t,effects);
+      if(task.kind==="treasure")task.t.treasureRemaining-=work;
+      if(task.kind==="auto")task.t.autoRemaining=Math.max(0,task.t.autoRemaining-work);
+    }
+    remaining=Math.max(0,remaining-step);
+
+    // A house starts providing its bonus after its first successful upkeep.
+    for(const t of homes){
+      if(t.houseRemaining>EPS)continue;
+      const mode=HOUSE_MODES[t.houseMode];
+      t.housePowered=resources.fish>=mode.upkeep;
+      if(t.housePowered){
+        resources.fish-=mode.upkeep;changedItems.add("fish");changed=true;
+      }
+      t.houseRemaining+=5;
+    }
+
+    const payoutEffects=supportEffects();
+    const multiplier=()=>Math.random()<payoutEffects.doubleChance?2:1;
+
+    for(const task of tasks){
+      const t=task.t;
+      if(task.kind==="gather"&&t.productionRemaining<=EPS){
+        t.productionRemaining+=task.p.interval;
+        const item=task.p.randomCrop?(Math.random()<.8?"wheat":"carrot"):
+          task.p.randomClay?(Math.random()<.8?"stone":"clay"):task.p.resource;
+        give(item,task.p.amount*multiplier(),"gather");
+        if(animate)t.flash=1;
+      }
+      if(task.kind==="treasure"&&t.treasureRemaining<=EPS){
+        t.treasureRemaining+=15;
+        const item=treasureRoll(t.treasureLevel);
+        give(item,multiplier(),"gather");
+        if(animate)t.flash=1;
+      }
+      if(task.kind==="auto"&&t.autoRemaining<=EPS&&canAfford(task.a.recipe)){
+        spend(task.a.recipe);
+        for(const k of Object.keys(task.a.recipe))changedItems.add(k);
+        give(task.a.item,multiplier(),"craft");
+        t.autoRemaining=task.a.interval;
+        if(animate)t.flash=1;
+      }
+    }
+  }
+
+  if(changed){
+    recordProgress({...gathered,plank:crafted.plank,iron:crafted.iron});
+    if(animate)for(const k of changedItems)pulse(k);
+    updateResources();
+  }
+}
+function synchronize(animate=true){
+  const now=performance.now(),elapsed=Math.max(0,(now-lastSimulation)/1000);
+  lastSimulation=now;if(!isPaused)simulate(elapsed,animate);
+}
+
+function drawCost(element,cost){
+  element.replaceChildren();
+  if(!Object.keys(cost).length){element.textContent="Free";return}
+  for(const[k,n]of Object.entries(cost)){
+    const row=document.createElement("span");row.className="cost-row";
+    row.classList.toggle("missing",balance(k)<n);
+    const required=document.createElement("span");required.className="cost-required";
+    required.textContent=`${ITEMS[k].emoji} ${n} ${ITEMS[k].label}`;
+    const owned=document.createElement("span");owned.className="cost-owned";
+    owned.textContent=`(You have ${balance(k)} ${ITEMS[k].emoji})`;
+    row.append(required,owned);element.appendChild(row);
+  }
+}
+function makePanel(menu,side,title="",subtitle=""){
+  const anchor=document.createElement("div");anchor.className=`panel-anchor ${side}`;
+  const element=document.createElement("div");element.className=`panel${title?" station":""}`;
+  element.setAttribute("role","group");element.setAttribute("aria-label",title||"Tile actions");
+  if(title){
+    const heading=document.createElement("div");heading.className="panel-heading";
+    const strong=document.createElement("strong");strong.textContent=title;
+    const small=document.createElement("small");small.textContent=subtitle;
+    heading.append(strong,small);element.appendChild(heading);
+  }
+  anchor.appendChild(element);document.body.appendChild(anchor);
+  menu.panels.push({anchor,element,side});return element;
+}
+function finishAction(menu,options){
+  if(options.reopen){closeMenu(menu);openMenu(menu.tile)}
+  else if(options.keepOpen)refreshMenus();
+  else closeMenu(menu);
+  updateResources();positionMenus();saveGame();
+}
+function makeButton(menu,panel,options){
+  const card=document.createElement("div");card.className="action-card";
+  const button=document.createElement("button");
+  button.type="button";button.className=`action ${options.color}`;
+  button.innerHTML=`
+    <span class="icon-column">
+      <span class="icon" aria-hidden="true">${options.emoji}</span>
+      <span class="owned-count" hidden></span>
+    </span>
+    <span class="content">
+      <span class="level-row"><span class="title"></span><span class="level-label"></span></span>
+      <span class="cost"></span><span class="note"></span>
+      <span class="status" hidden></span><span class="segments" hidden></span>
+    </span>
+    <span class="lock-overlay" hidden aria-hidden="true">
+      <span class="lock-emoji">🔒</span><span class="lock-text"></span>
+    </span>`;
+  const essenceButton=document.createElement("button");
+  essenceButton.type="button";essenceButton.className="essence-button";
+  essenceButton.textContent="✨ Use essence";essenceButton.hidden=true;
+  const craftRestButton=document.createElement("button");
+  craftRestButton.type="button";craftRestButton.className="craft-rest-button";
+  craftRestButton.textContent="craft the rest";craftRestButton.hidden=true;
+  const entry={card,button,options,essenceButton,craftRestButton};
+  for(const[name,selector]of Object.entries({
+    title:".title",level:".level-label",cost:".cost",note:".note",
+    status:".status",segments:".segments",lockOverlay:".lock-overlay",
+    lockText:".lock-text",ownedCount:".owned-count"
+  }))entry[name]=button.querySelector(selector);
+  menu.buttons.push(entry);card.append(button,craftRestButton,essenceButton);panel.appendChild(card);
+
+  button.addEventListener("click",()=>{
+    if(isPaused||menu.closing||activeMenu!==menu)return;
+    synchronize();
+    if(options.locked?.()||options.maxed?.()||options.blocked?.())return;
+    const plan=options.plan?.(),cost=plan?plan.cost:options.cost?.()||{};
+    if(plan&&plan.quantity===0)return;
+    if(!canAfford(cost))return;
+    spend(cost);options.action(cost,plan?.quantity||1);finishAction(menu,options);
+  });
+  craftRestButton.addEventListener("click",()=>{
+    if(isPaused||menu.closing||activeMenu!==menu)return;
+    synchronize();
+    if(isPaused||options.locked?.()||options.maxed?.()||options.blocked?.())return;
+    const target=options.plan?.();
+    if(target&&target.quantity<=0)return;
+    const cost=target?target.cost:options.cost?.()||{};
+    const plan=missingCraftPlan(cost);
+    if(!plan)return;
+    craftMissing(plan);
+    // Only prepare ingredients. The player still chooses when to build/craft.
+    updateResources();positionMenus();saveGame();
+  });
+  essenceButton.addEventListener("click",()=>{
+    if(isPaused||menu.closing||activeMenu!==menu||!options.essenceEligible)return;
+    synchronize();
+    if(inventory.essence<1||options.locked?.()||options.maxed?.()||options.blocked?.())return;
+    inventory.essence--;
+    // Store the actual expense for exact deletion refunds.
+    options.action({essence:1},1);finishAction(menu,options);
+  });
+}
+function refreshButton(e){
+  const o=e.options,locked=!!o.locked?.(),maxed=!!o.maxed?.(),blocked=!!o.blocked?.();
+  e.card.hidden=false;
+  const plan=o.plan?.(),cost=plan?plan.cost:o.cost?.()||{};
+  const affordable=canAfford(cost)&&(!plan||plan.quantity>0);
+  const rest=!isPaused&&!locked&&!maxed&&!blocked&&(!plan||plan.quantity>0)
+    ?missingCraftPlan(cost):null;
+  e.craftRestButton.hidden=!rest;
+  if(rest)e.craftRestButton.title="Craft missing ingredients: "+rest.steps
+    .map(({item,quantity})=>`${quantity} ${ITEMS[item].label}`).join(", ");
+  e.title.textContent=o.label;
+  e.button.disabled=isPaused||locked||maxed||blocked||!affordable;
+  e.button.classList.toggle("level-locked",locked);
+  e.lockOverlay.hidden=!locked;e.lockText.textContent=`LEVEL ${o.requiredLevel||2}`;
+  e.status.hidden=locked||maxed||(!isPaused&&!blocked&&affordable);
+  e.status.textContent=isPaused?"Game paused":blocked
+    ?o.blockMessage||"Limit reached":"Missing resources or tools";
+  e.note.textContent=plan
+    ?plan.note||`Craft +${plan.quantity} · ${craftMultiplier==="all"?"All affordable":`×${craftMultiplier}`} · fixed price`
+    :typeof o.note==="function"?o.note():o.note||"";
+  e.note.hidden=!e.note.textContent;
+  if(maxed)e.cost.textContent="Fully upgraded";
+  else if(o.detail)e.cost.textContent=o.detail;
+  else drawCost(e.cost,cost);
+  e.ownedCount.hidden=!o.itemType;
+  if(o.itemType){
+    e.ownedCount.textContent=String(balance(o.itemType));
+    e.ownedCount.title=`Owned ${ITEMS[o.itemType].label}`;
+  }
+  e.level.textContent=o.levelLabel?.()||"";e.level.hidden=!e.level.textContent;
+  e.segments.hidden=!o.segments;
+  if(o.segments){
+    e.segments.replaceChildren();
+    for(let i=0;i<o.segments;i++){
+      const segment=document.createElement("span");segment.className="segment";
+      segment.classList.toggle("filled",i<o.filled());e.segments.appendChild(segment);
+    }
+  }
+  e.essenceButton.hidden=!o.essenceEligible||inventory.essence<1||locked||maxed||blocked||isPaused;
+  e.essenceButton.textContent=`✨ Use essence (${inventory.essence})`;
+  e.button.title=locked?`Unlocks at Level ${o.requiredLevel||2}`
+    :o.scaling?"Each next construction of this type costs 30% more.":o.label;
+}
+function makeInventory(menu){
+  const anchor=document.createElement("div");anchor.className="inventory-anchor";
+  const panel=document.createElement("div");panel.className="inventory";
+  anchor.appendChild(panel);document.body.appendChild(anchor);menu.inventory={anchor,panel};
+}
+function refreshInventory(menu){
+  if(!menu.inventory)return;
+  const{anchor,panel}=menu.inventory;panel.replaceChildren();
+  for(const[k,n]of Object.entries(inventory)){
+    // A station only displays the items in its own recipe list.
+    const station=stationFor(menu.tile);
+    const isOutput=(station==="farm"&&["wheat","carrot"].includes(k))||
+      (station==="animalPen"&&k==="fur")||
+      (station==="improvedSawmill"&&k==="oak")||
+      (station==="improvedMine"&&k==="coal")||
+      (station==="port"&&["gold","oakPlank","steel","jacket","gloves","improvedAxe","improvedPickaxe"].includes(k));
+    if(n<=0||(!isOutput&&RECIPES[k]?.station!==station))continue;
+    const item=document.createElement("span");item.className="inventory-item";
+    item.title=RECIPES[k]?.label||ITEMS[k].label;
+    const emoji=document.createElement("i");emoji.textContent=ITEMS[k].emoji;
+    const count=document.createElement("span");count.textContent=String(n);
+    item.append(emoji,count);panel.appendChild(item);
+  }
+  anchor.hidden=!panel.childElementCount;
+}
+function makeBulkPicker(menu,panel){
+  const footer=document.createElement("div");footer.className="bulk-footer";
+  const heading=document.createElement("div");heading.className="bulk-heading";
+  heading.textContent="CRAFT AMOUNT · FIXED UNIT PRICES";
+  const choices=document.createElement("div");choices.className="bulk-options";
+  for(const value of[1,5,25,"all"]){
+    const button=document.createElement("button");button.type="button";
+    button.className="bulk-option";button.textContent=value==="all"?"All":`${value}×`;
+    menu.bulkButtons.push({button,value});
+    button.addEventListener("click",()=>{
+      craftMultiplier=value;refreshMenus();positionMenus();saveGame();
+    });
+    choices.appendChild(button);
+  }
+  footer.append(heading,choices);panel.appendChild(footer);
+}
+function updateAutomationStatus(menu){
+  if(!menu.autoStatus)return;
+  const t=menu.tile,a=automationFor(t);if(!a)return;
+  const running=!isPaused&&canAfford(a.recipe);
+  menu.autoStatus.classList.toggle("paused",!running);
+  menu.autoStatus.textContent=isPaused?"⏸ Game paused":running
+    ?`⚙ Auto ${ITEMS[a.item].label}: ${(t.autoRemaining*supportEffects().timeFactor).toFixed(1)}s · ${costText(a.recipe)}`
+    :`⏸ Paused · Needs ${costText(a.recipe)}`;
+}
+function refreshMenus(){
+  for(const menu of menus){
+    if(menu.closing)continue;
+    for(const e of menu.buttons)refreshButton(e);
+    for(const{button,value}of menu.bulkButtons){
+      button.classList.toggle("active",craftMultiplier===value);
+      button.setAttribute("aria-pressed",String(craftMultiplier===value));
+    }
+    refreshInventory(menu);updateAutomationStatus(menu);
+  }
+}
+function addBuildButton(menu,panel,tile,type){
+  const b=BUILDINGS[type],requiredLevel=b.requiredLevel||1;
+  makeButton(menu,panel,{
+    label:b.label,emoji:b.emoji,color:tile.biome,scaling:true,note:b.note,requiredLevel,
+    locked:()=>playerLevel<requiredLevel,cost:()=>constructionCost("building",type),
+    action(cost){
+      tile.owner=multiplayer.started?multiplayer.playerId:tile.owner;
+      tile.building=type;tile.buildingPaid={...cost};
+      tile.upgradeLevel=0;tile.automated=false;
+      tile.autoRemaining=AUTOMATION[type]?.interval||5;
+      tile.treasureLevel=1;tile.treasureRemaining=15;
+      tile.houseMode=null;tile.houseRemaining=5;tile.housePowered=false;
+      tile.buildingEmoji=b.emoji;tile.iconOpacity=0;tile.iconProgress=0;
+      constructionCounts.building[type]++;
+      achievements.add(type);recordProgress({[type]:1});resetProduction(tile);
+    }
+  });
+}
+function addUpgradeButtons(menu,panel,tile){
+  makeButton(menu,panel,{
+    label:"Production upgrade",emoji:"📈",color:"profit",keepOpen:true,
+    requiredLevel:2,locked:()=>playerLevel<2,essenceEligible:true,
+    cost:()=>upgradeCost(tile),maxed:()=>tile.upgradeLevel>=3,
+    segments:3,filled:()=>tile.upgradeLevel,
+    levelLabel:()=>`${tile.upgradeLevel} / 3`,
+    note(){
+      const p=production(tile),loot=p.randomClay?" · 80% stone / 20% clay":
+        tile.building==="mine"&&tile.upgradeLevel===1?" · Next: Clay Canyon, 80% stone / 20% clay":"";
+      return (tile.upgradeLevel>=3?`${p.amount} ${p.resource} / ${p.interval.toFixed(1)}s base`:
+        `${p.amount} → ${p.amount+1} per harvest · ${p.interval.toFixed(1)}s → ${(p.interval-(tile.building==="fishingHut"?4/3:.5)).toFixed(1)}s base`)+loot;
+    },
+    action(cost){
+      const fraction=tile.productionRemaining/production(tile).interval;
+      tile.upgradeLevel++;achievements.add(`${tile.building}Upgrade`);
+      if(tile.building==="mine"&&tile.upgradeLevel>=2){
+        achievements.add("clayCanyon");
+        for(const p of menu.panels){const title=p.element.querySelector(".panel-heading strong");
+          if(title)title.textContent=buildingLabel(tile);}
+      }
+      addCost(tile.buildingPaid,cost);
+      tile.productionRemaining=production(tile).interval*fraction;
+      if(tile.building!=="fishingHut"&&levelProgress.upgradedProducer<1)recordProgress({upgradedProducer:1});
+    }
+  });
+}
+function openMenu(tile){
+  if(multiplayer.started&&tile.biome&&tile.owner&&tile.owner!==multiplayer.playerId){
+    closeMenu();showToast("This tile belongs to another player.");return;
+  }
+  if(activeMenu?.tile===tile){closeMenu();return}
+  closeMenu();
+  const menu={
+    tile,panels:[],buttons:[],bulkButtons:[],inventory:null,
+    autoStatus:null,closing:false,revealFrame:null
+  };
+  if(!tile.biome){
+    const left=makePanel(menu,"left"),right=makePanel(menu,"right");
+    for(const[type,panel]of[
+      ["forest",left],["meadow",left],["lake",right],["mountains",right]
+    ]){
+      const b=BIOMES[type];
+      makeButton(menu,panel,{
+        label:b.label,emoji:b.emoji,color:type,note:b.note,scaling:true,
+        cost:()=>constructionCost("biome",type),
+        action(cost){
+          tile.biome=type;tile.owner=multiplayer.started?multiplayer.playerId:null;
+          tile.biomePaid={...cost};tile.targetColor=[...b.color];
+          constructionCounts.biome[type]++;achievements.add(type);resetProduction(tile);
+        }
+      });
+    }
+  }else{
+    const left=makePanel(menu,"left"),auto=AUTOMATION[tile.building];
+    if(auto&&!tile.automated){
+      makeButton(menu,left,{
+        label:"Upgrade",emoji:"⚙️",color:"automation",requiredLevel:3,
+        locked:()=>playerLevel<3,reopen:true,essenceEligible:true,
+        cost:()=>auto.upgradeCost,
+        note:`Automate 1 ${ITEMS[auto.item].label} / ${auto.interval}s · ${costText(auto.recipe)}`,
+        action(cost){
+          tile.automated=true;tile.autoRemaining=auto.interval;
+          achievements.add(tile.building==="carpenter"?"autoCarpenter":"autoForge");
+          addCost(tile.buildingPaid,cost);
+        }
+      });
+    }
+    makeButton(menu,left,{
+      label:"Delete",emoji:"🗑️",color:"delete",
+      detail:tile.building?"Remove building only":"Remove biome",
+      note:"100% construction and upgrade refund",
+      action(){
+        if(tile.building){
+          refund(tile.buildingPaid);tile.buildingPaid={};tile.building=null;
+          tile.upgradeLevel=0;tile.automated=false;tile.autoRemaining=5;
+          tile.houseMode=null;tile.housePowered=false;tile.houseRemaining=5;
+          tile.treasureLevel=1;tile.treasureRemaining=15;
+        }else{
+          refund(tile.biomePaid);tile.biomePaid={};tile.biome=null;tile.owner=null;
+          tile.targetColor=[255,255,255];
+        }
+        resetProduction(tile);
+      }
+    });
+
+    if(["carpenter","forge","farm","animalPen","advancedForge","tailor"].includes(stationFor(tile))){
+      const station=stationFor(tile);
+      const title=tile.automated
+        ?AUTOMATION[tile.building].label:stationDefinition(station).label;
+      const right=makePanel(menu,"right",title,"Fixed recipes · bulk crafting");
+      if(tile.automated){
+        menu.autoStatus=document.createElement("div");
+        menu.autoStatus.className="auto-status";right.appendChild(menu.autoStatus);
+      }
+      for(const[type,r]of Object.entries(RECIPES)){
+        if(r.station!==station)continue;
+        const requiredLevel=r.requiredLevel||1;
+        makeButton(menu,right,{
+          label:r.label,emoji:r.emoji,itemType:type,
+          color:["forge","advancedForge"].includes(tile.building)?"forge":"craft",
+          keepOpen:true,requiredLevel,locked:()=>playerLevel<requiredLevel,
+          plan:()=>craftPlan(type),
+          action(cost,quantity){
+            inventory[type]+=quantity;craftCounts[type]+=quantity;achievements.add(type);
+            recordProgress({[type]:quantity});
+            pulse(type);
+          }
+        });
+      }
+      makeBulkPicker(menu,right);makeInventory(menu);
+    }else if(tile.building==="port"){
+      const right=makePanel(menu,"right","⚓ Port","Sell goods · Buy supplies · Fixed exchange rates");
+      for(const[id,trade]of Object.entries(PORT_TRADES)){
+        makeButton(menu,right,{
+          label:trade.label,emoji:ITEMS[trade.item].emoji,itemType:trade.item,color:"treasure",
+          requiredLevel:4,locked:()=>playerLevel<4,keepOpen:true,
+          plan:()=>tradePlan(trade),
+          action(cost,quantity){
+            const amount=trade.amount*quantity;
+            (has(resources,trade.item)?resources:inventory)[trade.item]+=amount;
+            achievements.add(id);achievements.add(trade.item);pulse(trade.item);
+            // Purchases are not gathered resources or crafted progression items.
+          }
+        });
+      }
+      makeBulkPicker(menu,right);makeInventory(menu);
+    }else if(["sawmill","mine","fishingHut"].includes(tile.building)){
+      addUpgradeButtons(menu,makePanel(
+        menu,"right",buildingLabel(tile),"Production upgrades"
+      ),tile);
+    }else if(tile.building==="treasure"){
+      if(tile.treasureLevel<2){
+        const right=makePanel(menu,"right","Treasures","Upgrade the loot table");
+        makeButton(menu,right,{
+          label:"Upgrade to Level 2",emoji:"🧰",color:"treasure",reopen:true,
+          requiredLevel:2,locked:()=>playerLevel<2,cost:()=>TREASURE_UPGRADE,
+          note:"Unlock planks, iron, iron tools and XP essence",
+          action(cost){
+            tile.treasureLevel=2;addCost(tile.buildingPaid,cost);
+            achievements.add("treasure2");
+          }
+        });
+      }
+    }else if(["improvedSawmill","improvedMine"].includes(tile.building)){
+      makePanel(menu,"right",buildingLabel(tile),
+        `${BUILDINGS[tile.building].note} base · Residential speed and Kitchen double loot apply`);
+      makeInventory(menu);
+    }else if(tile.building==="house"&&!tile.houseMode){
+      const right=makePanel(menu,"right","House","Choose a permanent purpose");
+      for(const[type,mode]of Object.entries(HOUSE_MODES)){
+        makeButton(menu,right,{
+          label:mode.label,emoji:mode.emoji,color:"house",
+          requiredLevel:mode.requiredLevel,locked:()=>playerLevel<mode.requiredLevel,
+          cost:()=>mode.cost,note:()=>mode.note+(Number.isFinite(mode.limit)?` · ${assignedCount(type)} / ${mode.limit}`:""),
+          blocked:()=>assignedCount(type)>=mode.limit,blockMessage:"Assignment limit reached",
+          action(cost){
+            addCost(tile.buildingPaid,cost);
+            tile.houseMode=type;tile.housePowered=false;tile.houseRemaining=5;
+            tile.buildingEmoji=mode.emoji;achievements.add(type);
+            recordProgress({[type]:1});
+          }
+        });
+      }
+    }else if(!tile.building){
+      const right=makePanel(menu,"right","Build","Choose a building");
+      for(const type of BIOMES[tile.biome].buildings)addBuildButton(menu,right,tile,type);
+    }
+  }
+  menus.add(menu);activeMenu=menu;refreshMenus();positionMenu(menu);
+  for(const p of menu.panels)void p.anchor.offsetWidth;
+  if(menu.inventory)void menu.inventory.anchor.offsetWidth;
+  menu.revealFrame=requestAnimationFrame(()=>{
+    if(!menu.closing){
+      for(const p of menu.panels)p.anchor.classList.add("open");
+      menu.inventory?.anchor.classList.add("open");
+    }
+    menu.revealFrame=null;
+  });
+}
+function closeMenu(menu=activeMenu){
+  if(!menu||menu.closing)return;
+  menu.closing=true;
+  if(menu.revealFrame!==null)cancelAnimationFrame(menu.revealFrame);
+  if(activeMenu===menu)activeMenu=null;
+  for(const p of menu.panels){
+    if(p.anchor.contains(document.activeElement))document.activeElement.blur();
+    p.anchor.inert=true;p.anchor.setAttribute("aria-hidden","true");
+    p.anchor.classList.remove("open");
+  }
+  menu.inventory?.anchor.classList.remove("open");
+  setTimeout(()=>{
+    for(const p of menu.panels)p.anchor.remove();
+    menu.inventory?.anchor.remove();menus.delete(menu);
+  },260);
+}
+function positionMenu(menu){
+  const x=menu.tile.x-camera.x+width/2,y=menu.tile.y-camera.y+height/2;
+  for(const p of menu.panels){
+    const px=p.side==="left"
+      ?x-HEX_WIDTH/2-14-p.anchor.offsetWidth:x+HEX_WIDTH/2+14;
+    let py=y-p.anchor.offsetHeight/2;
+    if(p.element.classList.contains("station")){
+      py=Math.max(10,Math.min(height-p.anchor.offsetHeight-130,py));
+    }
+    p.anchor.style.transform=`translate(${px}px,${py}px)`;
+  }
+  if(menu.inventory&&!menu.inventory.anchor.hidden){
+    const a=menu.inventory.anchor;
+    a.style.transform=`translate(${x-a.offsetWidth/2}px,${y-HEX_SIZE-12-a.offsetHeight}px)`;
+  }
+}
+function positionMenus(){for(const m of menus)positionMenu(m)}
+function tileAt(sx,sy){
+  const x=sx-width/2+camera.x,y=sy-height/2+camera.y;
+  const fq=(Math.sqrt(3)/3*x-y/3)/HEX_SIZE,fr=(2/3*y)/HEX_SIZE,fs=-fq-fr;
+  let q=Math.round(fq),r=Math.round(fr);const s=Math.round(fs);
+  const dq=Math.abs(q-fq),dr=Math.abs(r-fr),ds=Math.abs(s-fs);
+  if(dq>dr&&dq>ds)q=-r-s;else if(dr>ds)r=-q-s;
+  return tileMap.get(tileKey(q,r))||null;
+}
+canvas.addEventListener("click",e=>{
+  const t=tileAt(e.clientX,e.clientY);if(t)openMenu(t);else closeMenu();
+});
+canvas.addEventListener("pointermove",e=>{pointer={x:e.clientX,y:e.clientY}});
+canvas.addEventListener("pointerleave",()=>{pointer=null;canvas.style.cursor="default"});
+function resetInput(){keys.clear();camera.vx=0;camera.vy=0}
+window.addEventListener("blur",resetInput);
+window.addEventListener("keydown",e=>{
+  if($("resetDialog").open)return;
+  if(e.target instanceof HTMLElement&&e.target.closest("input,textarea,select,[contenteditable]"))return;
+  if(e.code==="Escape"){if(treeOpen)setTreeOpen(false);else closeMenu();return}
+  if(isPaused||treeOpen||!movementCodes.has(e.code))return;
+  e.preventDefault();keys.add(e.code);
+});
+window.addEventListener("keyup",e=>{
+  if(!movementCodes.has(e.code))return;e.preventDefault();keys.delete(e.code);
+});
+function resize(){
+  width=innerWidth;height=innerHeight;
+  const ratio=devicePixelRatio||1;
+  canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);
+  ctx.setTransform(ratio,0,0,ratio,0,0);positionMenus();
+  if(treeOpen)fitTree();
+}
+window.addEventListener("resize",resize);
+function updateCamera(dt){
+  if(isPaused)return;
+  let dx=Number(keys.has("KeyD"))-Number(keys.has("KeyA"));
+  let dy=Number(keys.has("KeyS"))-Number(keys.has("KeyW"));
+  const length=Math.hypot(dx,dy);if(length){dx/=length;dy/=length}
+  const tx=dx*550,ty=dy*550,response=length?7:9;
+  const decay=Math.exp(-response*dt),movement=(1-decay)/response;
+  camera.x+=tx*dt+(camera.vx-tx)*movement;camera.y+=ty*dt+(camera.vy-ty)*movement;
+  camera.vx=tx+(camera.vx-tx)*decay;camera.vy=ty+(camera.vy-ty)*decay;
+  if(!length&&Math.hypot(camera.vx,camera.vy)<.1){camera.vx=0;camera.vy=0}
+}
+function updateTiles(dt){
+  const b=1-Math.exp(-9*dt),ib=1-Math.exp(-14*dt);
+  for(const t of tiles){
+    for(let i=0;i<3;i++){
+      const d=t.targetColor[i]-t.color[i];t.color[i]+=Math.abs(d)<.1?d:d*b;
+    }
+    t.iconOpacity+=((t.building?1:0)-t.iconOpacity)*ib;
+    if(t.building)t.iconProgress=Math.min(1,t.iconProgress+dt/.4);
+    else if(t.iconOpacity<.005){t.iconOpacity=0;t.buildingEmoji=null}
+    t.flash=Math.max(0,t.flash-dt*1.8);
+  }
+}
+function roundedRect(x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+function drawTimer(t,remaining,interval,label=null){
+  const w=label?42:35,x=t.x-w/2,y=t.y+18;
+  ctx.save();roundedRect(x,y,w,15,7);
+  ctx.fillStyle=label?"rgba(110,79,24,.35)":"rgba(20,40,45,.28)";ctx.fill();
+  ctx.save();ctx.clip();ctx.fillStyle="rgba(255,255,255,.26)";
+  ctx.fillRect(x,y,w*Math.max(0,Math.min(1,1-remaining/interval)),15);
+  ctx.restore();ctx.font="700 9px system-ui";
+  ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";
+  ctx.fillText(label||`${Math.max(.1,Math.ceil(remaining*10)/10).toFixed(1)}s`,t.x,y+7.5);
+  ctx.restore();
+}
+function drawBuildingBadge(t){
+  let label="";
+  if(["sawmill","mine","fishingHut"].includes(t.building))label=`Lv ${t.upgradeLevel}`;
+  else if(t.automated)label="AUTO";
+  else if(t.building==="treasure")label=`Lv ${t.treasureLevel}`;
+  else if(t.building==="house"&&t.houseMode)label=t.houseMode==="tailor"?"CRAFT":t.housePowered?"ON":"OFF";
+  if(!label)return;
+  ctx.save();ctx.globalAlpha=t.iconOpacity;
+  roundedRect(t.x-16,t.y-31,32,13,6);ctx.fillStyle="#ffffffc7";ctx.fill();
+  ctx.font="800 9px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillStyle="#344b40";ctx.fillText(label,t.x,t.y-24.5);ctx.restore();
+}
+function draw(){
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,width,height);
+  ctx.save();ctx.translate(width/2-camera.x,height/2-camera.y);
+  const factor=supportEffects().timeFactor;
+  for(const t of tiles){
+    ctx.fillStyle=`rgb(${t.color.join(",")})`;ctx.fill(t.path);
+    if(t.flash){ctx.fillStyle=`rgba(255,255,255,${t.flash*.25})`;ctx.fill(t.path)}
+  }
+  ctx.strokeStyle="#b5b5b5";ctx.lineWidth=1;
+  ctx.lineJoin="round";ctx.lineCap="round";ctx.stroke(borders);
+  if(multiplayer.started){
+    for(const t of tiles){
+      if(!t.biome||!t.owner)continue;
+      ctx.save();ctx.strokeStyle=t.owner===multiplayer.playerId?"#4b9b65":"#397dc2";
+      ctx.lineWidth=2.2;ctx.stroke(t.path);ctx.restore();
+    }
+  }
+  for(const t of tiles){
+    const localTile=mpOwnsTile(t);
+    const p=localTile?production(t):null,a=localTile?automationFor(t):null;
+    const timed=p||a||(localTile&&t.building==="treasure")||(localTile&&t.houseMode&&HOUSE_MODES[t.houseMode].upkeep>0);
+    if(t.buildingEmoji&&t.iconOpacity>0){
+      const v=t.iconProgress-1,eased=1+2.70158*v*v*v+1.70158*v*v;
+      const scale=t.building?0.55+eased*.45:.8+t.iconOpacity*.2;
+      ctx.save();ctx.translate(t.x,t.y-(timed?3:0));ctx.scale(scale,scale);
+      ctx.globalAlpha=t.iconOpacity;
+      ctx.font='30px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+      ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#222";
+      ctx.fillText(t.buildingEmoji,0,0);ctx.restore();
+    }
+    drawBuildingBadge(t);
+    if(p){const pf=productionTimeFactor(t);drawTimer(t,t.productionRemaining*pf,p.interval*pf)}
+    else if(a)drawTimer(t,t.autoRemaining*factor,a.interval*factor,
+      canAfford(a.recipe)?null:"Paused");
+    else if(localTile&&t.building==="treasure")drawTimer(t,t.treasureRemaining*factor,15*factor);
+    else if(localTile&&t.building==="house"&&t.houseMode&&HOUSE_MODES[t.houseMode].upkeep>0)drawTimer(t,t.houseRemaining,5);
+  }
+  // Remote players are shown at the world position they are currently viewing.
+  if(typeof multiplayer!=="undefined"&&multiplayer.started){
+    for(const [id,player] of multiplayer.remotePlayers){
+      if(!Number.isFinite(player.x)||!Number.isFinite(player.y))continue;
+      ctx.save();ctx.translate(player.x,player.y);
+      ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fillStyle="#2878d0";ctx.fill();
+      ctx.lineWidth=3;ctx.strokeStyle="#fff";ctx.stroke();
+      ctx.font="bold 12px system-ui";ctx.textAlign="center";ctx.textBaseline="bottom";
+      ctx.lineWidth=4;ctx.strokeStyle="#fff";ctx.strokeText(player.name||"Player",0,-17);
+      ctx.fillStyle="#174d87";ctx.fillText(player.name||"Player",0,-17);ctx.restore();
+    }
+  }
+  ctx.restore();
+}
+
+/* Progress tree */
+const treeView={x:0,y:0,scale:1},treeSize={width:2300,height:2250};
+const treeNodeElements=new Map(),treeLinkElements=[];
+const BRANCH_COLORS={
+  mountains:"#8b939e",forest:"#25653a",meadow:"#96c94f",
+  lake:"#65bce9",neutral:"#aabac6"
+};
+// Curated, multi-branch layout. Coordinates are intentional: no automatic
+// topological row packing, which previously flattened the whole tree.
+const treeNodes=[
+  // Early resources and fishing
+  {id:"lake",kind:"biome",branch:"lake",x:280,y:380},
+  {id:"fish",kind:"resource",branch:"lake",x:280,y:640},
+  {id:"fishingRod",kind:"recipe",branch:"lake",x:280,y:920},
+  {id:"fishingHut",kind:"building",branch:"lake",x:190,y:1210},
+  {id:"treasure",kind:"building",branch:"lake",x:510,y:1210},
+  {id:"essence",kind:"essence",branch:"lake",x:510,y:1500},
+  // Timber production, then high-level oak
+  {id:"forest",kind:"biome",branch:"forest",x:890,y:380},
+  {id:"wood",kind:"resource",branch:"forest",x:890,y:640},
+  {id:"axe",kind:"recipe",branch:"forest",x:890,y:920},
+  {id:"sawmill",kind:"building",branch:"forest",x:890,y:1210},
+  {id:"improvedSawmill",kind:"building",branch:"forest",x:890,y:4370},
+  {id:"oak",kind:"resource",branch:"forest",x:890,y:4650},
+  {id:"oakPlank",kind:"recipe",branch:"forest",x:890,y:4930},
+  // Mining, clay and improved mining
+  {id:"mountains",kind:"biome",branch:"mountains",x:1460,y:380},
+  {id:"stone",kind:"resource",branch:"mountains",x:1460,y:640},
+  {id:"pickaxe",kind:"recipe",branch:"mountains",x:1460,y:920},
+  {id:"mine",kind:"building",branch:"mountains",x:1460,y:1210},
+  {id:"clay",kind:"resource",branch:"mountains",x:1460,y:1500},
+  {id:"brick",kind:"recipe",branch:"mountains",x:1460,y:1790},
+  {id:"improvedMine",kind:"building",branch:"mountains",x:1460,y:4370},
+  {id:"coal",kind:"resource",branch:"mountains",x:1460,y:4650},
+  {id:"steel",kind:"recipe",branch:"mountains",x:1460,y:4930},
+  // Crafting hub, branching toward agriculture and industry
+  {id:"meadow",kind:"biome",branch:"meadow",x:2080,y:380},
+  {id:"carpenter",kind:"building",branch:"meadow",x:2080,y:640},
+  {id:"plank",kind:"recipe",branch:"meadow",x:2080,y:920},
+  {id:"forge",kind:"building",branch:"meadow",x:2080,y:1210},
+  {id:"iron",kind:"recipe",branch:"meadow",x:2080,y:1500},
+  {id:"ironAxe",kind:"recipe",branch:"forest",x:1800,y:1790},
+  {id:"ironPickaxe",kind:"recipe",branch:"mountains",x:2080,y:1790},
+  {id:"hammer",kind:"recipe",branch:"meadow",x:2350,y:1790},
+  // Farming: Forge -> Shovel -> Farm -> yields -> recipes -> animals
+  {id:"shovel",kind:"recipe",branch:"meadow",x:2740,y:1510},
+  {id:"farm",kind:"building",branch:"meadow",x:2740,y:1800},
+  {id:"wheat",kind:"resource",branch:"meadow",x:2550,y:2090},
+  {id:"carrot",kind:"resource",branch:"meadow",x:2940,y:2090},
+  {id:"bread",kind:"recipe",branch:"meadow",x:2550,y:2370},
+  {id:"animalFeed",kind:"recipe",branch:"meadow",x:2940,y:2370},
+  {id:"animalPen",kind:"building",branch:"meadow",x:2940,y:2650},
+  {id:"fur",kind:"resource",branch:"meadow",x:2940,y:2930},
+  {id:"leather",kind:"recipe",branch:"meadow",x:2940,y:3210},
+  // Houses and their three specialties. Kitchen depends on Farm bread.
+  {id:"house",kind:"building",branch:"meadow",x:3520,y:2110},
+  {id:"residential",kind:"houseMode",branch:"meadow",x:3520,y:2390},
+  {id:"kitchen",kind:"houseMode",branch:"meadow",x:3520,y:2690},
+  {id:"tailor",kind:"houseMode",branch:"meadow",x:3520,y:3500},
+  {id:"jacket",kind:"recipe",branch:"meadow",x:3340,y:3780},
+  {id:"gloves",kind:"recipe",branch:"meadow",x:3700,y:3780},
+  // Later industry branches from clay and animal leather
+  {id:"bellows",kind:"recipe",branch:"meadow",x:2350,y:3500},
+  {id:"advancedForge",kind:"building",branch:"meadow",x:2080,y:3790},
+  {id:"improvedAxe",kind:"recipe",branch:"forest",x:1830,y:4080},
+  {id:"improvedPickaxe",kind:"recipe",branch:"mountains",x:2180,y:4080},
+  // Port is a building; gold is an item. Trade actions are NOT tree nodes.
+  {id:"port",kind:"building",branch:"lake",x:380,y:5250},
+  {id:"gold",kind:"resource",branch:"lake",x:380,y:5530},
+  // A separate short progression branch showing level unlocks
+  {id:"level1",kind:"level",level:1,x:3250,y:380},
+  {id:"level2",kind:"level",level:2,x:3250,y:650},
+  {id:"level3",kind:"level",level:3,x:3250,y:920},
+  {id:"level4",kind:"level",level:4,x:3250,y:1190}
+];
+// Primary craft chains only: additional ingredients and their prices are listed
+// in the node tooltip. This prevents dozens of crossing lines obscuring branches.
+const treeEdges=[];
+const treeEdgeKeys=new Set();
+function addTreeEdge(from,to){
+  if(from===to||!treeNodes.some(n=>n.id===from)||!treeNodes.some(n=>n.id===to))return;
+  const key=`${from}:${to}`;
+  if(!treeEdgeKeys.has(key)){treeEdgeKeys.add(key);treeEdges.push([from,to])}
+}
+const primaryChains=[
+  ["lake","fish","fishingRod","fishingHut"],
+  ["lake","treasure","essence"],
+  ["forest","wood","axe","sawmill"],
+  ["mountains","stone","pickaxe","mine","clay","brick"],
+  ["meadow","carpenter","plank","forge","iron"],
+  ["forge","ironAxe"],["forge","ironPickaxe"],["forge","hammer"],
+  ["forge","shovel","farm","wheat","bread"],
+  ["farm","carrot","animalFeed","animalPen","fur","leather"],
+  ["hammer","house","residential"],
+  ["house","kitchen"],["bread","kitchen"],
+  ["house","tailor"],["leather","tailor"],
+  ["tailor","jacket"],["tailor","gloves"],
+  ["brick","advancedForge"],["leather","bellows","advancedForge"],
+  ["advancedForge","improvedAxe","improvedSawmill","oak","oakPlank","port","gold"],
+  ["advancedForge","improvedPickaxe","improvedMine","coal","steel","port"],
+  ["level1","level2","level3","level4"]
+];
+for(const chain of primaryChains){for(let i=1;i<chain.length;i++)addTreeEdge(chain[i-1],chain[i]);}
+// Secondary real prerequisites can be seen in the tooltip, not as sales/trade nodes.
+treeSize.width=3930;
+treeSize.height=5740;
+const treeById=new Map(treeNodes.map(n=>[n.id,n]));
+
+function svgEl(name,attrs={},text=""){
+  const el=document.createElementNS("http://www.w3.org/2000/svg",name);
+  for(const[k,v]of Object.entries(attrs))el.setAttribute(k,String(v));
+  if(text)el.textContent=text;return el;
+}
+function treeDefinition(n){
+  if(n.kind==="biome")return BIOMES[n.id];
+  if(n.kind==="building")return BUILDINGS[n.id];
+  if(n.kind==="recipe")return RECIPES[n.id];
+  if(n.kind==="resource")return ITEMS[n.id];
+  if(n.kind==="level")return{label:`Level ${n.level}`,emoji:"⭐"};
+  if(n.kind==="automation")return{
+    label:AUTOMATION[n.building].label,emoji:"⚙️",requiredLevel:3
+  };
+  if(n.kind==="houseMode")return HOUSE_MODES[n.id];
+  if(n.kind==="treasureUpgrade")return{label:"Treasures Level 2",emoji:"🧰",requiredLevel:2};
+  if(n.kind==="essence")return{label:"XP essence",emoji:"✨",requiredLevel:2};
+  return{
+    label:`${BUILDINGS[n.building].label} upgrades`,
+    emoji:"📈",requiredLevel:2
+  };
+}
+function nodeLevel(n){
+  if(["oak","coal","gold"].includes(n.id))return 4;
+  if(n.id==="clay")return 2;
+  if(["wheat","carrot","fur"].includes(n.id))return 3;
+  return n.kind==="level"?n.level:treeDefinition(n).requiredLevel||1;
+}
+function treeUnlocked(n){return playerLevel>=nodeLevel(n)}
+function treeCost(n){
+  if(n.kind==="biome")return constructionCost("biome",n.id);
+  if(n.kind==="building")return constructionCost("building",n.id);
+  if(n.kind==="recipe")return recipeCost(n.id);
+  if(n.kind==="automation")return AUTOMATION[n.building].upgradeCost;
+  if(n.kind==="treasureUpgrade")return TREASURE_UPGRADE;
+  if(n.kind==="houseMode")return HOUSE_MODES[n.id].cost;
+  return null;
+}
+function buildTree(){
+  $("treeWorld").replaceChildren();$("treeDefs").replaceChildren();
+  treeNodeElements.clear();treeLinkElements.length=0;
+  for(const[branch,color]of Object.entries(BRANCH_COLORS)){
+    const marker=svgEl("marker",{
+      id:`arrow-${branch}`,viewBox:"0 0 10 10",refX:9,refY:5,
+      markerWidth:5,markerHeight:5,orient:"auto-start-reverse"
+    });
+    marker.appendChild(svgEl("path",{d:"M0 0 10 5 0 10Z",fill:color}));
+    $("treeDefs").appendChild(marker);
+  }
+  const labels=svgEl("g"),links=svgEl("g"),nodes=svgEl("g");
+  $("treeWorld").append(labels,links,nodes);
+  const sections=[
+    {name:"🌊  FISHING",subtitle:"Fish, rods & treasure",x:55,y:125,width:470,color:"#e5f5fd",stroke:"#9cd0ef"},
+    {name:"🌲  FORESTRY",subtitle:"Wood, tools & oak",x:665,y:125,width:450,color:"#eaf7ed",stroke:"#8bcf9c"},
+    {name:"⛰️  MINING",subtitle:"Stone, clay & coal",x:1230,y:125,width:460,color:"#f0f2f5",stroke:"#b6c0ca"},
+    {name:"⚒️  CRAFTING",subtitle:"From the carpenter to advanced industry",x:1790,y:125,width:485,color:"#fdf4e5",stroke:"#e9c990"},
+    {name:"🌾  AGRICULTURE",subtitle:"Forge → shovel → farm → animal pen",x:2500,y:125,width:530,color:"#eff8e5",stroke:"#b8d894"},
+    {name:"🏠  HOUSING",subtitle:"Homes, kitchens & tailoring",x:3170,y:1580,width:590,color:"#fff1e9",stroke:"#e7b99e"},
+    {name:"⭐  LEVELS",subtitle:"Unlock milestones",x:3080,y:125,width:340,color:"#fff7dc",stroke:"#e9d397"}
+  ];
+  for(const b of sections){
+    const g=svgEl("g");
+    g.appendChild(svgEl("rect",{x:b.x,y:b.y,width:b.width,height:89,rx:21,
+      fill:b.color,stroke:b.stroke,"stroke-width":2}));
+    g.appendChild(svgEl("text",{x:b.x+18,y:b.y+34,fill:"#3b5362",
+      "font-size":19,"font-weight":850},b.name));
+    g.appendChild(svgEl("text",{x:b.x+18,y:b.y+63,fill:"#72818b",
+      "font-size":13},b.subtitle));
+    labels.appendChild(g);
+  }
+  for(const[from,to]of treeEdges){
+    const a=treeById.get(from),b=treeById.get(to);
+    const direction=b.y>=a.y?1:-1;
+    const sy=a.y+53*direction,ey=b.y-53*direction,mid=(sy+ey)/2;
+    const branch=a.branch||"neutral";
+    const path=svgEl("path",{
+      class:"tree-link",
+      d:`M${a.x},${sy} C${a.x},${mid} ${b.x},${mid} ${b.x},${ey}`,
+      stroke:BRANCH_COLORS[branch],"marker-end":`url(#arrow-${branch})`
+    });
+    links.appendChild(path);treeLinkElements.push({path,from,to});
+  }
+  for(const n of treeNodes){
+    const d=treeDefinition(n);
+    const g=svgEl("g",{
+      class:"tree-node",transform:`translate(${n.x},${n.y})`,
+      tabindex:0,role:"img","aria-label":d.label
+    });
+    g.style.animationDelay=`${Math.min(nodes.childElementCount*10,280)}ms`;
+    if(n.kind==="biome"){
+      const points=Array.from({length:6},(_,i)=>{
+        const a=(i*60-30)*Math.PI/180;
+        return`${Math.cos(a)*66},${Math.sin(a)*66}`;
+      }).join(" ");
+      g.appendChild(svgEl("polygon",{
+        points,class:"tree-shape",fill:`rgb(${d.color.join(",")})`
+      }));
+    }else{
+      g.appendChild(svgEl("rect",{
+        x:-109,y:-50,width:218,height:100,rx:19,class:"tree-shape",
+        fill:n.kind==="essence"?"#f5edff":
+          n.kind==="automation"?"#e5f5ec":
+          n.kind==="upgrade"?"#edf5ff":
+          n.kind==="level"?"#fff6de":"#fff"
+      }));
+    }
+    g.appendChild(svgEl("text",{
+      x:0,y:-7,"text-anchor":"middle",class:"tree-emoji"
+    },d.emoji));
+    g.appendChild(svgEl("text",{
+      x:0,y:20,"text-anchor":"middle",class:"tree-label"
+    },d.label.charAt(0).toUpperCase()+d.label.slice(1)));
+    const subtitle=n.kind==="recipe"?`Craft at ${stationDefinition(d.station).label}`
+      :n.kind==="resource"?"Gathered resource"
+      :n.kind==="upgrade"?"Production upgrade"
+      :n.kind==="automation"?"Automatic crafting"
+      :n.kind==="houseMode"?"House specialization"
+      :n.kind==="treasureUpgrade"?"Improved loot table"
+      :n.kind==="essence"?"Crafting resource"
+      :n.kind==="level"?"Progress milestone"
+      :n.kind==="biome"?"Biome":"Building";
+    g.appendChild(svgEl("text",{
+      x:0,y:n.kind==="biome"?85:39,"text-anchor":"middle",class:"tree-subtitle"
+    },subtitle));
+
+    const badge=svgEl("g",{
+      class:"achievement-badge",
+      transform:n.kind==="biome"?"translate(45,-43)":"translate(96,-43)"
+    });
+    badge.appendChild(svgEl("circle",{r:13}));
+    badge.appendChild(svgEl("text",{x:0,y:0},"✓"));g.appendChild(badge);
+
+    const unlock=svgEl("g",{
+      class:"unlock-badge",
+      transform:n.kind==="biome"?"translate(-46,-45)":"translate(-91,-43)"
+    });
+    unlock.appendChild(svgEl("rect",{x:-17,y:-10,width:34,height:20,rx:7}));
+    unlock.appendChild(svgEl("text",{x:0,y:0},`L${nodeLevel(n)}`));g.appendChild(unlock);
+
+    g.addEventListener("pointerenter",e=>{
+      if(!treeDrag)showTreeTooltip(n,e.clientX,e.clientY);
+    });
+    g.addEventListener("pointermove",e=>{
+      if(!treeDrag)showTreeTooltip(n,e.clientX,e.clientY);
+    });
+    g.addEventListener("pointerleave",hideTreeTooltip);
+    g.addEventListener("focus",()=>{
+      const r=g.getBoundingClientRect();showTreeTooltip(n,r.right,r.top);
+    });
+    g.addEventListener("blur",hideTreeTooltip);
+    nodes.appendChild(g);treeNodeElements.set(n.id,{g,badge});
+  }
+  treeBuilt=true;refreshTreeStates();
+}
+function refreshTreeStates(){
+  const count=treeNodes.filter(n=>achievements.has(n.id)).length;
+  const percent=count/treeNodes.length*100;
+  $("completionPercent").textContent=`${percent.toFixed(1)}%`;
+  $("completionFill").style.width=`${percent}%`;
+  $("completionTrack").setAttribute("aria-valuenow",String(percent.toFixed(1)));
+  $("completionDetail").textContent=
+    `${count} / ${treeNodes.length} milestones reached · Achievements are permanent`;
+  for(const n of treeNodes){
+    const entry=treeNodeElements.get(n.id);if(!entry)continue;
+    const done=achievements.has(n.id);
+    entry.g.setAttribute("display","inline");
+    entry.g.classList.toggle("achieved",done);
+    entry.g.classList.toggle("locked",!treeUnlocked(n));
+    entry.badge.setAttribute("display",done?"inline":"none");
+    entry.g.setAttribute("aria-label",
+      `${treeDefinition(n).label}. Unlock level ${nodeLevel(n)}${done?". Achieved":""}`);
+  }
+  for(const item of treeLinkElements){
+    item.path.setAttribute("display","inline");
+    item.path.classList.toggle("available",achievements.has(item.from));
+  }
+}
+function costText(cost){
+  return Object.entries(cost).map(
+    ([k,n])=>`${ITEMS[k].emoji} ${n} ${ITEMS[k].label}`).join(" + ");
+}
+function lootDescription(level){
+  return TREASURE_LOOT[level].map(
+    ([k,chance])=>`${ITEMS[k].emoji} ${ITEMS[k].label}: ${chance}%`).join("\n");
+}
+function treeDescription(n){
+  if(n.kind==="upgrade"&&n.building==="fishingHut")return "Three Fishing hut upgrades, available from Level 2. Each adds 1 fish per harvest and reduces the base interval by exactly 1⅓ seconds: 1 / 7.5s → 2 / 6⅙s → 3 / 4⅚s → 4 / 3.5s. Residential speed and Kitchen doubling apply. Costs are shown below.";
+  if(n.kind==="biome")return{
+    forest:"Produces 1 wood every 5 seconds. Supports a Sawmill or, at Level 4, an Improved Sawmill producing oak.",
+    mountains:"Produces 1 stone every 5 seconds. Supports a Mine or, at Level 4, an Improved Mine producing coal.",
+    lake:"Produces 1 fish every 15 seconds. Supports a Fishing hut or Treasures.",
+    meadow:"Supports one Carpenter, Forge, House, Farm, Animal pen or Advanced Forge per tile."
+  }[n.id];
+  if(n.kind==="resource")return{
+    wood:"Gather from Forests, Sawmills or Treasures. Used for buildings, tools and planks.",
+    stone:"Gather from Mountains, Mines or Treasures. Used for buildings, tools and iron.",
+    oak:"Gather 1 oak every 7.5 base seconds from an Improved Sawmill. Craft 5 oak into 1 oak plank at the Carpenter.",
+    gold:"Gold bags are earned by selling jackets, gloves and improved tools at a Port. Spend them on oak planks, steel or fish.",
+    coal:"Gather 1 coal every 7.5 base seconds from an Improved Mine. Used for steel at the Advanced Forge.",
+    clay:"20% chance per Clay Canyon harvest, starting at Mine production upgrade 2. Used for bricks and improved tools.",
+    wheat:"Farm harvest: 80% chance. Craft 5 wheat into 1 bread.",
+    carrot:"Farm harvest: 20% chance. Craft 3 carrots into 1 animal feed.",
+    fur:"Animal pens produce 1 fur every 30 base seconds. Craft 3 fur into 1 leather.",
+    fish:"Gather from Lakes, Fishing huts or Treasures. Used for rods, upgrades, automation and house upkeep."
+  }[n.id];
+  if(n.kind==="building")return{
+    carpenter:"Build on a Meadow. Crafts axes, pickaxes, rods and planks. Its inventory shows only these four item types. Level 3 unlocks Auto Carpenter.",
+    forge:"Build on a Meadow at Level 2. Crafts iron, iron axes, iron pickaxes and hammers. Shovels unlock at Level 3, opening the farming branch. Level 3 also unlocks Auto Forge.",
+    sawmill:"Build on a Forest. Produces 1 wood every 3.5 seconds before upgrades and residential bonuses.",
+    mine:"Build on Mountains. Starts at 1 stone / 3.5s. At production upgrade 2 it becomes a Clay Canyon: 80% stone or 20% clay per harvest.",
+    fishingHut:"Build on a Lake. Starts at 1 fish every 7.5s. Three upgrades add 1 fish and subtract 1⅓ seconds each. Residential speed and Kitchen doubling apply.",
+    treasure:"Build on a Lake. Replaces the Lake's fish production with one random item every 15 seconds. Upgrade to level 2 for improved drops, including XP essence.\n\nLevel 1:\n"+lootDescription(1),
+    farm:"Level 3. Build on a Meadow. Every 7.5 base seconds: 80% wheat or 20% carrot. Crafts bread and animal feed. Each powered Kitchen subtracts 0.5s, up to 2.5s. Residential speed and Kitchen doubling also apply.",
+    improvedSawmill:"Level 4. A separate building on a Forest: 15 bricks, 20 iron, 1 improved axe and 10 leather. Produces 1 oak every 7.5 base seconds instead of ordinary wood. Residential speed and Kitchen doubling apply.",
+    improvedMine:"Level 4. A separate building on Mountains: 15 bricks, 20 iron, 1 improved pickaxe and 10 leather. Produces 1 coal every 7.5 base seconds instead of stone or clay. Residential speed and Kitchen doubling apply.",
+    advancedForge:"Level 4. Build on a Meadow using 25 bricks, 1 blacksmith bellows, 40 iron, 1 hammer and 1 iron pickaxe. Crafts improved axes, improved pickaxes and steel.",
+    animalPen:"Level 3. Build on a Meadow. Produces 1 fur every 30 base seconds; crafts 3 fur into 1 leather. Residential speed and Kitchen doubling apply.",
+    port:"Level 4. Build on a Lake for 25 oak planks, 30 steel, 3 hammers and 25 rods. Sell jackets, gloves and improved tools for gold bags. Buy oak planks, steel and fish. Replaces the Lake fish production.",
+    house:"Build on a Meadow at Level 2. Residential assignment is free; Kitchen unlocks at Level 3 and costs 5 bread. Tailor unlocks at Level 4 for 10 leather and 5 fur, and crafts jackets/gloves without upkeep. Assignment is permanent until deletion. Bonuses start after the first successful 5-second upkeep payment."
+  }[n.id];
+  if(n.kind==="recipe")return{
+    axe:"Craft at the Carpenter. Used to build Sawmills, Forges and as a treasure reward.",
+    pickaxe:"Craft at the Carpenter. Used to build Mines and Forges.",
+    fishingRod:"Craft at the Carpenter. Used for Fishing huts and Treasures.",
+    plank:"Craft at the Carpenter from Level 2. Used for buildings, tools and upgrades.",
+    iron:"Craft at the Forge. Also found in Level 2 Treasures.",
+    ironAxe:"Craft at the Forge. Used for Sawmill production upgrades and Carpenter automation.",
+    ironPickaxe:"Craft at the Forge. Used for Mine production upgrades and Forge automation.",
+    oakPlank:"Level 4. Craft at the Carpenter: 5 oak for 1 oak plank.",
+    jacket:"Level 4. Craft at a Tailor house: 20 leather + 5 fur. Sell 3 jackets for 5 gold bags at the Port.",
+    gloves:"Level 4. Craft at a Tailor house: 15 fur + 5 leather. Sell 3 gloves for 3 gold bags at the Port.",
+    steel:"Level 4. Craft at the Advanced Forge: 10 coal + 5 iron for 1 steel.",
+    brick:"Level 4. Craft at the Forge: 5 clay.",
+    bellows:"Level 4. Craft at the Forge: 15 leather, 50 planks and 10 iron. Required for the Advanced Forge.",
+    improvedPickaxe:"Level 4. Craft at the Advanced Forge: 5 leather, 1 iron pickaxe, 5 clay and 5 iron.",
+    improvedAxe:"Level 4. Craft at the Advanced Forge: 5 leather, 1 iron axe, 5 clay and 5 iron.",
+    shovel:"Level 3. Craft at the Forge: 5 iron + 10 planks. Required for Farms.",
+    bread:"Level 3. Craft at a Farm: 5 wheat. Used to assign a Kitchen.",
+    animalFeed:"Level 3. Craft at a Farm: 3 carrots. Used to build Animal pens.",
+    leather:"Level 3. Craft at an Animal pen: 3 fur.",
+    hammer:"Craft at the Forge. Used for upgrades, buildings and automation."
+  }[n.id];
+  if(n.kind==="houseMode"){
+    if(n.id==="tailor")return "Level 4 house assignment. Costs 10 leather and 5 fur. Crafts jackets and gloves. No recurring upkeep or passive production bonus. Permanent until deletion.";
+    return n.id==="residential"
+      ?"Consumes 1 fish every 5 seconds. Each powered Residential reduces all production, treasure and automation intervals by 5%. Additive bonus, maximum 50%. Maximum 10 assigned Residential houses. No fish: bonus stops until a successful upkeep payment."
+      :"Consumes 3 fish every 5 seconds. Costs 5 bread to assign at Level 3. Each powered Kitchen reduces Farm base intervals by 0.5 seconds (up to 2.5s) and adds a 5% chance to double each individual production, treasure or automation payout. Maximum 25%, from 5 Kitchens. Upkeep itself cannot be doubled. No fish: bonus stops.";
+  }
+  if(n.kind==="treasureUpgrade"){
+    return"Unlocks an improved loot table. The interval remains 15 seconds before residential bonuses.\n\nLevel 2:\n"+lootDescription(2);
+  }
+  if(n.kind==="essence"){
+    return"Obtained from Level 2 Treasures with a 2.5% chance. Spend 1 essence instead of materials for one Production or Automation upgrade. Level locks and maximum levels still apply. Cannot upgrade Treasures. The indicator remains visible after your first essence.";
+  }
+  if(n.kind==="automation"){
+    const a=AUTOMATION[n.building];
+    return`Automatically crafts 1 ${ITEMS[a.item].label} every ${a.interval} base seconds.
+Each craft consumes ${costText(a.recipe)}.
+Pauses without materials. Manual crafting remains available. Residential and Kitchen bonuses apply.`;
+  }
+  if(n.kind==="level"){
+    if(n.level===1)return"Starting level. Gather resources and build production and crafting stations.";
+    if(n.level===2)return"Gather 150 wood, 150 stone and 75 fish. Build 1 Sawmill, Mine, Fishing hut and Carpenter. Unlocks planks, Forge, Treasures, Houses and production upgrades.";
+    if(n.level===4)return "After reaching Level 3: gather 1500 wood, 1500 stone and 750 fish; build 3 Farms and 2 Animal pens; craft 10 leather; assign 1 Kitchen. Unlocks bricks, bellows, Advanced Forge, improved tools, Improved Sawmill and Mine, oak planks and steel.";
+    return"After Level 2: gather 500 wood, 500 stone and 250 fish; craft 50 planks and 30 iron; reach production upgrade 1 on a Sawmill or Mine; assign a Residential house. Unlocks Farms, Animal pens, Shovels, Kitchens and automation.";
+  }
+  return "Three production upgrades. Each adds 1 resource per collection and reduces the base interval by 0.5 seconds: 1 / 3.5s → 2 / 3.0s → 3 / 2.5s → 4 / 2.0s. Residential and Kitchen bonuses apply. Can be paid with 1 essence. Mine upgrade 2 also unlocks Clay Canyon: 80% stone / 20% clay.";
+}
+function showTreeTooltip(n,x,y){
+  if(!treeOpen)return;
+  const tooltip=$("treeTooltip"),d=treeDefinition(n);tooltip.replaceChildren();
+  const title=document.createElement("h3");title.textContent=`${d.emoji} ${d.label}`;
+  const description=document.createElement("p");description.textContent=treeDescription(n);
+  tooltip.append(title,description);
+  const level=document.createElement("span");level.className="tooltip-lock";
+  level.textContent=`${treeUnlocked(n)?"":"🔒 "}Unlocks at Level ${nodeLevel(n)}`;
+  tooltip.appendChild(level);
+  const costs=document.createElement("div");costs.className="tooltip-cost";
+  const cost=treeCost(n);
+  if(cost){
+    const heading=document.createElement("span");
+    heading.textContent=n.kind==="recipe"?"Fixed price · 1 item":
+      n.kind==="houseMode"?(Object.keys(cost).length?"Assignment cost":"Free assignment"):"Current price";
+    costs.appendChild(heading);
+    for(const[k,amount]of Object.entries(cost)){
+      const row=document.createElement("span");
+      row.textContent=`${ITEMS[k].emoji} ${amount} ${ITEMS[k].label} (You have ${balance(k)})`;
+      costs.appendChild(row);
+    }
+  }else if(n.kind==="upgrade"){
+    for(let i=0;i<3;i++){
+      const c=producerUpgradeCost(n.building,i);
+      const row=document.createElement("span");
+      row.textContent=`Upgrade ${i+1}: ${costText(c)}`;costs.appendChild(row);
+    }
+  }
+  if(costs.childElementCount)tooltip.appendChild(costs);
+  if(achievements.has(n.id)){
+    const done=document.createElement("span");done.className="tooltip-achieved";
+    done.textContent="✓ Permanently achieved";tooltip.appendChild(done);
+  }
+  tooltip.classList.add("show");
+  const r=tooltip.getBoundingClientRect();
+  let left=x+15,top=y+15;
+  if(left+r.width>innerWidth-12)left=x-r.width-15;
+  if(top+r.height>innerHeight-12)top=innerHeight-r.height-12;
+  tooltip.style.left=`${Math.max(12,left)}px`;
+  tooltip.style.top=`${Math.max(12,top)}px`;
+}
+function hideTreeTooltip(){$("treeTooltip").classList.remove("show")}
+function applyTreeView(){
+  $("treeWorld").setAttribute("transform",
+    `translate(${treeView.x},${treeView.y}) scale(${treeView.scale})`);
+}
+function fitTree(){
+  const r=$("treeStage").getBoundingClientRect();
+  const visible=treeNodes;
+  treeSize.width=Math.max(...visible.map(n=>n.x))+230;
+  treeSize.height=Math.max(...visible.map(n=>n.y))+190;
+  treeView.scale=Math.max(.1,Math.min(
+    (r.width-45)/treeSize.width,(r.height-45)/treeSize.height,1));
+  treeView.x=(r.width-treeSize.width*treeView.scale)/2;
+  treeView.y=(r.height-treeSize.height*treeView.scale)/2;
+  applyTreeView();hideTreeTooltip();
+}
+// Jump between recognizable branches without requiring a tiny full-tree zoom.
+const treeDestinations={
+  start:[1200,650],lake:[280,1100],forest:[890,1100],mountains:[1460,1200],
+  meadow:[2080,1100],farming:[2820,2180],housing:[3470,2700],
+  industry:[1920,3980],port:[800,5120]
+};
+function focusTreeBranch(name){
+  const target=treeDestinations[name]||treeDestinations.start;
+  const r=$("treeStage").getBoundingClientRect();
+  treeView.scale=Math.max(.32,Math.min(.63,r.width/1950));
+  treeView.x=r.width/2-target[0]*treeView.scale;
+  treeView.y=r.height/2-target[1]*treeView.scale;
+  applyTreeView();hideTreeTooltip();
+}
+$("treeBranchSelect").addEventListener("change",e=>{
+  if(e.target.value==="all")fitTree();else focusTreeBranch(e.target.value);
+});
+function zoomTree(factor,x,y){
+  const old=treeView.scale,next=Math.max(.1,Math.min(2.4,old*factor));
+  treeView.x=x-(x-treeView.x)*next/old;
+  treeView.y=y-(y-treeView.y)*next/old;
+  treeView.scale=next;applyTreeView();hideTreeTooltip();
+}
+function setTreeOpen(open){
+  treeOpen=open;resetInput();hideTreeTooltip();
+  $("treeSidebar").classList.toggle("open",open);
+  $("treeSidebar").inert=!open;
+  $("treeSidebar").setAttribute("aria-hidden",String(!open));
+  $("treeButton").classList.toggle("open",open);
+  $("treeButton").setAttribute("aria-expanded",String(open));
+  if(open){
+    closeMenu();collectAchievements();
+    if(!treeBuilt)buildTree();
+    refreshTreeStates();
+    if(!treeHasFit){focusTreeBranch("start");treeHasFit=true}
+    $("treeClose").focus({preventScroll:true});
+  }else $("treeButton").focus({preventScroll:true});
+}
+$("treeButton").addEventListener("click",()=>setTreeOpen(true));
+$("treeClose").addEventListener("click",()=>setTreeOpen(false));
+$("treeFit").addEventListener("click",()=>{$("treeBranchSelect").value="all";fitTree()});
+for(const[id,factor]of[["treeZoomIn",1.25],["treeZoomOut",.8]]){
+  $(id).addEventListener("click",()=>{
+    const r=$("treeStage").getBoundingClientRect();zoomTree(factor,r.width/2,r.height/2);
+  });
+}
+$("treeSvg").addEventListener("wheel",e=>{
+  e.preventDefault();const r=$("treeSvg").getBoundingClientRect();
+  zoomTree(Math.exp(-e.deltaY*.0015),e.clientX-r.left,e.clientY-r.top);
+},{passive:false});
+$("treeSvg").addEventListener("pointerdown",e=>{
+  if(e.button!==0)return;
+  treeDrag={id:e.pointerId,x:e.clientX,y:e.clientY};
+  $("treeSvg").setPointerCapture(e.pointerId);
+  $("treeSvg").classList.add("dragging");hideTreeTooltip();
+});
+$("treeSvg").addEventListener("pointermove",e=>{
+  if(!treeDrag||treeDrag.id!==e.pointerId)return;
+  treeView.x+=e.clientX-treeDrag.x;treeView.y+=e.clientY-treeDrag.y;
+  treeDrag.x=e.clientX;treeDrag.y=e.clientY;applyTreeView();
+});
+function endTreeDrag(){treeDrag=null;$("treeSvg").classList.remove("dragging")}
+for(const event of["pointerup","pointercancel","lostpointercapture"]){
+  $("treeSvg").addEventListener(event,endTreeDrag);
+}
+
+
+/* World-wide mode: all multiplayer messages are relayed over one public WebSocket
+   connection (HTTPS/WSS when deployed). Unlike direct WebRTC, no NAT traversal is
+   required. This adapter implements the small PeerJS event API used by the game. */
+class MPEmitter {
+  constructor(){this._listeners=new Map()}
+  on(type,handler){
+    if(!this._listeners.has(type))this._listeners.set(type,new Set());
+    this._listeners.get(type).add(handler);return this;
+  }
+  emit(type,...args){
+    for(const handler of this._listeners.get(type)||[]){
+      try{handler(...args)}catch(e){console.error('Multiplayer event error',type,e)}
+    }
+  }
+}
+class MPRelayConnection extends MPEmitter {
+  constructor(peer,target,request=null,link=null){
+    super();this.peer=peer;this.peerId=target;this.request=request;this.link=link;
+    this.open=false;this._closed=false;
+  }
+  send(data){
+    if(!this.open||this._closed)throw new Error('The relay connection is not open.');
+    this.peer._send({op:'DATA',link:this.link,data});
+  }
+  close(notify=true){
+    if(this._closed)return;
+    this._closed=true;this.open=false;
+    if(this.request)this.peer._pending.delete(this.request);
+    if(this.link)this.peer._links.delete(this.link);
+    if(notify&&this.link)this.peer._send({op:'CLOSE_LINK',link:this.link});
+    this.emit('close');
+  }
+}
+class MPRelayPeer extends MPEmitter {
+  constructor(requestedId,relayUrl){
+    super();this.id=requestedId||null;this._requestedId=requestedId||null;
+    this.url=relayUrl;this.open=false;this.disconnected=true;this.destroyed=false;
+    this._socket=null;this._pending=new Map();this._links=new Map();
+    this._reconnectTimer=null;this._attempt=0;this._firstOpened=false;
+    this._connectSocket();
+  }
+  _error(type,message,request=null){
+    const err=new Error(message||type);err.type=type;
+    if(request){const conn=this._pending.get(request);if(conn){conn.emit('error',err);conn.close(false)}}
+    this.emit('error',err);
+  }
+  _send(data){
+    const socket=this._socket;
+    if(socket&&socket.readyState===WebSocket.OPEN){
+      if(socket.bufferedAmount>4_000_000)throw new Error('Slow connection: sending queue is full.');
+      socket.send(JSON.stringify(data));return true;
+    }
+    return false;
+  }
+  _connectSocket(){
+    if(this.destroyed)return;
+    let socket;
+    try{socket=new WebSocket(this.url)}catch(err){
+      this._error('network','Cannot open the relay server: '+err.message);
+      this._scheduleReconnect();return;
+    }
+    this._socket=socket;
+    socket.addEventListener('open',()=>{
+      if(this.destroyed||this._socket!==socket)return;
+      this._send({op:'REGISTER',id:this._requestedId});
+    });
+    socket.addEventListener('message',event=>{
+      if(this.destroyed||this._socket!==socket)return;
+      let packet;
+      try{packet=JSON.parse(event.data)}catch(e){return}
+      switch(packet?.op){
+        case 'OPEN':
+          this.id=packet.id;this.open=true;this.disconnected=false;
+          this._attempt=0;this._firstOpened=true;this.emit('open',this.id);break;
+        case 'INCOMING':{
+          if(typeof packet.link!=='string'||this._links.has(packet.link))break;
+          const c=new MPRelayConnection(this,packet.from,null,packet.link);
+          this._links.set(packet.link,c);this.emit('connection',c);break;
+        }
+        case 'LINK_OPEN':{
+          let c=this._links.get(packet.link);
+          if(!c&&packet.request){
+            c=this._pending.get(packet.request);
+            if(c){this._pending.delete(packet.request);c.request=null;c.link=packet.link;
+              this._links.set(packet.link,c)}
+          }
+          if(c&&!c._closed){c.open=true;c.emit('open')}
+          break;
+        }
+        case 'DATA':{
+          const c=this._links.get(packet.link);
+          if(c&&!c._closed)c.emit('data',packet.data);break;
+        }
+        case 'LINK_CLOSED':{
+          const c=this._links.get(packet.link);
+          if(c)c.close(false);break;
+        }
+        case 'ERROR':
+          this._error(packet.type||'server-error',
+            packet.type==='peer-unavailable'?'Lobby is not registered on the selected server.':
+            'Relay server: '+(packet.type||'unknown error'),packet.request);
+          if(['unavailable-id','invalid-id','server-full'].includes(packet.type)){
+            this.destroyed=true;try{socket.close()}catch(e){}
+          }
+          break;
+      }
+    });
+    socket.addEventListener('error',()=>{
+      if(this.destroyed||this._socket!==socket)return;
+      // The close event produces the actionable diagnostic. Do not say "lobby not found".
+    });
+    socket.addEventListener('close',()=>{
+      if(this.destroyed||this._socket!==socket)return;
+      this.open=false;this.disconnected=true;
+      for(const conn of [...this._links.values(),...this._pending.values()])conn.close(false);
+      this._links.clear();this._pending.clear();
+      this.emit('disconnected',this.id);
+      this._error('network','The relay server connection was lost.');
+      this._scheduleReconnect();
+    });
+  }
+  _scheduleReconnect(){
+    if(this.destroyed||this._reconnectTimer)return;
+    const delay=Math.min(8000,1000*Math.pow(1.6,this._attempt++));
+    this._reconnectTimer=setTimeout(()=>{this._reconnectTimer=null;this._connectSocket()},delay);
+  }
+  connect(target){
+    const request='r'+Math.random().toString(36).slice(2)+Date.now().toString(36);
+    const c=new MPRelayConnection(this,target,request,null);
+    this._pending.set(request,c);
+    if(!this._send({op:'CONNECT',target,request})){
+      this._pending.delete(request);
+      queueMicrotask(()=>c.emit('error',Object.assign(new Error('Server connection lost'),{type:'network'})));
+    }
+    return c;
+  }
+  reconnect(){
+    if(this.destroyed)return;
+    if(this._socket&&this._socket.readyState===WebSocket.OPEN)return;
+    if(this._reconnectTimer){clearTimeout(this._reconnectTimer);this._reconnectTimer=null}
+    this._connectSocket();
+  }
+  destroy(){
+    if(this.destroyed)return;
+    this.destroyed=true;this.open=false;this.disconnected=true;
+    if(this._reconnectTimer){clearTimeout(this._reconnectTimer);this._reconnectTimer=null}
+    for(const conn of [...this._links.values(),...this._pending.values()])conn.close(false);
+    this._links.clear();this._pending.clear();
+    if(this._socket){try{this._socket.close()}catch(e){}this._socket=null}
+  }
+}
+function mpTransportDetails(){
+  const mode=$('mpNetworkMode').value;
+  const custom=$('mpRelayUrl').value.trim();
+  if(mode==='relay'){
+    try{
+      const url=new URL(custom);
+      if(!['wss:','ws:'].includes(url.protocol))throw Error('Use wss:// or ws://');
+      if(location.protocol==='https:'&&url.protocol!=='wss:')throw Error('HTTPS pages require secure wss://');
+      return {kind:'relay',url:url.href};
+    }catch(e){throw Error('Enter a valid WebSocket server address (wss://domain/ws). '+e.message)}
+  }
+  if(mode==='auto'&&window.__HEX_RELAY_ENABLED__){
+    const secure=location.protocol==='https:';
+    return{kind:'relay',url:(secure?'wss://':'ws://')+location.host+'/ws'};
+  }
+  return{kind:'cloud'};
+}
+function mpMakePeer(id,transport){
+  return transport.kind==='relay'?new MPRelayPeer(id,transport.url):new Peer(id,mpPeerOptions());
+}
+function mpConnectionLabel(transport){
+  return transport.kind==='relay'?'Global relay server (works across different networks)':'PeerJS Cloud (direct WebRTC)';
+}
+function mpUpdateNetworkMode(){
+  const mode=$('mpNetworkMode').value;
+  $('mpRelayUrlWrap').hidden=mode!=='relay';
+  $('mpNetworkHelp').textContent=mode==='relay'
+    ?'Both players must use the SAME relay address. Use wss:// for a public HTTPS server.'
+    :mode==='cloud'?'Free PeerJS Cloud. Some countries or restrictive NATs may need another network or a TURN relay.'
+    :window.__HEX_RELAY_ENABLED__?'Global relay is active automatically because you opened the game from its server.'
+    :'This file uses PeerJS Cloud. For the reliable global relay, host index.html with the included server.py and open its public URL.';
+  const banner=$('mpConnectionBanner');
+  if(banner)banner.textContent=mode==='relay'
+    ?'🌐 Global relay selected — the same public server address is needed on both devices.'
+    :mode==='auto'&&window.__HEX_RELAY_ENABLED__
+      ?'🌐 Global relay is active. Players in other countries can use this same website to join.'
+      :'ℹ️ PeerJS Cloud mode. For more reliable international play, host the included server.py and open the public website.';
+}
+
+/* Peer-to-peer multiplayer. Never write multiplayer state into the singleplayer save. */
+const multiplayer={
+  peer:null,host:false,code:null,capacity:4,connections:new Set(),hostConnection:null,
+  state:"idle",players:1,started:false,playerId:null,remotePlayers:new Map(),
+  lastSnapshot:"",lastPosition:"",syncTimer:null,stats:new Map(),roster:new Map(),
+  selectedStatsId:null,startedAt:0,nickname:"",joinTimeout:null,joinRetryTimer:null,
+  transport:null
+};
+const mpViews=["mpHome","mpCreateView","mpFindView","mpJoinedView","mpConnectedView"];
+const MP_TURN_KEY="hex-world-turn-settings-v1",MP_NICK_KEY="hex-world-nickname-v1";
+function mpShow(view){for(const id of mpViews)$(id).hidden=id!==view}
+function mpLoadNetworkSettings(){
+  try{
+    const cfg=JSON.parse(localStorage.getItem(MP_TURN_KEY)||"{}");
+    $("mpTurnUrls").value=cfg.urls||"";$("mpTurnUsername").value=cfg.username||"";$("mpTurnCredential").value=cfg.credential||"";
+    $("mpNetworkMode").value=["auto","cloud","relay"].includes(cfg.networkMode)?cfg.networkMode:"auto";
+    $("mpRelayUrl").value=cfg.relayUrl||"";mpUpdateNetworkMode();
+    $("mpNetworkStatus").textContent=cfg.urls?"Custom TURN settings loaded.":"No custom TURN server configured. STUN only.";
+  }catch(e){$("mpNetworkStatus").textContent="Could not load network settings."}
+}
+function mpSaveNetworkSettings(){
+  const cfg={urls:$("mpTurnUrls").value.split(/\n|,/).map(v=>v.trim()).filter(Boolean).join("\n"),username:$("mpTurnUsername").value.trim(),credential:$("mpTurnCredential").value,
+    networkMode:$("mpNetworkMode").value,relayUrl:$("mpRelayUrl").value.trim()};
+  if(cfg.networkMode==="relay")try{mpTransportDetails()}catch(e){$("mpNetworkStatus").textContent=e.message;return}
+  if(cfg.urls&&!cfg.urls.split("\n").every(v=>/^turns?:/i.test(v))){$("mpNetworkStatus").textContent="Use turn: or turns: URLs.";return}
+  if(cfg.urls&&(!cfg.username||!cfg.credential)){$("mpNetworkStatus").textContent="TURN requires username and credential.";return}
+  try{localStorage.setItem(MP_TURN_KEY,JSON.stringify(cfg));$("mpNetworkStatus").textContent="Connection settings saved."}
+  catch(e){$("mpNetworkStatus").textContent="Could not save settings."}
+}
+function mpPeerOptions(){
+  const iceServers=[
+    {urls:"stun:stun.l.google.com:19302"},
+    {urls:["turn:eu-0.turn.peerjs.com:3478","turn:us-0.turn.peerjs.com:3478"],username:"peerjs",credential:"peerjsp"}
+  ];
+  try{
+    const cfg=JSON.parse(localStorage.getItem(MP_TURN_KEY)||"{}");
+    if(cfg.urls&&cfg.username&&cfg.credential)for(const url of cfg.urls.split(/\n|,/).map(v=>v.trim()).filter(Boolean))iceServers.push({urls:url,username:cfg.username,credential:cfg.credential});
+  }catch(e){}
+  return{debug:1,config:{iceServers,sdpSemantics:"unified-plan"}};
+}
+function mpPeerErrorMessage(err){
+  const type=err?.type||"unknown";
+  if(type==="peer-unavailable")return"Lobby could not be reached on this server. Check the code and make sure both players use the same server.";
+  if(type==="network"||type==="socket-error"||type==="server-error"||type==="socket-closed")return"Connection to lobby service failed. Check internet/server access.";
+  if(type==="webrtc")return"WebRTC connection failed. The players may require TURN.";
+  if(type==="unavailable-id")return"This code is already in use. Try creating a new lobby.";
+  if(type==="server-full")return"Relay server is full. Try later.";
+  if(type==="connection-limit")return"The lobby has too many connections.";
+  return`Connection error (${type}). Try again.`;
+}
+function mpStatus(id,message){$(id).textContent=message}
+function mpGetNickname(){
+  const name=$("mpNickname").value.replace(/[<>\x00-\x1F]/g,"").trim().slice(0,20);
+  return name||"Player";
+}
+function mpSetNickname(){
+  multiplayer.nickname=mpGetNickname();
+  try{localStorage.setItem(MP_NICK_KEY,multiplayer.nickname)}catch(e){}
+  if(multiplayer.playerId){
+    multiplayer.roster.set(multiplayer.playerId,multiplayer.nickname);
+    if(multiplayer.host)mpBroadcastRoster();
+    else if(multiplayer.hostConnection?.open)multiplayer.hostConnection.send({type:"NICK",name:multiplayer.nickname});
+    mpRenderRoster();mpRenderPlayers();
+  }
+}
+function mpStopSync(){if(multiplayer.syncTimer){clearInterval(multiplayer.syncTimer);multiplayer.syncTimer=null}}
+function mpCleanup(){
+  mpStopSync();if(multiplayer.joinTimeout){clearTimeout(multiplayer.joinTimeout);multiplayer.joinTimeout=null}
+  if(multiplayer.joinRetryTimer){clearTimeout(multiplayer.joinRetryTimer);multiplayer.joinRetryTimer=null}
+  // Reset state before closing connections to prevent their close callbacks from re-entering.
+  const all=[...multiplayer.connections];if(multiplayer.hostConnection)all.push(multiplayer.hostConnection);
+  const peer=multiplayer.peer;
+  multiplayer.connections.clear();multiplayer.hostConnection=null;multiplayer.peer=null;
+  multiplayer.host=false;multiplayer.code=null;multiplayer.state="idle";multiplayer.players=1;
+  multiplayer.started=false;multiplayer.playerId=null;multiplayer.remotePlayers.clear();
+  multiplayer.lastSnapshot="";multiplayer.lastPosition="";multiplayer.stats.clear();
+  multiplayer.roster.clear();multiplayer.selectedStatsId=null;multiplayer.startedAt=0;multiplayer.transport=null;
+  $("mpRoster").hidden=true;mpCloseStats();
+  for(const conn of all){try{conn.close()}catch(e){}}
+  if(peer)try{peer.destroy()}catch(e){}
+}
+function mpOpen(){if(!$("multiplayerDialog").open)$("multiplayerDialog").showModal()}
+function mpRosterRecords(){
+  const records=[{id:"host",name:multiplayer.host?multiplayer.nickname:multiplayer.roster.get("host")||"Host"}];
+  if(multiplayer.host){for(const conn of multiplayer.connections)records.push({id:conn.mpPlayerId,name:conn.mpName||"Player"})}
+  else for(const [id,name] of multiplayer.roster)if(id!=="host")records.push({id,name});
+  return records;
+}
+function mpApplyRoster(records){
+  if(!Array.isArray(records))return;
+  multiplayer.roster.clear();
+  for(const p of records)if(p&&typeof p.id==="string"&&typeof p.name==="string"&&p.id.length<60)multiplayer.roster.set(p.id,p.name.slice(0,20));
+  if(multiplayer.playerId)multiplayer.roster.set(multiplayer.playerId,multiplayer.nickname);
+  multiplayer.players=multiplayer.roster.size;
+  for(const id of [...multiplayer.remotePlayers.keys()])if(!multiplayer.roster.has(id))multiplayer.remotePlayers.delete(id);
+  for(const id of [...multiplayer.stats.keys()])if(!multiplayer.roster.has(id))multiplayer.stats.delete(id);
+  mpRenderRoster();mpRenderPlayers();
+}
+function mpBroadcast(message,except=null){
+  for(const conn of multiplayer.connections)if(conn!==except&&conn.open)try{conn.send(message)}catch(e){}
+}
+function mpBroadcastRoster(){
+  if(!multiplayer.host)return;
+  const roster=mpRosterRecords();mpApplyRoster(roster);mpBroadcast({type:"ROSTER",players:roster,capacity:multiplayer.capacity});
+}
+function mpRenderPlayers(){
+  $("mpHostCount").textContent=`Players: ${multiplayer.players} / ${multiplayer.capacity}`;
+  const list=$("mpPlayers");list.replaceChildren();
+  for(const [id,name] of multiplayer.roster){
+    const el=document.createElement("div");el.className="mp-player";
+    el.textContent=`${name}${id==="host"?" · Host":""}${id===multiplayer.playerId?" · You":""}`;
+    list.appendChild(el);
+  }
+  $("mpStart").disabled=multiplayer.state!=="hosting";
+}
+function mpRenderRoster(){
+  $("mpRoster").hidden=!multiplayer.started;
+  if(!multiplayer.started)return;
+  $("mpRosterTitle").textContent=`👥 Players (${multiplayer.roster.size})`;
+  const root=$("mpRosterEntries");root.replaceChildren();
+  for(const [id,name] of multiplayer.roster){
+    const b=document.createElement("button");b.type="button";b.className="mp-roster-entry";
+    if(multiplayer.selectedStatsId===id)b.classList.add("active");
+    const dot=document.createElement("span");dot.className="mp-dot";
+    const label=document.createElement("span");label.textContent=name+(id===multiplayer.playerId?" (You)":"");
+    const mini=document.createElement("span");mini.className="mp-mini";mini.textContent=id==="host"?"HOST":"";
+    b.append(dot,label,mini);b.addEventListener("click",()=>{
+      if(multiplayer.selectedStatsId===id)mpCloseStats();else mpOpenStats(id);
+    });root.append(b);
+  }
+}
+function mpLocalStats(){
+  const biomes=Object.fromEntries(Object.keys(BIOMES).map(k=>[k,0]));
+  const buildings=Object.fromEntries(Object.keys(BUILDINGS).map(k=>[k,0]));
+  for(const t of tiles){
+    if(t.owner!==multiplayer.playerId)continue;
+    if(t.biome)biomes[t.biome]++;
+    if(t.building)buildings[t.building]++;
+  }
+  return{id:multiplayer.playerId,name:multiplayer.nickname,level:playerLevel,
+    resources:{...resources},inventory:{...inventory},biomes,buildings,
+    time:multiplayer.startedAt?Math.max(0,Math.floor((Date.now()-multiplayer.startedAt)/1000)):0,
+    gathered:{...levelProgress},paused:isPaused};
+}
+function mpValidStats(s,id){
+  if(!s||typeof s!=="object"||s.id!==id)return null;
+  function counts(obj,keys){return Object.fromEntries(keys.map(k=>[k,Math.min(1e12,validCount(obj?.[k]))]))}
+  return{id,name:multiplayer.roster.get(id)||"Player",level:Math.min(4,Math.max(1,validCount(s.level,1))),
+    resources:counts(s.resources,Object.keys(resources)),inventory:counts(s.inventory,Object.keys(inventory)),
+    biomes:counts(s.biomes,Object.keys(BIOMES)),buildings:counts(s.buildings,Object.keys(BUILDINGS)),
+    time:Math.min(1e8,validCount(s.time)),paused:s.paused===true};
+}
+function mpReceiveStats(s,id){
+  const safe=mpValidStats(s,id);if(!safe)return;
+  multiplayer.stats.set(id,safe);
+  if(multiplayer.selectedStatsId===id)mpUpdateStatsPanel();
+}
+function mpFormatTime(secs){
+  const h=Math.floor(secs/3600),m=Math.floor(secs%3600/60),s=secs%60;
+  return(h?`${h}h `:"")+`${m}m ${s}s`;
+}
+function mpCloseStats(){
+  $("mpStats").classList.remove("open");$("mpStats").setAttribute("aria-hidden","true");
+  multiplayer.selectedStatsId=null;
+  if(multiplayer.started)mpRenderRoster();
+}
+function mpOpenStats(id){
+  multiplayer.selectedStatsId=id;$("mpStats").classList.add("open");
+  $("mpStats").setAttribute("aria-hidden","false");mpRenderRoster();mpUpdateStatsPanel();
+}
+function mpUpdateStatsPanel(){
+  const id=multiplayer.selectedStatsId;if(!id)return;
+  const s=id===multiplayer.playerId?mpLocalStats():multiplayer.stats.get(id);
+  $("mpStatsName").textContent=multiplayer.roster.get(id)||"Player";
+  $("mpStatsSubtitle").textContent=`${id==="host"?"Lobby host":"Multiplayer player"} · ${id===multiplayer.playerId?"You":"Online"}`;
+  const root=$("mpStatsContent");root.replaceChildren();
+  if(!s){const note=document.createElement("p");note.className="mp-roster-empty";note.textContent="Waiting for this player's statistics…";root.append(note);return}
+  const section=(title,rows)=>{
+    const wrap=document.createElement("section");wrap.className="mp-stat-section";
+    const heading=document.createElement("h3");heading.textContent=title;
+    const grid=document.createElement("div");grid.className="mp-stat-grid";
+    for(const [label,value] of rows){
+      const cell=document.createElement("div");cell.className="mp-stat-cell";
+      const lbl=document.createElement("span");lbl.textContent=label;
+      const val=document.createElement("strong");val.textContent=String(value);
+      cell.append(lbl,val);grid.append(cell);
+    }
+    wrap.append(heading,grid);root.append(wrap);
+  };
+  section("Overview",[["⭐ Level",s.level],["⏱ Play time",mpFormatTime(s.time)],
+    ["🌍 Biomes",Object.values(s.biomes).reduce((a,b)=>a+b,0)],
+    ["🏘 Buildings",Object.values(s.buildings).reduce((a,b)=>a+b,0)]]);
+  section("Resources",Object.entries(s.resources).map(([k,n])=>[`${ITEMS[k]?.emoji||"📦"} ${ITEMS[k]?.label||k}`,n]));
+  const itemRows=Object.entries(s.inventory).filter(([,n])=>n>0)
+    .map(([k,n])=>[`${ITEMS[k]?.emoji||"📦"} ${ITEMS[k]?.label||k}`,n]);
+  section("Inventory",itemRows.length?itemRows:[["No items yet",0]]);
+  section("Biomes",Object.entries(s.biomes).map(([k,n])=>[`${BIOMES[k].emoji} ${BIOMES[k].label}`,n]));
+  const buildingRows=Object.entries(s.buildings).filter(([,n])=>n>0)
+    .map(([k,n])=>[`${BUILDINGS[k].emoji} ${BUILDINGS[k].label}`,n]);
+  section("Buildings",buildingRows.length?buildingRows:[["None yet",0]]);
+}
+function mpSharedTileRecord(t){
+  return{q:t.q,r:t.r,biome:t.biome,building:t.building,owner:t.owner||null,
+    upgradeLevel:t.upgradeLevel,biomePaid:t.biomePaid,buildingPaid:t.buildingPaid,
+    automated:t.automated,treasureLevel:t.treasureLevel,
+    houseMode:t.houseMode,housePowered:t.housePowered};
+}
+function mpOwnedTiles(){
+  return tiles.filter(t=>t.biome&&t.owner===multiplayer.playerId).map(mpSharedTileRecord)
+    .sort((a,b)=>a.q-b.q||a.r-b.r);
+}
+function mpSharedMap(){return tiles.filter(t=>t.biome).map(mpSharedTileRecord).sort((a,b)=>a.q-b.q||a.r-b.r)}
+function mpRecordsSignature(records){return JSON.stringify(records)}
+function mpApplySharedTile(t,s){
+  if(!s||!has(BIOMES,s.biome))return;
+  const oldBuilding=t.building,oldBiome=t.biome;
+  t.biome=s.biome;
+  t.building=BIOMES[t.biome].buildings.includes(s.building)?s.building:null;
+  t.owner=typeof s.owner==="string"?s.owner:null;
+  t.color=[...BIOMES[t.biome].color];t.targetColor=[...t.color];
+  t.upgradeLevel=["mine","sawmill","fishingHut"].includes(t.building)?Math.min(3,validCount(s.upgradeLevel)):0;
+  t.biomePaid=cleanCost(s.biomePaid,BIOMES[t.biome].baseCost);
+  t.buildingPaid=t.building?cleanCost(s.buildingPaid,BUILDINGS[t.building].baseCost):{};
+  t.automated=s.automated===true&&!!AUTOMATION[t.building];
+  t.treasureLevel=Math.max(1,Math.min(2,validCount(s.treasureLevel,1)));
+  t.houseMode=t.building==="house"&&has(HOUSE_MODES,s.houseMode)?s.houseMode:null;
+  t.housePowered=!!t.houseMode&&s.housePowered===true;
+  if(t.building){t.buildingEmoji=t.houseMode?HOUSE_MODES[t.houseMode].emoji:BUILDINGS[t.building].emoji;t.iconOpacity=1;t.iconProgress=1}
+  else{t.buildingEmoji=null;t.iconOpacity=0;t.iconProgress=0}
+  if(oldBiome!==t.biome||oldBuilding!==t.building)resetProduction(t);
+}
+function mpClearSharedTile(t){Object.assign(t,freshTileState())}
+function mpApplySharedMap(records){
+  if(!Array.isArray(records)||!multiplayer.started)return;
+  const incoming=new Map();
+  for(const s of records){
+    if(!s||!Number.isInteger(s.q)||!Number.isInteger(s.r)||!has(BIOMES,s.biome)||typeof s.owner!=="string")continue;
+    if(s.building&&!BIOMES[s.biome].buildings.includes(s.building))continue;
+    if(!tileMap.has(tileKey(s.q,s.r)))continue;
+    incoming.set(tileKey(s.q,s.r),s);
+  }
+  let changed=false;
+  for(const t of tiles){
+    const s=incoming.get(tileKey(t.q,t.r));
+    if(s){
+      if(t.owner===multiplayer.playerId&&s.owner===multiplayer.playerId)continue;
+      const before=JSON.stringify(mpSharedTileRecord(t));mpApplySharedTile(t,s);
+      if(before!==JSON.stringify(mpSharedTileRecord(t)))changed=true;
+    }else if(t.biome&&t.owner!==multiplayer.playerId){mpClearSharedTile(t);changed=true}
+  }
+  if(activeMenu?.tile?.biome&&!mpOwnsTile(activeMenu.tile))closeMenu();
+  if(changed)updateResources();
+}
+function mpAcceptPlayerTiles(conn,records){
+  const owner=conn.mpPlayerId;if(!owner||!Array.isArray(records))return;
+  const incoming=new Map();
+  for(const s of records.slice(0,tiles.length)){
+    if(!s||s.owner!==owner||!Number.isInteger(s.q)||!Number.isInteger(s.r)||!has(BIOMES,s.biome))continue;
+    if(s.building&&!BIOMES[s.biome].buildings.includes(s.building))continue;
+    const key=tileKey(s.q,s.r),t=tileMap.get(key);
+    if(!t||(t.owner&&t.owner!==owner))continue;
+    incoming.set(key,s);
+  }
+  for(const t of tiles)if(t.owner===owner&&!incoming.has(tileKey(t.q,t.r)))mpClearSharedTile(t);
+  for(const [key,s] of incoming)mpApplySharedTile(tileMap.get(key),s);
+  if(activeMenu?.tile?.biome&&!mpOwnsTile(activeMenu.tile))closeMenu();
+  mpBroadcast({type:"MAP",tiles:mpSharedMap()});
+}
+function mpStartWorld(records=[]){
+  // Snapshot the exact original singleplayer save BEFORE replacing the live world.
+  if(worldMode==="singleplayer"){
+    saveGame();
+    try{singleplayerSnapshot=localStorage.getItem(SAVE_KEY)}catch(e){singleplayerSnapshot=null}
+  }
+  worldMode="multiplayer";
+  $("resetButton").hidden=true;
+  clearWorldState(false,false);
+  multiplayer.started=true;multiplayer.state="started";multiplayer.startedAt=Date.now();
+  mpApplySharedMap(records);
+  mpShow("mpConnectedView");$("mpActiveCode").textContent=multiplayer.code;
+  $("mpConnectedInfo").textContent=`${multiplayer.roster.size} players · Your progress here is separate from singleplayer.`;
+  mpRenderRoster();mpRenderPlayers();mpStartSync();
+  if($("multiplayerDialog").open)$("multiplayerDialog").close();
+}
+function mpReturnToSingleplayer(){
+  if(worldMode!=="multiplayer")return;
+  worldMode="singleplayer";
+  $("resetButton").hidden=false;
+  clearWorldState(false,false);
+  try{
+    if(singleplayerSnapshot!==null)localStorage.setItem(SAVE_KEY,singleplayerSnapshot);
+  }catch(e){console.warn("Could not restore save snapshot",e)}
+  loadGame(true);singleplayerSnapshot=null;
+  lastSimulation=performance.now();updatePauseUI();updateResources();saveGame();
+  showToast("Disconnected. Your singleplayer world is restored.");
+}
+function mpDisconnect(announce=true){
+  if(multiplayer.host&&announce)mpBroadcast({type:"HOST_LEFT"});
+  else if(!multiplayer.host&&announce&&multiplayer.hostConnection?.open)
+    try{multiplayer.hostConnection.send({type:"LEAVE"})}catch(e){}
+  mpCleanup();mpReturnToSingleplayer();mpShow("mpHome");
+  if($("multiplayerDialog").open)$("multiplayerDialog").close();
+}
+function mpStartSync(){
+  mpStopSync();multiplayer.lastSnapshot="";multiplayer.lastPosition="";
+  multiplayer.syncTimer=setInterval(()=>{
+    if(!multiplayer.started)return;
+    const owned=mpOwnedTiles(),signature=mpRecordsSignature(owned);
+    if(signature!==multiplayer.lastSnapshot){
+      multiplayer.lastSnapshot=signature;
+      if(multiplayer.host)mpBroadcast({type:"MAP",tiles:mpSharedMap()});
+      else if(multiplayer.hostConnection?.open)multiplayer.hostConnection.send({type:"TILES",tiles:owned});
+    }
+    const pos={id:multiplayer.playerId,name:multiplayer.nickname,x:camera.x,y:camera.y};
+    const posSig=JSON.stringify(pos);
+    if(posSig!==multiplayer.lastPosition){
+      multiplayer.lastPosition=posSig;
+      if(multiplayer.host)mpBroadcast({type:"POS",player:pos});
+      else if(multiplayer.hostConnection?.open)multiplayer.hostConnection.send({type:"POS",player:pos});
+    }
+    const s=mpLocalStats();mpReceiveStats(s,multiplayer.playerId);
+    if(multiplayer.host)mpBroadcast({type:"STATS",stats:s});
+    else if(multiplayer.hostConnection?.open)multiplayer.hostConnection.send({type:"STATS",stats:s});
+    if(multiplayer.selectedStatsId)mpUpdateStatsPanel();
+  },600);
+}
+function mpHandleHostData(conn,msg){
+  if(msg?.type==="LEAVE"){
+    try{conn.close()}catch(e){}
+  }else if(msg?.type==="TILES"&&multiplayer.started)mpAcceptPlayerTiles(conn,msg.tiles);
+  else if(msg?.type==="POS"&&multiplayer.started&&msg.player){
+    const p={id:conn.mpPlayerId,name:conn.mpName,x:msg.player.x,y:msg.player.y};
+    if(Number.isFinite(p.x)&&Number.isFinite(p.y)){
+      multiplayer.remotePlayers.set(p.id,p);mpBroadcast({type:"POS",player:p},conn);
+    }
+  }else if(msg?.type==="STATS"&&multiplayer.started){
+    mpReceiveStats(msg.stats,conn.mpPlayerId);
+    const safe=multiplayer.stats.get(conn.mpPlayerId);
+    if(safe)mpBroadcast({type:"STATS",stats:safe},conn);
+  }else if(msg?.type==="NICK"){
+    conn.mpName=typeof msg.name==="string"?msg.name.trim().slice(0,20)||"Player":"Player";
+    mpBroadcastRoster();
+  }
+}
+function mpHostConnection(conn){
+  conn.on("open",()=>{
+    if(multiplayer.state!=="hosting"||multiplayer.started||multiplayer.connections.size+1>=multiplayer.capacity){
+      try{conn.send({type:"FULL"})}catch(e){}setTimeout(()=>conn.close(),120);return;
+    }
+    conn.mpPlayerId=`p${Math.random().toString(36).slice(2,10)}`;
+    conn.mpName="Player";
+    multiplayer.connections.add(conn);multiplayer.players=multiplayer.connections.size+1;
+    conn.send({type:"WELCOME",code:multiplayer.code,count:multiplayer.players,capacity:multiplayer.capacity,playerId:conn.mpPlayerId,roster:mpRosterRecords()});
+    mpBroadcastRoster();
+  });
+  conn.on("data",msg=>mpHandleHostData(conn,msg));
+  conn.on("close",()=>{
+    if(!multiplayer.connections.delete(conn))return;
+    multiplayer.remotePlayers.delete(conn.mpPlayerId);multiplayer.stats.delete(conn.mpPlayerId);
+    // Leave remaining players' constructions visible until the session ends.
+    mpBroadcastRoster();
+  });
+  conn.on("error",err=>console.warn("Peer connection",err));
+}
+function mpCreateLobby(){
+  mpSetNickname();mpCleanup();multiplayer.nickname=mpGetNickname();
+  mpShow('mpCreateView');mpStatus('mpHostStatus','Connecting to lobby service…');
+  $('mpCode').textContent='-----';
+  let transport;
+  try{transport=mpTransportDetails()}catch(e){mpStatus('mpHostStatus',e.message);return}
+  if(transport.kind==='cloud'&&!window.Peer){mpStatus('mpHostStatus','PeerJS did not load. Check your internet connection.');return}
+  multiplayer.transport=transport;
+  $('mpHostNetwork').textContent='Network: '+mpConnectionLabel(transport);
+  multiplayer.state='creating';multiplayer.capacity=Number($('mpCapacity').value);
+  let attempts=0;
+  const tryHost=()=>{
+    if(!['creating','hosting'].includes(multiplayer.state))return;
+    attempts++;
+    const code=String(Math.floor(10000+Math.random()*90000));
+    let peer;
+    try{peer=mpMakePeer(`hexworld-${code}`,transport)}
+    catch(e){mpStatus('mpHostStatus','Could not initialize multiplayer: '+e.message);return}
+    multiplayer.peer=peer;
+    let registered=false;
+    const connectTimeout=setTimeout(()=>{
+      if(multiplayer.peer===peer&&!peer.open)
+        mpStatus('mpHostStatus','Lobby service is not responding. Check the server and your connection. Retrying…');
+    },14000);
+    peer.on('open',()=>{
+      if(multiplayer.peer!==peer)return;
+      clearTimeout(connectTimeout);
+      if(registered){
+        mpStatus('mpHostStatus','Lobby service reconnected. Your 5-digit code is active again.');
+        return;
+      }
+      registered=true;
+      multiplayer.host=true;multiplayer.code=code;multiplayer.state='hosting';multiplayer.playerId='host';
+      multiplayer.roster.set('host',multiplayer.nickname);multiplayer.players=1;
+      $('mpCode').textContent=code;mpRenderPlayers();
+      mpStatus('mpHostStatus','Lobby is online! Give your friend this 5-digit code.');
+    });
+    peer.on('connection',conn=>{if(multiplayer.peer===peer)mpHostConnection(conn);else conn.close()});
+    peer.on('disconnected',()=>{
+      if(multiplayer.peer!==peer)return;
+      mpStatus('mpHostStatus','Connection to lobby service lost. Reconnecting…');
+      if(transport.kind==='cloud')setTimeout(()=>{
+        if(multiplayer.peer===peer&&peer.disconnected&&!peer.destroyed){
+          try{peer.reconnect()}catch(e){mpStatus('mpHostStatus','Reconnection failed: '+e.message)}
+        }
+      },1500);
+    });
+    peer.on('error',err=>{
+      if(multiplayer.peer!==peer)return;
+      if(err?.type==='unavailable-id'&&!registered&&attempts<6){
+        clearTimeout(connectTimeout);
+        multiplayer.peer=null;try{peer.destroy()}catch(e){}
+        mpStatus('mpHostStatus','Code already taken. Generating another…');
+        setTimeout(tryHost,150);return;
+      }
+      mpStatus('mpHostStatus',mpPeerErrorMessage(err));
+    });
+  };
+  tryHost();
+}
+function mpJoinLobby(){
+  const code=$('mpJoinCode').value.replace(/\D/g,'').slice(0,5);
+  $('mpJoinCode').value=code;
+  if(code.length!==5){mpStatus('mpFindStatus','Enter exactly 5 digits.');return}
+  let transport;
+  try{transport=mpTransportDetails()}catch(e){mpStatus('mpFindStatus',e.message);return}
+  if(transport.kind==='cloud'&&!window.Peer){mpStatus('mpFindStatus','PeerJS did not load. Check your connection.');return}
+  mpSetNickname();mpCleanup();multiplayer.nickname=mpGetNickname();
+  multiplayer.transport=transport;multiplayer.state='joining';
+  mpShow('mpFindView');$('mpJoinNetwork').textContent='Network: '+mpConnectionLabel(transport);
+  mpStatus('mpFindStatus','Connecting to lobby service…');
+  let peer;
+  try{peer=mpMakePeer(undefined,transport)}
+  catch(e){mpStatus('mpFindStatus','Connection error: '+e.message);return}
+  multiplayer.peer=peer;
+  let welcomed=false,attempt=0,lastError='',currentConn=null;
+  const clearJoinTimers=()=>{
+    if(multiplayer.joinTimeout){clearTimeout(multiplayer.joinTimeout);multiplayer.joinTimeout=null}
+    if(multiplayer.joinRetryTimer){clearTimeout(multiplayer.joinRetryTimer);multiplayer.joinRetryTimer=null}
+  };
+  const fail=message=>{
+    if(multiplayer.peer!==peer||welcomed)return;
+    clearJoinTimers();mpCleanup();mpShow('mpFindView');mpStatus('mpFindStatus',message);
+  };
+  const retry=reason=>{
+    if(multiplayer.peer!==peer||welcomed||multiplayer.joinRetryTimer)return;
+    lastError=reason;clearJoinTimers();
+    const old=currentConn;currentConn=null;multiplayer.hostConnection=null;
+    if(old)try{old.close()}catch(e){}
+    if(attempt>=3){
+      fail('Could not reach this lobby after 3 attempts. Confirm the code, the host is online, and BOTH devices use the SAME lobby server. Last error: '+lastError);
+      return;
+    }
+    mpStatus('mpFindStatus',`Attempt ${attempt}/3 failed (${reason}). Retrying…`);
+    multiplayer.joinRetryTimer=setTimeout(()=>{
+      multiplayer.joinRetryTimer=null;
+      attemptConnection();
+    },1100*attempt);
+  };
+  const attemptConnection=()=>{
+    if(multiplayer.peer!==peer||welcomed||!peer.open)return;
+    attempt++;
+    mpStatus('mpFindStatus',`Finding lobby ${code}… Attempt ${attempt}/3`);
+    let conn;
+    try{conn=peer.connect(`hexworld-${code}`,{reliable:true})}
+    catch(e){retry(e.message);return}
+    currentConn=conn;multiplayer.hostConnection=conn;
+    multiplayer.joinTimeout=setTimeout(()=>{
+      if(multiplayer.hostConnection===conn)retry('No response from host (15 s)');
+    },15000);
+    conn.on('open',()=>{
+      if(multiplayer.peer!==peer||multiplayer.hostConnection!==conn)return;
+      mpStatus('mpFindStatus','Network connected. Waiting for host confirmation…');
+    });
+    conn.on('data',msg=>{
+      if(multiplayer.peer!==peer||multiplayer.hostConnection!==conn)return;
+      if(msg?.type==='FULL'){
+        fail('This lobby is full or the match has already started.');return;
+      }
+      if(msg?.type==='WELCOME'){
+        welcomed=true;clearJoinTimers();
+        multiplayer.code=code;multiplayer.playerId=msg.playerId;
+        multiplayer.state='joined';multiplayer.capacity=msg.capacity;
+        mpApplyRoster(msg.roster||[{id:'host',name:'Host'},{id:msg.playerId,name:multiplayer.nickname}]);
+        mpShow('mpJoinedView');$('mpJoinedCode').textContent=code;
+        $('mpJoinedInfo').textContent=`Players: ${multiplayer.players} / ${multiplayer.capacity}.`;
+        mpStatus('mpJoinedStatus','Connected. Waiting for the host to start…');
+        conn.send({type:'NICK',name:multiplayer.nickname});
+      }else if(msg?.type==='ROSTER'){
+        multiplayer.capacity=msg.capacity||multiplayer.capacity;mpApplyRoster(msg.players);
+        $('mpJoinedInfo').textContent=`Players: ${multiplayer.players} / ${multiplayer.capacity}.`;
+      }else if(msg?.type==='START'){
+        if(!welcomed)return;
+        mpApplyRoster(msg.roster||mpRosterRecords());mpStartWorld(msg.tiles||[]);
+        showToast('Multiplayer started. Separate world loaded.');
+      }else if(msg?.type==='MAP'&&multiplayer.started){mpApplySharedMap(msg.tiles)}
+      else if(msg?.type==='POS'&&multiplayer.started&&msg.player){
+        if(msg.player.id!==multiplayer.playerId)multiplayer.remotePlayers.set(msg.player.id,msg.player);
+      }else if(msg?.type==='STATS'&&multiplayer.started&&msg.stats){
+        mpReceiveStats(msg.stats,msg.stats.id);
+      }else if(msg?.type==='HOST_LEFT'){
+        mpDisconnect(false);showToast('Host disconnected. Back to singleplayer.');
+      }
+    });
+    conn.on('error',err=>{
+      if(multiplayer.hostConnection===conn&&!welcomed)retry(mpPeerErrorMessage(err));
+    });
+    conn.on('close',()=>{
+      if(multiplayer.hostConnection!==conn)return;
+      if(multiplayer.started){
+        mpDisconnect(false);showToast('Connection lost. Your singleplayer world was restored.');
+      }else if(welcomed){
+        mpDisconnect(false);showToast('Lobby connection lost.');
+      }else retry('Host connection closed');
+    });
+  };
+  peer.on('open',()=>{
+    if(multiplayer.peer===peer&&!welcomed&&!currentConn)attemptConnection();
+  });
+  peer.on('disconnected',()=>{
+    if(multiplayer.peer!==peer)return;
+    if(!welcomed){
+      mpStatus('mpFindStatus','Connection to lobby server lost. Reconnecting…');
+      if(transport.kind==='cloud')setTimeout(()=>{
+        if(multiplayer.peer===peer&&peer.disconnected&&!peer.destroyed)
+          try{peer.reconnect()}catch(e){}
+      },1000);
+    }
+  });
+  peer.on('error',err=>{
+    if(multiplayer.peer!==peer)return;
+    if(err?.type==='peer-unavailable'&&!welcomed){
+      retry('Lobby is not available on the selected server');return;
+    }
+    if(!welcomed&&['network','server-error','socket-error','socket-closed','invalid-id'].includes(err?.type)){
+      fail(mpPeerErrorMessage(err));return;
+    }
+    if(!welcomed)retry(mpPeerErrorMessage(err));
+  });
+}
+function mpStartGame(){
+  if(!multiplayer.host||multiplayer.state!=="hosting")return;
+  const roster=mpRosterRecords();mpApplyRoster(roster);
+  mpStartWorld([]);
+  mpBroadcast({type:"START",tiles:mpSharedMap(),roster});
+  showToast("Multiplayer started. Your singleplayer save is safe.");
+}
+function mpLeave(){mpDisconnect(true)}
+try{$("mpNickname").value=localStorage.getItem(MP_NICK_KEY)||"Player"}catch(e){$("mpNickname").value="Player"}
+multiplayer.nickname=mpGetNickname();
+mpLoadNetworkSettings();
+$("mpNickname").addEventListener("change",mpSetNickname);
+$("mpNickname").addEventListener("input",()=>{if(multiplayer.state!=="idle")mpSetNickname()});
+$("mpSaveNetwork").addEventListener("click",mpSaveNetworkSettings);
+$("mpNetworkMode").addEventListener("change",mpUpdateNetworkMode);
+$("multiplayerButton").addEventListener("click",()=>{
+  // Keep saved network settings visible when the dialog is opened.
+  mpLoadNetworkSettings();
+  if(multiplayer.started){mpShow("mpConnectedView");$("mpActiveCode").textContent=multiplayer.code}
+  else if(multiplayer.state==="hosting"||multiplayer.state==="creating")mpShow("mpCreateView");
+  else if(multiplayer.state==="joined")mpShow("mpJoinedView");
+  else if(multiplayer.state==="joining")mpShow("mpFindView");
+  else mpShow("mpHome");
+  mpOpen();
+});
+$("mpClose").addEventListener("click",()=>$("multiplayerDialog").close());
+$("mpCreate").addEventListener("click",mpCreateLobby);
+$("mpFind").addEventListener("click",()=>{mpShow("mpFindView");mpStatus("mpFindStatus","Only open lobbies can be joined.");$("mpJoinCode").focus()});
+$("mpJoin").addEventListener("click",mpJoinLobby);
+$("mpJoinCode").addEventListener("input",()=>{$("mpJoinCode").value=$("mpJoinCode").value.replace(/\D/g,"").slice(0,5)});
+$("mpBack").addEventListener("click",()=>mpShow("mpHome"));
+$("mpStart").addEventListener("click",mpStartGame);
+$("mpCancelHost").addEventListener("click",()=>mpDisconnect(true));
+$("mpLeave").addEventListener("click",mpLeave);
+$("mpDisconnect").addEventListener("click",()=>mpDisconnect(true));
+$("mpStatsClose").addEventListener("click",mpCloseStats);
+$("multiplayerDialog").addEventListener("cancel",e=>{
+  // Escape closes the dialog; it must not unexpectedly delete the lobby or game.
+  e.preventDefault();$("multiplayerDialog").close();
+});
+
+/* Save and load */
+function cleanCost(value,fallback={}){
+  if(!value||typeof value!=="object")return{...fallback};
+  const result={};
+  for(const[k,n]of Object.entries(value)){
+    if(has(ITEMS,k)&&Number.isSafeInteger(n)&&n>=0)result[k]=n;
+  }
+  return result;
+}
+function validCount(n,fallback=0){
+  return Number.isSafeInteger(n)&&n>=0?n:fallback;
+}
+function validTimer(value,interval){
+  return Number.isFinite(value)?Math.max(EPS,Math.min(interval,value)):interval;
+}
+function saveGame(){
+  if(!savingAllowed||worldMode!=="singleplayer")return;
+  if(!multiplayer.started||multiplayer.host)synchronize(false);collectAchievements();
+  const data={
+    version:1,producerUpgradeVersion:2,savedAt:Date.now(),resources,inventory,constructionCounts,craftCounts,
+    playerLevel,levelProgress,resourcesExpanded,craftMultiplier,isPaused,
+    achievements:[...achievements],camera:{x:camera.x,y:camera.y},
+    tiles:tiles.filter(t=>t.biome&&(!multiplayer.started||t.owner===multiplayer.playerId)).map(t=>({
+      q:t.q,r:t.r,biome:t.biome,building:t.building,owner:t.owner||null,
+      productionRemaining:t.productionRemaining,
+      upgradeLevel:t.upgradeLevel,
+      biomePaid:t.biomePaid,buildingPaid:t.buildingPaid,
+      automated:t.automated,autoRemaining:t.autoRemaining,
+      treasureLevel:t.treasureLevel,treasureRemaining:t.treasureRemaining,
+      houseMode:t.houseMode,houseRemaining:t.houseRemaining,housePowered:t.housePowered
+    }))
+  };
+  try{
+    localStorage.setItem(SAVE_KEY,JSON.stringify(data));$("saveWarning").hidden=true;
+  }catch(error){
+    $("saveWarning").textContent="Saving is unavailable in this browser.";
+    $("saveWarning").hidden=false;console.warn(error);
+  }
+}
+function loadGame(skipOffline=false){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);if(!raw)return;
+    const data=JSON.parse(raw);
+    if(data?.version!==1||!Array.isArray(data.tiles)||!data.resources||!data.inventory){
+      throw new Error("Invalid save");
+    }
+    for(const k of Object.keys(resources))resources[k]=validCount(data.resources[k],resources[k]);
+    for(const k of Object.keys(inventory))inventory[k]=validCount(data.inventory[k]);
+    for(const k of Object.keys(craftCounts))craftCounts[k]=validCount(data.craftCounts?.[k]);
+    playerLevel=Math.max(1,Math.min(4,validCount(data.playerLevel,1)));
+    isPaused=data.isPaused===true;resourcesExpanded=data.resourcesExpanded===true;
+    craftMultiplier=[1,5,25,"all"].includes(data.craftMultiplier)?data.craftMultiplier:1;
+    const known=new Set(treeNodes.map(n=>n.id));
+    if(Array.isArray(data.achievements)){
+      for(const id of data.achievements){
+        const merged=/^(sawmill|mine)(Speed|Profit)$/.test(id)?id.replace(/(Speed|Profit)$/, "Upgrade"):id;
+        if(known.has(merged))achievements.add(merged);
+      }
+    }
+    for(const category of Object.keys(constructionCounts)){
+      for(const k of Object.keys(constructionCounts[category])){
+        constructionCounts[category][k]=validCount(data.constructionCounts?.[category]?.[k]);
+      }
+    }
+    for(const s of data.tiles){
+      if(!s||!has(BIOMES,s.biome))continue;
+      const t=tileMap.get(tileKey(s.q,s.r));if(!t)continue;
+      t.biome=s.biome;t.owner=typeof s.owner==="string"?s.owner:null;
+      t.building=BIOMES[t.biome].buildings.includes(s.building)?s.building:null;
+      t.color=[...BIOMES[t.biome].color];t.targetColor=[...t.color];
+      const up=["mine","sawmill","fishingHut"].includes(t.building);
+      t.upgradeLevel=up?Math.min(3,validCount(s.upgradeLevel,
+        Math.max(validCount(s.speedLevel),validCount(s.profitLevel)))):0;
+      t.biomePaid=cleanCost(s.biomePaid,BIOMES[t.biome].baseCost);
+      t.buildingPaid=t.building?cleanCost(s.buildingPaid,BUILDINGS[t.building].baseCost):{};
+      t.automated=s.automated===true&&!!AUTOMATION[t.building];
+      t.autoRemaining=validTimer(s.autoRemaining,AUTOMATION[t.building]?.interval||5);
+      t.treasureLevel=Math.max(1,Math.min(2,validCount(s.treasureLevel,1)));
+      t.treasureRemaining=validTimer(s.treasureRemaining,15);
+      t.houseMode=t.building==="house"&&has(HOUSE_MODES,s.houseMode)?s.houseMode:null;
+      t.houseRemaining=validTimer(s.houseRemaining,5);
+      t.housePowered=!!t.houseMode&&s.housePowered===true;
+      if(t.building){
+        t.buildingEmoji=t.houseMode?HOUSE_MODES[t.houseMode].emoji:BUILDINGS[t.building].emoji;
+        t.iconOpacity=1;t.iconProgress=1;
+      }
+      t.productionRemaining=validTimer(s.productionRemaining,production(t)?.interval||5);
+    }
+    for(const k of Object.keys(BIOMES)){
+      constructionCounts.biome[k]=Math.max(
+        constructionCounts.biome[k],tiles.filter(t=>t.biome===k).length);
+    }
+    for(const k of Object.keys(BUILDINGS)){
+      constructionCounts.building[k]=Math.max(
+        constructionCounts.building[k],tiles.filter(t=>t.building===k).length);
+    }
+    for(const k of Object.keys(levelProgress)){
+      let fallback=playerLevel===1&&has(BUILDINGS,k)?constructionCounts.building[k]:0;
+      if(playerLevel===2){
+        if(k==="upgradedProducer")fallback=tiles.some(t=>
+          ["sawmill","mine"].includes(t.building)&&t.upgradeLevel>=1)?1:0;
+        if(k==="residential"||k==="kitchen"){
+          fallback=achievements.has(k)||assignedCount(k)>0?1:0;
+        }
+      }
+      levelProgress[k]=validCount(data.levelProgress?.[k],fallback);
+    }
+    collectAchievements();
+    if(Number.isFinite(data.camera?.x))camera.x=data.camera.x;
+    if(Number.isFinite(data.camera?.y))camera.y=data.camera.y;
+    if(!skipOffline&&!isPaused&&Number.isFinite(data.savedAt)&&data.savedAt>0){
+      simulate(Math.max(0,(Date.now()-data.savedAt)/1000),false);
+    }
+    if(playerLevel<4)recordProgress({});
+  }catch(error){
+    savingAllowed=false;
+    $("saveWarning").textContent="Saved progress could not be loaded. Reset progress to start again.";
+    $("saveWarning").hidden=false;console.warn(error);
+  }
+}
+function clearWorldState(deleteSave=false,notify=false){
+  if(deleteSave&&worldMode==="singleplayer")try{localStorage.removeItem(SAVE_KEY)}catch(e){console.warn(e)}
+  for(const m of menus){
+    if(m.revealFrame!==null)cancelAnimationFrame(m.revealFrame);
+    for(const p of m.panels)p.anchor.remove();m.inventory?.anchor.remove();
+  }
+  menus.clear();activeMenu=null;
+  resources.wood=5;resources.stone=5;resources.fish=0;
+  for(const k of Object.keys(inventory))inventory[k]=0;
+  for(const k of Object.keys(craftCounts))craftCounts[k]=0;
+  for(const category of Object.keys(constructionCounts)){
+    for(const k of Object.keys(constructionCounts[category]))constructionCounts[category][k]=0;
+  }
+  achievements.clear();playerLevel=1;resourcesExpanded=false;
+  craftMultiplier=1;isPaused=false;
+  for(const k of Object.keys(levelProgress))levelProgress[k]=0;
+  for(const t of tiles)Object.assign(t,freshTileState());
+  camera.x=0;camera.y=0;resetInput();
+  lastFrame=null;lastSimulation=performance.now();savingAllowed=true;
+  clearTimeout(toastTimer);$("toast").classList.remove("show");
+  for(const el of document.querySelectorAll(".resource"))el.classList.remove("gain");
+  updatePauseUI();updateResources();
+  if(notify){saveGame();showToast("Progress reset. A new world is ready.")}
+}
+function resetAllProgress(){clearWorldState(worldMode==="singleplayer",true)}
+$("resetButton").addEventListener("click",()=>{
+  resetInput();$("resetDialog").showModal();
+});
+$("cancelReset").addEventListener("click",()=>$("resetDialog").close());
+$("confirmReset").addEventListener("click",()=>{
+  $("resetDialog").close();resetAllProgress();
+});
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){resetInput();saveGame()}
+});
+window.addEventListener("pagehide",()=>saveGame());
+
+function animate(time){
+  if(lastFrame===null)lastFrame=time;
+  const dt=Math.min(.05,Math.max(0,(time-lastFrame)/1000));lastFrame=time;
+  synchronize();updateCamera(dt);updateTiles(dt);draw();positionMenus();
+  if(activeMenu)updateAutomationStatus(activeMenu);
+  updateFishRate();
+  if(pointer)canvas.style.cursor=tileAt(pointer.x,pointer.y)?"pointer":"default";
+  requestAnimationFrame(animate);
+}
+loadGame();
+lastSimulation=performance.now();
+updatePauseUI();updateResources();resize();saveGame();
+setInterval(saveGame,2000);
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
