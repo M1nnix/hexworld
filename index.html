@@ -218,6 +218,7 @@ button{-webkit-tap-highlight-color:transparent}
 .meadow{--bg:#b0e86a;--fg:#35551c;--shadow:#65912b2b}
 .lake{--bg:#73cafa;--fg:#174d70;--shadow:#2980b32e}
 .mountains{--bg:#a4aab3;--fg:#303943;--shadow:#48526030}
+.wasteland{--bg:#ead5ab;--fg:#6e4b25;--shadow:#bd995a30}
 .craft{--bg:#edd2a3;--fg:#654723;--shadow:#93632c22}
 .forge{--bg:#c9ced8;--fg:#384253;--shadow:#38425322}
 .speed{--bg:#c7e7f3;--fg:#24546b;--shadow:#24546b22}
@@ -539,6 +540,36 @@ html[data-theme="dark"] :is(.food-row,.trade-side,.music-card,.auto-status){back
 @media(max-width:480px){.setting-row{gap:8px}.setting-row label{font-size:12px}.music-card{padding:14px}.setting-row select{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.music-bars i{animation:none}}
 
+
+/* Fury battle — multiplayer only. */
+#furyIndicator{background:#fff4e5f5;border-color:#edcea3;color:#875d2c}
+#battleStatus{position:fixed;left:20px;bottom:80px;z-index:29;max-width:260px;
+  background:#fffaf2f0;border:1px solid #ebd5b4;border-radius:12px;
+  padding:10px 13px;color:#815b2c;font-size:11px;font-weight:750;
+  box-shadow:0 4px 20px #4b33151d;pointer-events:none}
+#battleTargetDialog,#battleResultDialog{width:min(510px,calc(100vw - 24px));padding:24px;
+  background:#fffdfa;border:1px solid #e3d1ae;max-height:85vh;overflow-y:auto}
+.battle-title{color:#70502e;font-size:20px;font-weight:850;margin:0 0 9px}
+.battle-caption{color:#8a795e;font-size:12px;line-height:1.6;margin:0 0 18px}
+.battle-targets{display:grid;gap:9px;max-height:42vh;overflow-y:auto}
+.battle-target{width:100%;padding:13px 15px;border:1px solid #e8d7b7;border-radius:12px;
+  background:#fff6e7;color:#79592e;text-align:left;cursor:pointer;font:750 13px system-ui}
+.battle-target small{display:block;margin-top:5px;color:#a2713d;font-size:11px;font-weight:550}
+.battle-target:hover{background:#ffeccc}
+.battle-action{width:100%;padding:13px;border:1px solid #dec79e;border-radius:11px;
+  background:#fff3d9;color:#815d2b;font:750 12px system-ui;cursor:pointer;margin-top:9px}
+.battle-action:disabled{opacity:.46;cursor:not-allowed}
+.battle-ability{display:block;width:100%;text-align:left;padding:13px;border:1px solid #dec79e;
+  border-radius:12px;background:#fff4db;color:#78502a;cursor:pointer;margin-top:7px}
+.battle-ability strong{display:block;font-size:13px}.battle-ability small{display:block;font-size:10px;margin-top:6px;line-height:1.5}
+.battle-ability:disabled{opacity:.45;cursor:not-allowed}
+.battle-result-stat{padding:9px 0;border-bottom:1px solid #eee0c7;font-size:13px;color:#6d593e}
+.battle-result-stat strong{float:right;color:#3b4d3d}
+#battleResultDialog .battle-title{font-size:25px}
+html[data-theme="dark"] :is(#battleTargetDialog,#battleResultDialog,#battleStatus){background:#2b3030;color:#e9d9bb;border-color:#65543b}
+html[data-theme="dark"] :is(.battle-ability,.battle-action,.battle-target){background:#40392d;color:#f3debb;border-color:#796446}
+@media(max-width:700px){#battleStatus{left:12px;bottom:130px;max-width:170px;font-size:10px}}
+
 </style>
 </head>
 
@@ -568,6 +599,7 @@ html[data-theme="dark"] :is(.food-row,.trade-side,.music-card,.auto-status){back
           <option value="housing">🏠 Housing</option>
           <option value="industry">🏭 Advanced industry</option>
           <option value="port">⚓ Port</option>
+          <option value="fury" id="treeFuryOption" hidden>⚔️ Fury battles</option>
           <option value="all">⌖ Overview</option>
         </select>
       <button id="treeZoomOut" class="tree-control" aria-label="Zoom out">−</button>
@@ -614,7 +646,11 @@ html[data-theme="dark"] :is(.food-row,.trade-side,.music-card,.auto-status){back
     <div id="fishIndicator" class="resource fish-stat" aria-label="Fish">
       <span class="resource-emoji">🐟</span><span id="fishCount" class="resource-value">0</span><span id="fishRate" class="fish-rate" aria-label="Net fish per minute">+0 / min</span>
     </div>
-    <div id="plankIndicator" class="resource" aria-label="Planks" hidden>
+    <div id="furyIndicator" class="resource fish-stat" aria-label="Fury" hidden>
+       <span class="resource-emoji">⚔️</span><span id="furyCount" class="resource-value">0</span>
+       <span id="furyRate" class="fish-rate">+0 / min</span>
+     </div>
+     <div id="plankIndicator" class="resource" aria-label="Planks" hidden>
       <span class="resource-emoji">🟫</span><span id="plankCount" class="resource-value">0</span>
     </div>
     <div id="ironIndicator" class="resource" aria-label="Iron" hidden>
@@ -741,6 +777,21 @@ turns:your-server.example:443?transport=tcp"></textarea>
   </div>
   <div id="mpStatsContent"></div>
 </aside>
+<div id="battleStatus" hidden aria-live="polite"></div>
+<dialog id="battleTargetDialog" aria-labelledby="battleTargetTitle">
+  <h2 class="battle-title" id="battleTargetTitle">🔮 Choose a rival</h2>
+  <p id="battleTargetText" class="battle-caption"></p>
+  <div id="battleTargetList" class="battle-targets"></div>
+  <button id="battleTargetCancel" class="battle-action" type="button">Cancel</button>
+</dialog>
+<dialog id="battleResultDialog" aria-labelledby="battleResultTitle">
+  <h2 class="battle-title" id="battleResultTitle">Round complete</h2>
+  <p id="battleResultText" class="battle-caption"></p>
+  <div id="battleResultStats"></div>
+  <button id="battleRestart" class="battle-action" type="button">↻ Restart</button>
+  <button id="battleSingleplayer" class="battle-action" type="button">🏡 Singleplayer</button>
+  <p id="battleVoteStatus" class="battle-caption" style="margin-top:12px"></p>
+</dialog>
 <div id="toast" class="toast" role="status"></div>
 <div id="saveWarning" class="save-warning" role="status" hidden></div>
 
@@ -768,7 +819,7 @@ let singleplayerSnapshot=null;
 const HEX_SIZE=42,HEX_WIDTH=Math.sqrt(3)*HEX_SIZE,MAP_RADIUS=9;
 const PRICE_MULTIPLIER=1.25,EPS=0.000001;
 
-const resources={wood:5,stone:5,fish:0};
+const resources={wood:5,stone:5,fish:0,fury:0};
 let juiceSeconds=0;
 const inventory={wildBerry:0,berryJuice:0,
   axe:0,pickaxe:0,fishingRod:0,plank:0,iron:0,
@@ -781,6 +832,7 @@ const ITEMS={
   wood:{emoji:"🪵",label:"wood"},
   stone:{emoji:"🪨",label:"stone"},
   fish:{emoji:"🐟",label:"fish"},
+  fury:{emoji:"⚔️",label:"Fury"},
   axe:{emoji:"🪓",label:"axe"},
   pickaxe:{emoji:"⛏️",label:"pickaxe"},
   fishingRod:{emoji:"🎣",label:"rod"},
@@ -811,9 +863,15 @@ const BIOMES={
   lake:{label:"Lake",emoji:"🌊",baseCost:{stone:3},color:[115,202,250],
     note:"+1 fish / 15s",buildings:["fishingHut","treasure","port"]},
   mountains:{label:"Mountains",emoji:"⛰️",baseCost:{stone:5},color:[164,170,179],
-    note:"+1 stone / 5s",buildings:["mine","improvedMine"]}
+    note:"+1 stone / 5s",buildings:["mine","improvedMine"]},
+  wasteland:{label:"Wasteland",emoji:"🏜️",baseCost:{fury:5},color:[234,211,168],
+    multiplayerOnly:true,note:"Multiplayer only · +1 Fury every 30s",buildings:["arena","sorcerer"]}
 };
 const BUILDINGS={
+  arena:{label:"Arena",emoji:"🏟️",baseCost:{fury:5},multiplayerOnly:true,
+    note:"Fury every 20s · Upgrade to 15s, 10s, 5s"},
+  sorcerer:{label:"Sorcerer",emoji:"🔮",baseCost:{fury:20},requiredLevel:2,multiplayerOnly:true,
+    note:"Multiplayer only · Cast debuffs on rivals using Fury"},
   berryBush:{label:"Berry bush",emoji:"🫐",baseCost:{wheat:10,wood:50},requiredLevel:3,note:"+1 wild berry / 25s · Craft berry juice"},
   sawmill:{label:"Sawmill",emoji:"🪚",baseCost:{wood:10,stone:5,axe:1},
     note:"+1 wood / 3.5s"},
@@ -1122,6 +1180,8 @@ function refund(cost){
 function constructionCost(category,type){
   const base=(category==="biome"?BIOMES[type]:BUILDINGS[type]).baseCost;
   const m=PRICE_MULTIPLIER**constructionCounts[category][type];
+  if((category==="biome"&&type==="wasteland")||
+     (category==="building"&&["arena","sorcerer"].includes(type)))return{...base};
   return Object.fromEntries(Object.entries(base).map(([k,n])=>[k,Math.ceil(n*m)]));
 }
 function recipeCost(type){return{...RECIPES[type].cost}}
@@ -1181,6 +1241,8 @@ function productionTimeFactor(t,effects=supportEffects()){
   return effects.timeFactor*(t.building==="farm"?(7.5-effects.farmReduction)/7.5:1);
 }
 function production(t){
+  if(t.biome==="wasteland")return{resource:"fury",amount:1,
+    interval:t.building==="arena"?[20,15,10,5][Math.min(3,t.upgradeLevel)]:30};
   if(t.building==="berryBush")return{resource:"wildBerry",amount:1,interval:25};
   if(t.building==="improvedSawmill")return{resource:"oak",amount:1,interval:7.5};
   if(t.building==="improvedMine")return{resource:"coal",amount:1,interval:7.5};
@@ -1215,7 +1277,8 @@ function supportEffects(){
     if(t.houseMode==="kitchen")kitchens++;
   }
   return{
-    timeFactor:(1-Math.min(.5,residential*.05))*(juiceSeconds>EPS?.9:1),
+    timeFactor:(1-Math.min(.5,residential*.05))*(juiceSeconds>EPS?.9:1)*
+      (multiplayer.started&&multiplayer.battle&&Date.now()<multiplayer.battle.slowUntil?1.1:1),
     doubleChance:Math.min(.25,kitchens*.05),
     farmReduction:Math.min(2.5,kitchens*.5)
   };
@@ -1296,7 +1359,8 @@ function resourceBalancePerMinute(resource){
 }
 function fishBalancePerMinute(){return resourceBalancePerMinute("fish")}
 function updateFishRate(){
-  for(const resource of ["wood","stone","fish"]){
+  for(const resource of ["wood","stone","fish","fury"]){
+    if(resource==="fury"&&worldMode!=="multiplayer")continue;
     const rate=resourceBalancePerMinute(resource),net=isPaused?0:rate.net;
     const rounded=Math.round(net*10)/10,el=$(`${resource}Rate`);
     el.textContent=`${rounded<0?"−":"+"}${Math.abs(rounded).toLocaleString("en-US",{maximumFractionDigits:1})} / min`;
@@ -1307,7 +1371,8 @@ function updateFishRate(){
 function updateResources(){
   updateFishRate();
   collectAchievements();foodUI();
-  for(const k of["wood","stone","fish","plank","iron","essence","gold"]){
+  $("furyIndicator").hidden=worldMode!=="multiplayer";
+  for(const k of["wood","stone","fish","fury","plank","iron","essence","gold"]){
     $(`${k}Count`).textContent=String(balance(k));
   }
   renderInventoryDrawer();refreshMenus();updateLevelHUD();refreshTreeStates();
@@ -1319,7 +1384,8 @@ function updateResources(){
   House upkeep remains a fixed 5-second wall-clock interval.
 */
 function simulate(elapsed,animate=true){
-  if(isPaused||elapsed<=0)return;
+  if(isPaused||elapsed<=0||multiplayer.started&&
+    (multiplayer.battle?.eliminated.has(multiplayer.playerId)||multiplayer.battle?.finished))return;
   const gathered={wood:0,stone:0,fish:0};
   const crafted={plank:0,iron:0};
   const changedItems=new Set();
@@ -1612,6 +1678,7 @@ function refreshMenus(){
   for(const menu of menus){
     if(menu.closing)continue;
     for(const e of menu.buttons)refreshButton(e);
+    if(menu.battleButtons)for(const f of menu.battleButtons)f();
     for(const{button,value}of menu.bulkButtons){
       button.classList.toggle("active",craftMultiplier===value);
       button.setAttribute("aria-pressed",String(craftMultiplier===value));
@@ -1623,7 +1690,7 @@ function addBuildButton(menu,panel,tile,type){
   const b=BUILDINGS[type],requiredLevel=b.requiredLevel||1;
   makeButton(menu,panel,{
     label:b.label,emoji:b.emoji,color:tile.biome,scaling:true,note:b.note,requiredLevel,
-    locked:()=>playerLevel<requiredLevel,cost:()=>constructionCost("building",type),
+    locked:()=>playerLevel<requiredLevel||b.multiplayerOnly&&!multiplayer.started,cost:()=>constructionCost("building",type),
     action(cost){
       tile.owner=multiplayer.started?multiplayer.playerId:tile.owner;
       tile.building=type;tile.buildingPaid={...cost};
@@ -1665,6 +1732,9 @@ function addUpgradeButtons(menu,panel,tile){
   });
 }
 function openMenu(tile){
+  if(multiplayer.started&&multiplayer.battle?.eliminated.has(multiplayer.playerId)){
+    showToast("You are eliminated. Choose Restart or Singleplayer.");return;
+  }
   if(multiplayer.started&&tile.biome&&tile.owner&&tile.owner!==multiplayer.playerId){
     closeMenu();showToast("This tile belongs to another player.");return;
   }
@@ -1677,7 +1747,8 @@ function openMenu(tile){
   if(!tile.biome){
     const left=makePanel(menu,"left"),right=makePanel(menu,"right");
     for(const[type,panel]of[
-      ["forest",left],["meadow",left],["lake",right],["mountains",right]
+      ["forest",left],["meadow",left],["lake",right],["mountains",right],
+      ...(multiplayer.started?[["wasteland",left]]:[])
     ]){
       const b=BIOMES[type];
       makeButton(menu,panel,{
@@ -1764,6 +1835,25 @@ function openMenu(tile){
         });
       }
       makeBulkPicker(menu,right);makeInventory(menu);
+    }else if(tile.building==="arena"){
+      const panel=makePanel(menu,"right","🏟️ Arena","Fury production · 3 upgrades");
+      makeButton(menu,panel,{
+        label:"Upgrade Arena",emoji:"🏟️",color:"wasteland",keepOpen:true,
+        cost:()=>({fury:[15,30,50][tile.upgradeLevel]||0}),
+        maxed:()=>tile.upgradeLevel>=3,segments:3,filled:()=>tile.upgradeLevel,
+        levelLabel:()=>`Level ${tile.upgradeLevel}/3`,
+        note:()=>tile.upgradeLevel>=3?"Maximum: +1 Fury / 5s":
+          `Production: 1 Fury every ${[20,15,10,5][tile.upgradeLevel]}s → ${[15,10,5][tile.upgradeLevel]}s`,
+        action(cost){
+          const current=production(tile).interval;
+          const fraction=tile.productionRemaining/current;
+          tile.upgradeLevel++;tile.productionRemaining=production(tile).interval*fraction;
+          addCost(tile.buildingPaid,cost);achievements.add("arenaUpgrade");
+        }
+      });
+    }else if(tile.building==="sorcerer"){
+      const panel=makePanel(menu,"right","🔮 Sorcerer","Use Fury to cast spells on rivals");
+      mpBattleAddAbilityButtons(menu,panel);
     }else if(["sawmill","mine","fishingHut"].includes(tile.building)){
       addUpgradeButtons(menu,makePanel(
         menu,"right",buildingLabel(tile),"Production upgrades"
@@ -1802,7 +1892,8 @@ function openMenu(tile){
       }
     }else if(!tile.building){
       const right=makePanel(menu,"right","Build","Choose a building");
-      for(const type of [...BIOMES[tile.biome].buildings].sort((a,b)=>(BUILDINGS[a].requiredLevel||1)-(BUILDINGS[b].requiredLevel||1)))addBuildButton(menu,right,tile,type);
+      for(const type of [...BIOMES[tile.biome].buildings].sort((a,b)=>(BUILDINGS[a].requiredLevel||1)-(BUILDINGS[b].requiredLevel||1)))
+        if(multiplayer.started||!BUILDINGS[type].multiplayerOnly)addBuildButton(menu,right,tile,type);
     }
   }
   menus.add(menu);activeMenu=menu;refreshMenus();positionMenu(menu);
@@ -1923,7 +2014,7 @@ function drawTimer(t,remaining,interval,label=null){
 }
 function drawBuildingBadge(t){
   let label="";
-  if(["sawmill","mine","fishingHut"].includes(t.building))label=`Lv ${t.upgradeLevel}`;
+  if(["sawmill","mine","fishingHut","arena"].includes(t.building))label=`Lv ${t.upgradeLevel}`;
   else if(t.automated)label="AUTO";
   else if(t.building==="treasure")label=`Lv ${t.treasureLevel}`;
   else if(t.building==="house"&&t.houseMode)label=t.houseMode==="tailor"?"CRAFT":t.housePowered?"ON":"OFF";
@@ -1990,11 +2081,15 @@ const treeView={x:0,y:0,scale:1},treeSize={width:2300,height:2250};
 const treeNodeElements=new Map(),treeLinkElements=[];
 const BRANCH_COLORS={
   mountains:"#8b939e",forest:"#25653a",meadow:"#96c94f",
-  lake:"#65bce9",neutral:"#aabac6"
+  lake:"#65bce9",wasteland:"#c5a66d",neutral:"#aabac6"
 };
 // Curated, multi-branch layout. Coordinates are intentional: no automatic
 // topological row packing, which previously flattened the whole tree.
 const treeNodes=[
+  {id:"wasteland",kind:"biome",branch:"wasteland",x:4200,y:380,multiplayerOnly:true},
+  {id:"fury",kind:"resource",branch:"wasteland",x:4200,y:640,multiplayerOnly:true},
+  {id:"arena",kind:"building",branch:"wasteland",x:4000,y:920,multiplayerOnly:true},
+  {id:"sorcerer",kind:"building",branch:"wasteland",x:4430,y:920,multiplayerOnly:true},
   {id:"treasure2",kind:"treasureUpgrade",level:2,branch:"lake",x:510,y:1800},
   {id:"treasure3",kind:"treasureUpgrade",level:3,branch:"lake",x:510,y:2090},
   {id:"berryBush",kind:"building",branch:"meadow",x:2350,y:2650},
@@ -2092,11 +2187,12 @@ const primaryChains=[
   ["brick","advancedForge"],["leather","bellows","advancedForge"],
   ["advancedForge","improvedAxe","improvedSawmill","oak","oakPlank","port","gold"],
   ["advancedForge","improvedPickaxe","improvedMine","coal","steel","port"],
-  ["level1","level2","level3","level4"]
+  ["level1","level2","level3","level4"],
+  ["wasteland","fury","arena"],["fury","sorcerer"]
 ];
 for(const chain of primaryChains){for(let i=1;i<chain.length;i++)addTreeEdge(chain[i-1],chain[i]);}
 // Secondary real prerequisites can be seen in the tooltip, not as sales/trade nodes.
-treeSize.width=3930;
+treeSize.width=4800;
 treeSize.height=5740;
 const treeById=new Map(treeNodes.map(n=>[n.id,n]));
 
@@ -2158,9 +2254,11 @@ function buildTree(){
     {name:"⚒️  CRAFTING",subtitle:"From the carpenter to advanced industry",x:1790,y:125,width:485,color:"#fdf4e5",stroke:"#e9c990"},
     {name:"🌾  AGRICULTURE",subtitle:"Forge → shovel → farm → animal pen",x:2500,y:125,width:530,color:"#eff8e5",stroke:"#b8d894"},
     {name:"🏠  HOUSING",subtitle:"Homes, kitchens & tailoring",x:3170,y:1580,width:590,color:"#fff1e9",stroke:"#e7b99e"},
-    {name:"⭐  LEVELS",subtitle:"Unlock milestones",x:3080,y:125,width:340,color:"#fff7dc",stroke:"#e9d397"}
+    {name:"⭐  LEVELS",subtitle:"Unlock milestones",x:3080,y:125,width:340,color:"#fff7dc",stroke:"#e9d397"},
+    {name:"⚔️  FURY",subtitle:"Multiplayer rivalry, Arenas and Sorcerers",x:3890,y:125,width:730,color:"#fff0d3",stroke:"#d9b574"}
   ];
   for(const b of sections){
+    if(b.name.includes("FURY")&&worldMode!=="multiplayer")continue;
     const g=svgEl("g");
     g.appendChild(svgEl("rect",{x:b.x,y:b.y,width:b.width,height:89,rx:21,
       fill:b.color,stroke:b.stroke,"stroke-width":2}));
@@ -2255,15 +2353,17 @@ function buildTree(){
   treeBuilt=true;refreshTreeStates();
 }
 function refreshTreeStates(){
-  const count=treeNodes.filter(n=>achievements.has(n.id)).length;
-  const percent=count/treeNodes.length*100;
+  const visible=treeNodes.filter(n=>!n.multiplayerOnly||worldMode==="multiplayer");
+  const count=visible.filter(n=>achievements.has(n.id)).length;
+  const percent=count/visible.length*100;
   $("completionPercent").textContent=`${percent.toFixed(1)}%`;
   $("completionFill").style.width=`${percent}%`;
   $("completionTrack").setAttribute("aria-valuenow",String(percent.toFixed(1)));
   $("completionDetail").textContent=
-    `${count} / ${treeNodes.length} milestones reached · Achievements are permanent`;
+    `${count} / ${visible.length} milestones reached · Achievements are permanent`;
   for(const n of treeNodes){
     const entry=treeNodeElements.get(n.id);if(!entry)continue;
+    if(n.multiplayerOnly&&worldMode!=="multiplayer"){entry.g.setAttribute("display","none");continue;}
     const done=achievements.has(n.id);
     entry.g.setAttribute("display","inline");
     entry.g.classList.toggle("achieved",done);
@@ -2273,7 +2373,7 @@ function refreshTreeStates(){
       `${treeDefinition(n).label}. Unlock level ${nodeLevel(n)}${done?". Achieved":""}`);
   }
   for(const item of treeLinkElements){
-    item.path.setAttribute("display","inline");
+    item.path.setAttribute("display",treeById.get(item.from)?.multiplayerOnly&&worldMode!=="multiplayer"?"none":"inline");
     item.path.classList.toggle("available",achievements.has(item.from));
   }
 }
@@ -2286,6 +2386,10 @@ function lootDescription(level){
     ([k,chance])=>`${ITEMS[k].emoji} ${ITEMS[k].label}: ${chance}%`).join("\n");
 }
 function treeDescription(n){
+  if(n.id==="wasteland")return "Multiplayer only. Costs 5 Fury and produces 1 Fury every 30 seconds. Can host an Arena or Sorcerer.";
+  if(n.id==="fury")return "Multiplayer-only resource. Starts with 5 Fury. Produced by Wastelands and Arenas. Spent on spells and upgrades.";
+  if(n.id==="arena")return "Multiplayer only. Costs 5 Fury and reduces Wasteland production to 20s. Upgrades cost 15 / 30 / 50 Fury and reduce the interval to 15s / 10s / 5s.";
+  if(n.id==="sorcerer")return "Multiplayer only, available at Level 2. Costs 20 Fury. Slow rival production, remove random rival buildings, or drain half their resources. Each cast raises all spell prices by 30%.";
   if(n.id==="berryBush")return "Build on a Forest at Level 3 for 10 wheat and 50 wood (before construction scaling). Produces 1 wild berry every 25 base seconds. Craft berry juice here.";
   if(n.id==="wildBerry")return "Berry bushes produce wild berries. Craft 10 berries into 1 berry juice.";
   if(n.id==="berryJuice")return "Craft 10 wild berries into 1 berry juice. Use it in Food for −10% production cooldown for 60 seconds. Extra servings extend the duration. The effect is personal.";
@@ -2433,7 +2537,7 @@ function fitTree(){
 const treeDestinations={
   start:[1200,650],lake:[280,1100],forest:[890,1100],mountains:[1460,1200],
   meadow:[2080,1100],farming:[2820,2180],housing:[3470,2700],
-  industry:[1920,3980],port:[800,5120]
+  industry:[1920,3980],port:[800,5120],fury:[4200,830]
 };
 function focusTreeBranch(name){
   const target=treeDestinations[name]||treeDestinations.start;
@@ -2692,7 +2796,7 @@ const multiplayer={
   state:"idle",players:1,started:false,playerId:null,remotePlayers:new Map(),
   lastSnapshot:"",lastPosition:"",syncTimer:null,stats:new Map(),roster:new Map(),
   selectedStatsId:null,startedAt:0,nickname:"",joinTimeout:null,joinRetryTimer:null,
-  transport:null
+  transport:null,battle:null
 };
 const mpViews=["mpHome","mpCreateView","mpFindView","mpJoinedView","mpConnectedView"];
 const MP_TURN_KEY="hex-world-turn-settings-v1",MP_NICK_KEY="hex-world-nickname-v1";
@@ -2754,7 +2858,7 @@ function mpSetNickname(){
 function mpStopSync(){if(multiplayer.syncTimer){clearInterval(multiplayer.syncTimer);multiplayer.syncTimer=null}}
 function mpCleanup(){
   tradeReset();
-  mpStopSync();if(multiplayer.joinTimeout){clearTimeout(multiplayer.joinTimeout);multiplayer.joinTimeout=null}
+  mpStopSync();mpBattleCloseUI();if(multiplayer.joinTimeout){clearTimeout(multiplayer.joinTimeout);multiplayer.joinTimeout=null}
   if(multiplayer.joinRetryTimer){clearTimeout(multiplayer.joinRetryTimer);multiplayer.joinRetryTimer=null}
   // Reset state before closing connections to prevent their close callbacks from re-entering.
   const all=[...multiplayer.connections];if(multiplayer.hostConnection)all.push(multiplayer.hostConnection);
@@ -2763,7 +2867,7 @@ function mpCleanup(){
   multiplayer.host=false;multiplayer.code=null;multiplayer.state="idle";multiplayer.players=1;
   multiplayer.started=false;multiplayer.playerId=null;multiplayer.remotePlayers.clear();
   multiplayer.lastSnapshot="";multiplayer.lastPosition="";multiplayer.stats.clear();
-  multiplayer.roster.clear();multiplayer.selectedStatsId=null;multiplayer.startedAt=0;multiplayer.transport=null;
+  multiplayer.roster.clear();multiplayer.selectedStatsId=null;multiplayer.startedAt=0;multiplayer.transport=null;multiplayer.battle=null;
   $("mpRoster").hidden=true;mpCloseStats();
   for(const conn of all){try{conn.close()}catch(e){}}
   if(peer)try{peer.destroy()}catch(e){}
@@ -2828,6 +2932,7 @@ function mpLocalStats(){
   }
   return{id:multiplayer.playerId,name:multiplayer.nickname,level:playerLevel,
     resources:{...resources},inventory:{...inventory},biomes,buildings,
+    furyPurchases:multiplayer.battle?.purchases||0,eliminated:!!multiplayer.battle?.eliminated.has(multiplayer.playerId),
     time:multiplayer.startedAt?Math.max(0,Math.floor((Date.now()-multiplayer.startedAt)/1000)):0,
     gathered:{...levelProgress},paused:isPaused};
 }
@@ -2837,7 +2942,8 @@ function mpValidStats(s,id){
   return{id,name:multiplayer.roster.get(id)||"Player",level:Math.min(4,Math.max(1,validCount(s.level,1))),
     resources:counts(s.resources,Object.keys(resources)),inventory:counts(s.inventory,Object.keys(inventory)),
     biomes:counts(s.biomes,Object.keys(BIOMES)),buildings:counts(s.buildings,Object.keys(BUILDINGS)),
-    time:Math.min(1e8,validCount(s.time)),paused:s.paused===true};
+    time:Math.min(1e8,validCount(s.time)),paused:s.paused===true,
+    furyPurchases:validCount(s.furyPurchases),eliminated:s.eliminated===true};
 }
 function mpReceiveStats(s,id){
   const safe=mpValidStats(s,id);if(!safe)return;
@@ -2876,7 +2982,7 @@ function mpUpdateStatsPanel(){
     }
     wrap.append(heading,grid);root.append(wrap);
   };
-  section("Overview",[["⭐ Level",s.level],["⏱ Play time",mpFormatTime(s.time)],
+  section("Overview",[["⭐ Level",s.level],["⏱ Play time",mpFormatTime(s.time)],["⚔️ Spells",s.furyPurchases||0],
     ["🌍 Biomes",Object.values(s.biomes).reduce((a,b)=>a+b,0)],
     ["🏘 Buildings",Object.values(s.buildings).reduce((a,b)=>a+b,0)]]);
   section("Resources",Object.entries(s.resources).map(([k,n])=>[`${ITEMS[k]?.emoji||"📦"} ${ITEMS[k]?.label||k}`,n]));
@@ -2907,7 +3013,7 @@ function mpApplySharedTile(t,s){
   t.building=BIOMES[t.biome].buildings.includes(s.building)?s.building:null;
   t.owner=typeof s.owner==="string"?s.owner:null;
   t.color=[...BIOMES[t.biome].color];t.targetColor=[...t.color];
-  t.upgradeLevel=["mine","sawmill","fishingHut"].includes(t.building)?Math.min(3,validCount(s.upgradeLevel)):0;
+  t.upgradeLevel=["mine","sawmill","fishingHut","arena"].includes(t.building)?Math.min(3,validCount(s.upgradeLevel)):0;
   t.biomePaid=cleanCost(s.biomePaid,BIOMES[t.biome].baseCost);
   t.buildingPaid=t.building?cleanCost(s.buildingPaid,BUILDINGS[t.building].baseCost):{};
   t.automated=s.automated===true&&!!AUTOMATION[t.building];
@@ -2942,6 +3048,7 @@ function mpApplySharedMap(records){
 }
 function mpAcceptPlayerTiles(conn,records){
   const owner=conn.mpPlayerId;if(!owner||!Array.isArray(records))return;
+  if(multiplayer.battle?.eliminated.has(owner))return; // eliminated players cannot rebuild
   const incoming=new Map();
   for(const s of records.slice(0,tiles.length)){
     if(!s||s.owner!==owner||!Number.isInteger(s.q)||!Number.isInteger(s.r)||!has(BIOMES,s.biome))continue;
@@ -2955,6 +3062,267 @@ function mpAcceptPlayerTiles(conn,records){
   if(activeMenu?.tile?.biome&&!mpOwnsTile(activeMenu.tile))closeMenu();
   mpBroadcast({type:"MAP",tiles:mpSharedMap()});
 }
+
+/* Multiplayer Fury combat. The host resolves effects; each browser keeps its own
+   inventory. This is casual client-authoritative resource accounting, not an anti-cheat server. */
+const BATTLE_SPELLS={
+  slow:{label:"Slow all rivals",emoji:"⏳",base:30,
+    note:"For 30 seconds every rival's stations take 10% longer to produce resources."},
+  destroy:{label:"Destroy random building",emoji:"🏚️",base:75,
+    note:"Select a rival. Removes one random building. If they have none, eliminates them."},
+  drain:{label:"Drain half of resources",emoji:"💫",base:150,
+    note:"Select a rival. Removes 50% of every resource they own."}
+};
+const BATTLE_DRAIN_ITEMS=["plank","iron","clay","brick","wheat","carrot","fur","leather",
+  "coal","oak","oakPlank","steel","gold","essence","wildBerry"];
+function mpBattleFresh(){return{
+  purchases:0,slowUntil:0,eliminated:new Set(),voters:new Set(),winner:null,finished:false,
+  eliminatedBy:new Map(),attacks:0,roundNumber:(multiplayer.roundNumber||0)+1,
+  participants:[...multiplayer.roster.keys()],hostPurchases:new Map(),pending:null
+}}
+function mpBattlePrice(kind){const b=multiplayer.battle;
+  return Math.ceil(BATTLE_SPELLS[kind].base*Math.pow(1.3,b?.purchases||0));}
+function mpBattleCount(id){return tiles.filter(t=>t.owner===id&&!!t.building).length;}
+function mpBattleAvailable(){const b=multiplayer.battle;
+  return multiplayer.started&&b&&!b.finished&&!b.eliminated.has(multiplayer.playerId)&&
+    playerLevel>=2&&tiles.some(t=>t.owner===multiplayer.playerId&&t.building==="sorcerer");}
+function mpBattleAlivePlayers(){const b=multiplayer.battle;if(!b)return[];
+  return b.participants.filter(id=>multiplayer.roster.has(id)&&!b.eliminated.has(id));}
+function mpBattleAddAbilityButtons(menu,panel){
+  menu.battleButtons=[];
+  const help=document.createElement("div");help.className="auto-status";
+  help.textContent="Casting a spell increases ALL your spell prices by 30%. You cannot target yourself.";
+  panel.append(help);
+  for(const [kind,spell] of Object.entries(BATTLE_SPELLS)){
+    const btn=document.createElement("button");btn.type="button";btn.className="battle-ability";
+    const name=document.createElement("strong"),tip=document.createElement("small");
+    tip.textContent=spell.note;btn.append(name,tip);panel.append(btn);
+    const update=()=>{
+      const price=mpBattlePrice(kind);
+      name.textContent=`${spell.emoji} ${spell.label} — ⚔️ ${price} Fury`;
+      btn.disabled=!mpBattleAvailable()||resources.fury<price||
+        multiplayer.roster.size<2;
+    };
+    menu.battleButtons.push(update);update();
+    btn.onclick=()=>mpBattleChoose(kind);
+  }
+}
+function mpBattleChoose(kind){
+  if(!mpBattleAvailable()||!BATTLE_SPELLS[kind]||resources.fury<mpBattlePrice(kind)){
+    showToast("Insufficient Fury or Sorcerer unavailable.");return;
+  }
+  if(kind==="slow"){
+    if(mpBattleAlivePlayers().filter(id=>id!==multiplayer.playerId).length===0){showToast("No rivals remain.");return;}
+    mpBattleBuy(kind,null);return;
+  }
+  const d=$("battleTargetDialog"),list=$("battleTargetList");list.replaceChildren();
+  $("battleTargetTitle").textContent=`${BATTLE_SPELLS[kind].emoji} Choose a rival`;
+  $("battleTargetText").textContent=`${BATTLE_SPELLS[kind].label} · ${mpBattlePrice(kind)} Fury. Select who receives this spell.`;
+  for(const [id,name] of multiplayer.roster){
+    if(id===multiplayer.playerId||multiplayer.battle.eliminated.has(id))continue;
+    const button=document.createElement("button");button.type="button";button.className="battle-target";
+    button.textContent=name;
+    const detail=document.createElement("small"),count=mpBattleCount(id);
+    detail.textContent=kind==="destroy"&&count===0
+      ?"⚠ NO BUILDINGS: casting Destroy on this player will eliminate them!"
+      :`${count} buildings remaining`;
+    button.append(detail);button.onclick=()=>{
+      d.close();mpBattleBuy(kind,id);
+    };list.append(button);
+  }
+  if(!list.childElementCount){showToast("No available targets.");return;}
+  if(!d.open)d.showModal();
+}
+function mpBattleBuy(kind,target){
+  const battle=multiplayer.battle,price=mpBattlePrice(kind);
+  if(!mpBattleAvailable()||resources.fury<price||!BATTLE_SPELLS[kind])return;
+  if(target&&(target===multiplayer.playerId||!multiplayer.roster.has(target)||battle.eliminated.has(target)))return;
+  synchronize();if(resources.fury<price)return;
+  resources.fury-=price;battle.purchases++;updateResources();closeMenu();
+  const msg={type:"BATTLE_ATTACK",kind,target,price};
+  if(multiplayer.host)mpBattleHostAttack(multiplayer.playerId,msg);
+  else if(multiplayer.hostConnection?.open){
+    // Send latest owned buildings before the spell for correct host-side validation.
+    multiplayer.hostConnection.send({type:"TILES",tiles:mpOwnedTiles()});
+    multiplayer.hostConnection.send(msg);
+  }else mpBattleRefund({price});
+}
+function mpBattleRefund(msg){
+  if(!multiplayer.battle||!Number.isInteger(msg.price)||msg.price<0)return;
+  resources.fury+=msg.price;
+  multiplayer.battle.purchases=Math.max(0,multiplayer.battle.purchases-1);
+  updateResources();showToast("Spell cancelled; Fury refunded.");
+}
+function mpBattleSendTo(id,msg){
+  if(id==="host")return;
+  for(const c of multiplayer.connections)if(c.mpPlayerId===id&&c.open){c.send(msg);return;}
+}
+function mpBattleRemoveBuilding(t){
+  if(!t||!t.building)return false;
+  t.building=null;t.buildingPaid={};t.upgradeLevel=0;t.automated=false;
+  t.autoRemaining=5;t.treasureLevel=1;t.treasureRemaining=15;
+  t.houseMode=null;t.housePowered=false;t.houseRemaining=5;
+  t.buildingEmoji=null;t.iconOpacity=0;t.iconProgress=0;
+  resetProduction(t);return true;
+}
+function mpBattleHostAttack(actor,msg){
+  const b=multiplayer.battle;if(!multiplayer.host||!multiplayer.started||!b||b.finished)return;
+  const kind=msg.kind,target=msg.target,spell=BATTLE_SPELLS[kind];
+  if(!spell)return;
+  const alive=mpBattleAlivePlayers();
+  // A host-maintained price counter prevents out-of-order or underpriced casts.
+  const previous=b.hostPurchases.get(actor)||0;
+  const expected=Math.ceil(spell.base*Math.pow(1.3,previous));
+  const invalid=b.eliminated.has(actor)||!alive.includes(actor)||
+    !Number.isSafeInteger(msg.price)||msg.price!==expected||
+    !tiles.some(t=>t.owner===actor&&t.building==="sorcerer")||
+    (kind!=="slow"&&(target===actor||!alive.includes(target)))||
+    (kind==="slow"&&alive.length<2);
+  if(invalid){
+    // Never refund unverified prices: only the expected price can be credited.
+    const refund=msg.price===expected?expected:0;
+    if(actor!=="host")mpBattleSendTo(actor,{type:"BATTLE_REJECT",price:refund});
+    else if(refund)mpBattleRefund({price:refund});
+    return;
+  }
+  b.hostPurchases.set(actor,previous+1);
+  b.attacks++;
+  if(kind==="slow"){
+    const until=Date.now()+30000;
+    const event={type:"BATTLE_EVENT",kind:"slow",actor,until};
+    mpBattleApplyEvent(event);mpBroadcast(event);
+  }else if(kind==="drain"){
+    const event={type:"BATTLE_EVENT",kind:"drain",actor,target};
+    mpBattleApplyEvent(event);mpBroadcast(event);
+  }else if(kind==="destroy"){
+    const buildings=tiles.filter(t=>t.owner===target&&t.building);
+    if(buildings.length){
+      const chosen=buildings[Math.floor(Math.random()*buildings.length)];
+      const event={type:"BATTLE_EVENT",kind:"destroy",actor,target,q:chosen.q,r:chosen.r};
+      mpBattleApplyEvent(event);mpBroadcast(event);
+      mpBroadcast({type:"MAP",tiles:mpSharedMap()});
+    }else{
+      const event={type:"BATTLE_EVENT",kind:"eliminate",actor,target};
+      mpBattleApplyEvent(event);mpBroadcast(event);
+    }
+  }
+  const survivors=mpBattleAlivePlayers();
+  if(survivors.length===1&&b.participants.length>=2){
+    const event={type:"BATTLE_EVENT",kind:"finish",winner:survivors[0],
+      duration:Math.floor((Date.now()-multiplayer.startedAt)/1000),attacks:b.attacks};
+    mpBattleApplyEvent(event);mpBroadcast(event);
+  }
+}
+function mpBattleApplyEvent(msg){
+  const b=multiplayer.battle;if(!b||!multiplayer.started)return;
+  const actorName=multiplayer.roster.get(msg.actor)||"A player";
+  const targetName=multiplayer.roster.get(msg.target)||"a rival";
+  if(msg.kind==="slow"){
+    if(msg.actor!==multiplayer.playerId){
+      b.slowUntil=Math.max(b.slowUntil,Number(msg.until)||Date.now()+30000);
+      showToast(`${actorName} slowed all rivals for 30 seconds!`);
+    }else showToast("All rivals slowed by 10% for 30 seconds!");
+  }else if(msg.kind==="drain"){
+    if(msg.target===multiplayer.playerId){
+      for(const k of Object.keys(resources))resources[k]=Math.floor(resources[k]*.5);
+      for(const k of BATTLE_DRAIN_ITEMS)if(has(inventory,k))inventory[k]=Math.floor(inventory[k]*.5);
+      updateResources();showToast(`🔮 ${actorName} drained half your resources!`);
+    }else showToast(`${actorName} drained 50% of ${targetName}'s resources!`);
+  }else if(msg.kind==="destroy"){
+    const t=tileMap.get(tileKey(msg.q,msg.r));
+    if(t&&t.owner===msg.target){
+      mpBattleRemoveBuilding(t);
+      if(activeMenu?.tile===t)closeMenu();
+      updateResources();
+    }
+    showToast(`${actorName} removed a random building from ${targetName}!`);
+  }else if(msg.kind==="eliminate"){
+    b.eliminated.add(msg.target);b.eliminatedBy.set(msg.target,msg.actor);
+    showToast(`🏁 ${targetName} has been eliminated by ${actorName}!`);
+    if(msg.target===multiplayer.playerId)mpBattleResult(false,false);
+  }else if(msg.kind==="finish"){
+    b.finished=true;b.winner=msg.winner;b.duration=msg.duration;b.attacks=msg.attacks;
+    mpBattleResult(multiplayer.playerId===b.winner,true);
+  }
+  mpBattleUpdateHUD();
+}
+function mpBattleUpdateHUD(){
+  const b=multiplayer.battle;
+  $("battleStatus").hidden=!multiplayer.started||!b;
+  if(!multiplayer.started||!b)return;
+  const slowed=Math.max(0,Math.ceil((b.slowUntil-Date.now())/1000));
+  $("battleStatus").textContent=`⚔️ Round ${b.roundNumber} · ${mpBattleAlivePlayers().length} players remaining · `+
+    `Fury ${resources.fury}${slowed?` · Slowed ${slowed}s`:``}`;
+}
+function mpBattleResult(won,roundEnded){
+  const b=multiplayer.battle;if(!b)return;
+  $("battleResultTitle").textContent=roundEnded?(won?"🏆 Victory!":"🏳️ Round over"):
+    "🏳️ Eliminated";
+  $("battleResultText").textContent=roundEnded
+    ?`${multiplayer.roster.get(b.winner)||"A player"} wins! The last remaining rival has been eliminated.`
+    :"You were targeted with Destroy while you had no buildings. You are out of this round.";
+  const root=$("battleResultStats");root.replaceChildren();
+  const rows=[["Round",String(b.roundNumber)],
+    ["Time",mpFormatTime(b.duration??Math.floor((Date.now()-multiplayer.startedAt)/1000))],
+    ["Players",String(b.participants.length)],
+    ["Spells cast",String(b.attacks)],
+    ["Your spells",String(b.purchases)]];
+  if(b.winner)rows.push(["Winner",multiplayer.roster.get(b.winner)||b.winner]);
+  for(const [key,value] of rows){
+    const div=document.createElement("div");div.className="battle-result-stat";
+    div.textContent=key;const str=document.createElement("strong");str.textContent=value;
+    div.append(str);root.append(div);
+  }
+  $("battleRestart").disabled=b.voters.has(multiplayer.playerId);
+  mpBattleVoteText();
+  if(!$("battleResultDialog").open)$("battleResultDialog").showModal();
+}
+function mpBattleVoteText(){
+  const b=multiplayer.battle;if(!b)return;
+  $("battleVoteStatus").textContent=b.voters.size
+    ?`${b.voters.size}/${multiplayer.roster.size} players requested a rematch. Everyone must choose Restart.`
+    :"All connected players must press Restart to begin a new round.";
+}
+function mpBattleHostVote(actor){
+  const b=multiplayer.battle;if(!multiplayer.host||!b||!multiplayer.roster.has(actor))return;
+  b.voters.add(actor);
+  const people=[...multiplayer.roster.keys()];
+  if(people.length>0&&people.every(id=>b.voters.has(id))){
+    const msg={type:"BATTLE_NEW_ROUND",roundNumber:b.roundNumber+1};
+    mpBroadcast(msg);mpBattleClientRestart(msg);return;
+  }
+  const event={type:"BATTLE_VOTES",voters:[...b.voters]};
+  mpBroadcast(event);mpBattleApplyVotes(event);
+}
+function mpBattleApplyVotes(msg){
+  if(!multiplayer.battle)return;
+  multiplayer.battle.voters=new Set((msg.voters||[]).filter(id=>multiplayer.roster.has(id)));
+  $("battleRestart").disabled=multiplayer.battle.voters.has(multiplayer.playerId);
+  mpBattleVoteText();
+}
+function mpBattleClientRestart(msg){
+  if(!multiplayer.started)return;
+  mpBattleCloseUI();closeMenu();
+  multiplayer.roundNumber=(msg.roundNumber||2)-1;
+  mpStartWorld([]);
+  showToast(`Round ${multiplayer.battle.roundNumber} started! Everyone begins with 5 Fury.`);
+}
+function mpBattleCloseUI(){
+  for(const id of ["battleTargetDialog","battleResultDialog"]){
+    const d=$(id);if(d?.open)d.close();
+  }
+  $("battleStatus").hidden=true;
+}
+$("battleTargetCancel").onclick=()=>$("battleTargetDialog").close();
+$("battleRestart").onclick=()=>{
+  if(!multiplayer.battle||multiplayer.battle.voters.has(multiplayer.playerId))return;
+  if(multiplayer.host)mpBattleHostVote(multiplayer.playerId);
+  else if(multiplayer.hostConnection?.open)multiplayer.hostConnection.send({type:"BATTLE_VOTE"});
+  $("battleRestart").disabled=true;
+};
+$("battleSingleplayer").onclick=()=>mpDisconnect(true);
+$("battleResultDialog").addEventListener("cancel",e=>e.preventDefault());
+
 function mpStartWorld(records=[]){
   // Snapshot the exact original singleplayer save BEFORE replacing the live world.
   if(worldMode==="singleplayer"){
@@ -2965,7 +3333,10 @@ function mpStartWorld(records=[]){
   $("resetButton").hidden=true;
   clearWorldState(false,false);
   multiplayer.started=true;multiplayer.state="started";multiplayer.startedAt=Date.now();
-  mpApplySharedMap(records);
+  multiplayer.battle=mpBattleFresh();multiplayer.roundNumber=multiplayer.battle.roundNumber;resources.fury=5;
+  $("treeFuryOption").hidden=false;
+  mpApplySharedMap(records);updateResources();mpBattleUpdateHUD();
+  if(treeBuilt)buildTree();
   mpShow("mpConnectedView");$("mpActiveCode").textContent=multiplayer.code;
   $("mpConnectedInfo").textContent=`${multiplayer.roster.size} players · Your progress here is separate from singleplayer.`;
   mpRenderRoster();mpRenderPlayers();mpStartSync();
@@ -2974,13 +3345,16 @@ function mpStartWorld(records=[]){
 function mpReturnToSingleplayer(){
   if(worldMode!=="multiplayer")return;
   worldMode="singleplayer";
+  $("treeFuryOption").hidden=true;
+  if($("treeBranchSelect").value==="fury")$("treeBranchSelect").value="start";
   $("resetButton").hidden=false;
   clearWorldState(false,false);
   try{
     if(singleplayerSnapshot!==null)localStorage.setItem(SAVE_KEY,singleplayerSnapshot);
   }catch(e){console.warn("Could not restore save snapshot",e)}
   loadGame(true);singleplayerSnapshot=null;
-  lastSimulation=performance.now();updatePauseUI();updateResources();saveGame();
+  lastSimulation=performance.now();updatePauseUI();updateResources();
+  if(treeBuilt)buildTree();saveGame();
   showToast("Disconnected. Your singleplayer world is restored.");
 }
 function mpDisconnect(announce=true){
@@ -2994,6 +3368,7 @@ function mpStartSync(){
   mpStopSync();multiplayer.lastSnapshot="";multiplayer.lastPosition="";
   multiplayer.syncTimer=setInterval(()=>{
     if(!multiplayer.started)return;
+    mpBattleUpdateHUD();
     const owned=mpOwnedTiles(),signature=mpRecordsSignature(owned);
     if(signature!==multiplayer.lastSnapshot){
       multiplayer.lastSnapshot=signature;
@@ -3014,6 +3389,12 @@ function mpStartSync(){
   },600);
 }
 function mpHandleHostData(conn,msg){
+  if(msg?.type==="BATTLE_ATTACK"&&multiplayer.connections.has(conn)){
+    mpBattleHostAttack(conn.mpPlayerId,msg);return;
+  }
+  if(msg?.type==="BATTLE_VOTE"&&multiplayer.connections.has(conn)){
+    mpBattleHostVote(conn.mpPlayerId);return;
+  }
   if(msg?.type==="TRADE"&&multiplayer.connections.has(conn)){tradeHost(conn.mpPlayerId,msg);return;}
   if(msg?.type==="LEAVE"){
     try{conn.close()}catch(e){}
@@ -3054,7 +3435,7 @@ function mpHostConnection(conn){
   conn.on("error",err=>console.warn("Peer connection",err));
 }
 function mpCreateLobby(){
-  mpSetNickname();mpCleanup();multiplayer.nickname=mpGetNickname();
+  mpSetNickname();mpCleanup();multiplayer.roundNumber=0;multiplayer.nickname=mpGetNickname();
   mpShow('mpCreateView');mpStatus('mpHostStatus','Connecting to lobby service…');
   $('mpCode').textContent='-----';
   let transport;
@@ -3120,7 +3501,7 @@ function mpJoinLobby(){
   let transport;
   try{transport=mpTransportDetails()}catch(e){mpStatus('mpFindStatus',e.message);return}
   if(transport.kind==='cloud'&&!window.Peer){mpStatus('mpFindStatus','PeerJS did not load. Check your connection.');return}
-  mpSetNickname();mpCleanup();multiplayer.nickname=mpGetNickname();
+  mpSetNickname();mpCleanup();multiplayer.roundNumber=0;multiplayer.nickname=mpGetNickname();
   multiplayer.transport=transport;multiplayer.state='joining';
   mpShow('mpFindView');$('mpJoinNetwork').textContent='Network: '+mpConnectionLabel(transport);
   mpStatus('mpFindStatus','Connecting to lobby service…');
@@ -3170,6 +3551,10 @@ function mpJoinLobby(){
     conn.on('data',msg=>{
       if(multiplayer.peer!==peer||multiplayer.hostConnection!==conn)return;
       if(msg?.type==='TRADE_EVENT'){tradeEvent(msg);return;}
+      if(msg?.type==='BATTLE_EVENT'){mpBattleApplyEvent(msg);return;}
+      if(msg?.type==='BATTLE_NEW_ROUND'){mpBattleClientRestart(msg);return;}
+      if(msg?.type==='BATTLE_VOTES'){mpBattleApplyVotes(msg);return;}
+      if(msg?.type==='BATTLE_REJECT'){mpBattleRefund(msg);return;}
       if(msg?.type==='FULL'){
         fail('This lobby is full or the match has already started.');return;
       }
@@ -3404,7 +3789,7 @@ function clearWorldState(deleteSave=false,notify=false){
     for(const p of m.panels)p.anchor.remove();m.inventory?.anchor.remove();
   }
   menus.clear();activeMenu=null;
-  resources.wood=5;resources.stone=5;resources.fish=0;
+  resources.wood=5;resources.stone=5;resources.fish=0;resources.fury=0;
   for(const k of Object.keys(inventory))inventory[k]=0;
   for(const k of Object.keys(craftCounts))craftCounts[k]=0;
   for(const category of Object.keys(constructionCounts)){
