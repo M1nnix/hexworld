@@ -570,6 +570,48 @@ html[data-theme="dark"] :is(#battleTargetDialog,#battleResultDialog,#battleStatu
 html[data-theme="dark"] :is(.battle-ability,.battle-action,.battle-target){background:#40392d;color:#f3debb;border-color:#796446}
 @media(max-width:700px){#battleStatus{left:12px;bottom:130px;max-width:170px;font-size:10px}}
 
+
+/* Comfortable map navigation, craft shortcuts and compact building selector. */
+#map{touch-action:none}
+#craftDock{position:fixed;left:18px;top:105px;bottom:165px;width:56px;z-index:36;display:flex;flex-direction:column;gap:9px;overflow:auto;scrollbar-width:none;padding:3px}
+#craftDock:empty{display:none}
+.dock-button,.build-shortcut,.build-arrow,.quick-close{border:1px solid #d4e6dc;background:#f5fff9;color:#3c6651;cursor:pointer;transition:background .2s,transform .2s,box-shadow .2s;border-radius:14px}
+.dock-button{flex:none;width:48px;height:50px;font-size:25px;position:relative;box-shadow:0 5px 16px #305c4512;animation:dockAppear .3s ease both}
+.dock-button:hover,.build-shortcut:hover,.build-arrow:hover{transform:translateY(-3px);background:#e0f5e8;box-shadow:0 6px 18px #305c4525}
+.dock-button[aria-pressed="true"],.build-shortcut[aria-pressed="true"]{background:#d4efde;border-color:#68ae84;box-shadow:0 0 0 3px #6db38a22}
+.dock-count{position:absolute;right:2px;bottom:1px;font-size:9px;font-weight:800;background:#e3f2e9;border-radius:5px;padding:1px 4px;color:#48735b}
+.quick-panel{z-index:34!important}.quick-panel .panel.station{width:min(360px,calc(100vw - 104px));max-height:calc(100dvh - 310px);overflow:auto;overscroll-behavior:contain;box-shadow:0 16px 50px #173d3429}
+.quick-panel .panel-heading{padding-right:24px}.quick-close{position:absolute;right:9px;top:9px;width:28px;height:28px;font-size:21px;z-index:2}
+.panel.station:has(.build-selector){width:min(360px,calc(100vw - 16px))}
+.build-selector{display:grid;grid-template-columns:30px minmax(0,1fr) 30px;gap:6px;align-items:center}
+.build-arrow{width:30px;height:48px;font-size:27px}.build-stage{min-width:0}.build-stage .action-card{min-height:150px}.build-stage .action{width:100%;min-width:0}
+.build-shortcuts{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;padding:12px 0 1px;margin-top:10px;border-top:1px solid #8da99630}
+.build-shortcut{width:37px;height:37px;position:relative;font-size:21px;border-radius:11px}.build-shortcut .tiny-lock{position:absolute;right:-2px;bottom:-3px;font-size:11px}
+.build-counter{text-align:center;color:#779084;font-size:10px;font-weight:750;margin-top:8px}.build-stage .cost-row{flex-wrap:wrap}
+.requirement{transition:background .25s,color .25s,border-color .25s}
+html[data-theme="dark"] :is(.dock-button,.build-shortcut,.build-arrow,.quick-close){background:#263b36;border-color:#49685b;color:#d8eee2}
+html[data-theme="dark"] :is(.dock-button,.build-shortcut)[aria-pressed="true"]{background:#345844;border-color:#75bc8d}
+@keyframes dockAppear{from{opacity:0;transform:translateX(-14px) scale(.85)}to{opacity:1;transform:translateX(0) scale(1)}}
+@media(max-width:700px){#craftDock{left:8px;top:150px;bottom:170px}.quick-panel .panel.station{max-height:calc(100dvh - 330px)}.panel.station:has(.build-selector){width:min(340px,calc(100vw - 16px))}}
+@media(prefers-reduced-motion:reduce){.dock-button,.build-shortcut,.build-arrow,.requirement{animation:none;transition:none}}
+
+
+#weatherPanel{position:fixed;right:18px;top:clamp(160px,28vh,300px);width:238px;z-index:29;padding:15px 16px;background:#f8fcfff2;border:1px solid #cee0eb;border-radius:18px;box-shadow:0 8px 30px #34556a15;backdrop-filter:blur(12px);color:#45616e;pointer-events:none}
+.weather-heading{display:flex;justify-content:space-between;gap:8px;font-size:14px}#weatherTime{font-variant-numeric:tabular-nums;color:#558977}#weatherDescription{font-size:12px;line-height:1.6;margin:9px 0 12px}.weather-track{height:4px;background:#b9d2cb40;border-radius:4px;overflow:hidden}#weatherProgress{height:100%;background:#83b7aa;border-radius:4px;transition:width .4s linear}
+#weatherNotice{position:fixed;right:18px;bottom:155px;max-width:280px;border-radius:12px;padding:10px 13px;background:#fff1dded;color:#896842;font-size:12px;z-index:31;pointer-events:none}
+#weatherEdges{position:fixed;inset:0;z-index:28;pointer-events:none;overflow:hidden}#weatherEdges:before,#weatherEdges:after{content:'';position:absolute;top:-10%;bottom:-10%;width:min(11vw,135px);opacity:.16;transition:background 1.2s,opacity 1.2s;mask-image:linear-gradient(to right,#000,transparent);animation:weatherDrift 13s ease-in-out infinite alternate}#weatherEdges:before{left:0}#weatherEdges:after{right:0;transform:scaleX(-1);animation-delay:-6s}
+#weatherEdges[data-weather='rain']:before,#weatherEdges[data-weather='rain']:after{background:repeating-linear-gradient(110deg,transparent 0 20px,#689bb9 21px 22px,transparent 23px 43px);animation:weatherRain 2s linear infinite;opacity:.11}
+#weatherEdges[data-weather='quake']:before,#weatherEdges[data-weather='quake']:after{background:radial-gradient(ellipse at left bottom,#bca581,transparent 70%);animation:weatherDrift 4s ease-in-out infinite alternate}
+#weatherEdges[data-weather='rainbow']:before,#weatherEdges[data-weather='rainbow']:after{background:linear-gradient(180deg,#eeafbe,#edcd8c,#a7d4ac,#a5c6e5,#c9ace2);opacity:.22}
+#weatherEdges[data-weather='heat']:before,#weatherEdges[data-weather='heat']:after{background:radial-gradient(ellipse at left,#edb25e,transparent 75%);opacity:.24}
+#weatherEdges[data-weather='fog']:before,#weatherEdges[data-weather='fog']:after{background:radial-gradient(ellipse at left,#afbdc7 10%,transparent 75%);opacity:.35}
+#weatherEdges[data-weather='wind']:before,#weatherEdges[data-weather='wind']:after{background:repeating-linear-gradient(160deg,transparent 0 65px,#a9c6b4 67px,transparent 70px 110px);opacity:.2}
+#weatherEdges[data-weather='storm']:before,#weatherEdges[data-weather='storm']:after{background:linear-gradient(160deg,#aaa3cc,transparent 75%);opacity:.25}
+@keyframes weatherDrift{from{translate:0 -2%;filter:blur(3px)}to{translate:0 3%;filter:blur(7px)}}@keyframes weatherRain{to{background-position:-30px 90px}}
+html[data-theme='dark'] #weatherPanel{background:#20323bed;color:#c4d9df;border-color:#425c67}html[data-theme='dark'] #weatherNotice{background:#443b2ded;color:#e8d3ae}
+@media(max-width:700px){#weatherPanel{right:8px;width:185px;top:auto;bottom:160px;padding:11px}.weather-heading{font-size:12px}#weatherDescription{font-size:10px;margin:6px 0}#weatherNotice{bottom:300px;max-width:210px}}
+@media(prefers-reduced-motion:reduce){#weatherEdges:before,#weatherEdges:after{animation:none!important}#weatherProgress{transition:none}}
+
 </style>
 </head>
 
@@ -581,6 +623,9 @@ html[data-theme="dark"] :is(.battle-ability,.battle-action,.battle-target){backg
     aria-controls="treeSidebar" aria-expanded="false">🌳 Progress Tree</button>
   <button id="pauseButton" class="pause-button" aria-pressed="false">⚙ Settings</button><div class="food-wrap"><button id="foodButton" class="pause-button" hidden>🧃 Food</button><div id="foodBuff" hidden></div></div>
 </div>
+<div id="weatherEdges" aria-hidden="true"></div>
+<aside id="weatherPanel" hidden aria-label="Weather event"><div class="weather-heading"><strong id="weatherName"></strong><strong id="weatherTime"></strong></div><p id="weatherDescription" translate="no"></p><div class="weather-track"><div id="weatherProgress"></div></div></aside><div id="weatherNotice" role="status" hidden></div>
+<nav id="craftDock" aria-label="Quick crafting stations"></nav>
 <div id="pauseBadge" class="pause-badge" hidden>⏸ Game paused</div>
 
 <aside id="treeSidebar" class="tree-sidebar"
@@ -802,16 +847,25 @@ turns:your-server.example:443?transport=tcp"></textarea>
 <dialog id="tradeDialog" class="fx-dialog" aria-labelledby="tradeTitle"><div class="fx-head"><h2 id="tradeTitle">⇄ Trade</h2><button id="tradeAdd">＋ Add</button></div><p class="fx-sub">Your offer is on the left. Items are reserved until completion or cancellation. Changing an offer clears both confirmations.</p><div class="trade-grid"><section id="tradeMine" class="trade-side"><h3>Your offer</h3><div id="tradeMyItems"></div></section><section id="tradeTheirs" class="trade-side"><h3 id="tradeOtherName">Their offer</h3><div id="tradeOtherItems"></div></section></div><p id="tradeMessage" role="status"></p><div class="fx-footer"><button id="tradeDecline" class="danger">Decline</button><button id="tradeConfirm" class="primary">Accept</button></div></dialog>
 <dialog id="tradeAddDialog" class="fx-dialog" aria-labelledby="tradeAddTitle"><div class="fx-head"><h2 id="tradeAddTitle">Add items</h2><button data-close="tradeAddDialog" aria-label="Close">✕</button></div><div id="tradeItems"></div><div id="tradeQuantityRow" hidden><input id="tradeQuantity" type="number" min="1" step="1" inputmode="numeric" aria-label="Quantity"><button id="tradeQuantityOK" class="primary">OK</button></div><p id="tradeAddInfo" class="fx-sub" role="status"></p></dialog>
 
-<dialog id="settingsDialog" class="fx-dialog" aria-labelledby="settingsTitle"><div class="fx-head"><div><h2 id="settingsTitle">⚙ Settings</h2><p class="fx-sub" style="margin:5px 0 0">Your world is paused while this window is open.</p></div><button id="settingsClose" aria-label="Close settings">✕</button></div><div class="setting-row"><label for="themeChoice">Appearance<small>Choose your preferred palette</small></label><select id="themeChoice"><option value="light">Light</option><option value="dark">Dark</option></select></div><div class="setting-row"><label for="musicVolume">Music volume<small id="musicVolumeLabel">35%</small></label><input id="musicVolume" type="range" min="0" max="100" value="35"></div><div class="setting-row"><label for="musicChoice">Soundtrack<small>Five original ambient compositions</small></label><select id="musicChoice"><option value="0">Morning Orchard</option><option value="1">Rain on the Lake</option><option value="2">Amber Fields</option><option value="3">Moonlit Forest</option><option value="4">Quiet Horizon</option></select></div><div class="music-card"><div class="music-bars"><i></i><i></i><i></i><i></i><i></i></div><div><strong id="musicTitle">Morning Orchard</strong><p id="musicDescription"></p><small id="musicState">Music starts after your first click.</small></div></div><div class="fx-footer"><small class="fx-sub">Settings are saved automatically.</small><button id="settingsResume" class="primary">Return to game</button></div></dialog>
+<dialog id="settingsDialog" class="fx-dialog" aria-labelledby="settingsTitle"><div class="fx-head"><div><h2 id="settingsTitle">⚙ Settings</h2><p class="fx-sub" style="margin:5px 0 0">Your world is paused while this window is open.</p></div><button id="settingsClose" aria-label="Close settings">✕</button></div><div class="setting-row"><label for="languageChoice">Language<small>Change the language of the entire game</small></label><select id="languageChoice" translate="no"><option value="en">English</option><option value="uk">Українська</option><option value="ru">Русский</option><option value="pl">Polski</option></select></div><div class="setting-row"><label for="themeChoice">Appearance<small>Choose your preferred palette</small></label><select id="themeChoice"><option value="light">Light</option><option value="dark">Dark</option></select></div><div class="setting-row"><label for="musicVolume">Music volume<small id="musicVolumeLabel">35%</small></label><input id="musicVolume" type="range" min="0" max="100" value="35"></div><div class="setting-row"><label for="musicChoice">Soundtrack<small>Five original ambient compositions</small></label><select id="musicChoice"><option value="0">Morning Orchard</option><option value="1">Rain on the Lake</option><option value="2">Amber Fields</option><option value="3">Moonlit Forest</option><option value="4">Quiet Horizon</option></select></div><div class="music-card"><div class="music-bars"><i></i><i></i><i></i><i></i><i></i></div><div><strong id="musicTitle">Morning Orchard</strong><p id="musicDescription"></p><small id="musicState">Music starts after your first click.</small></div></div><div class="fx-footer"><small class="fx-sub">Settings are saved automatically.</small><button id="settingsResume" class="primary">Return to game</button></div></dialog>
 
 <script>
 const $=id=>document.getElementById(id);
+// Performance only: avoid DOM mutations when the visible text is already correct.
+function setSameText(el,value){
+  // In translated locales compare with the preserved original, not the visible translation.
+  const node=el.firstChild;
+  if(preferences.language!=='en'&&node?.nodeType===Node.TEXT_NODE&&
+      originalTexts.get(node)?.raw===value&&el.childNodes.length===1)return;
+  if(el.textContent!==value)el.textContent=value;
+}
+
 const canvas=$("map"),ctx=canvas.getContext("2d");
 const tradeIncoming=new Map(),tradeSessions=new Map(),tradeRequests=new Map();
 let tradeCurrent=null,tradeEscrow={},tradePending=false,tradeSelected=null;
 const tradeFinished=new Set();
-const preferences={theme:'light',volume:35,track:0};
-try{const p=JSON.parse(localStorage.getItem('wildlife-settings-v1')||'{}');preferences.theme=p.theme==='dark'?'dark':'light';preferences.volume=Number.isFinite(p.volume)?Math.max(0,Math.min(100,p.volume)):35;preferences.track=Number.isInteger(p.track)?Math.max(0,Math.min(4,p.track)):0}catch(e){}
+const preferences={theme:'light',volume:35,track:0,language:'en'};
+try{const p=JSON.parse(localStorage.getItem('wildlife-settings-v1')||'{}');preferences.theme=p.theme==='dark'?'dark':'light';preferences.language=['en','uk','ru','pl'].includes(p.language)?p.language:'en';preferences.volume=Number.isFinite(p.volume)?Math.max(0,Math.min(100,p.volume)):35;preferences.track=Number.isInteger(p.track)?Math.max(0,Math.min(4,p.track)):0}catch(e){}
 let settingsPreviousPause=false;
 const SAVE_KEY="hex-world-progress-v1"; // Existing singleplayer save key stays untouched.
 let worldMode="singleplayer";
@@ -825,7 +879,7 @@ const inventory={wildBerry:0,berryJuice:0,
   axe:0,pickaxe:0,fishingRod:0,plank:0,iron:0,
   ironAxe:0,ironPickaxe:0,hammer:0,essence:0,
   shovel:0,wheat:0,carrot:0,bread:0,animalFeed:0,fur:0,leather:0,
-  clay:0,brick:0,bellows:0,improvedPickaxe:0,improvedAxe:0,coal:0,oak:0,oakPlank:0,steel:0,jacket:0,gloves:0,gold:0
+  clay:0,brick:0,stoneBlock:0,gear:0,bellows:0,improvedPickaxe:0,improvedAxe:0,coal:0,oak:0,oakPlank:0,steel:0,jacket:0,gloves:0,gold:0
 };
 const ITEMS={
   wildBerry:{emoji:"🍇",label:"wild berry"},berryJuice:{emoji:"🧃",label:"berry juice"},
@@ -846,6 +900,7 @@ const ITEMS={
   bread:{emoji:"🍞",label:"bread"},animalFeed:{emoji:"🐾",label:"animal feed"},
   fur:{emoji:"🧣",label:"fur"},leather:{emoji:"🟤",label:"leather"},
   clay:{emoji:"🟫",label:"clay"},brick:{emoji:"🧱",label:"brick"},
+  stoneBlock:{emoji:"🪨",label:"stone block"},gear:{emoji:"⚙️",label:"ordinary gear"},
   bellows:{emoji:"💨",label:"blacksmith bellows"},
   improvedPickaxe:{emoji:"⛏️",label:"improved pickaxe"},
   improvedAxe:{emoji:"🪓",label:"improved axe"},
@@ -859,7 +914,7 @@ const BIOMES={
   forest:{label:"Forest",emoji:"🌲",baseCost:{wood:5},color:[54,173,89],
     note:"+1 wood / 5s",buildings:["sawmill","berryBush","improvedSawmill"]},
   meadow:{label:"Meadow",emoji:"🌱",baseCost:{wood:3},color:[176,232,106],
-    note:"Crafting and support buildings",buildings:["carpenter","forge","house","farm","animalPen","advancedForge"]},
+    note:"Crafting and support buildings",buildings:["carpenter","forge","stonecutter","workshop","house","farm","animalPen","advancedForge"]},
   lake:{label:"Lake",emoji:"🌊",baseCost:{stone:3},color:[115,202,250],
     note:"+1 fish / 15s",buildings:["fishingHut","treasure","port"]},
   mountains:{label:"Mountains",emoji:"⛰️",baseCost:{stone:5},color:[164,170,179],
@@ -881,6 +936,12 @@ const BUILDINGS={
     baseCost:{wood:15,stone:10,fishingRod:1},note:"+1 fish / 7.5s"},
   carpenter:{label:"Carpenter",emoji:"🛠️",baseCost:{wood:5,stone:5},
     note:"Craft tools and planks"},
+  stonecutter:{label:"Stonecutter",emoji:"🧱",
+    baseCost:{stone:50,plank:15,hammer:1,ironPickaxe:1},requiredLevel:2,
+    note:"Craft stone blocks from 5 stone"},
+  workshop:{label:"Workshop",emoji:"⚙️",
+    baseCost:{plank:30,iron:15,hammer:1},requiredLevel:3,
+    note:"Craft gears and blacksmith bellows"},
   forge:{label:"Forge",emoji:"⚒️",baseCost:{plank:10,pickaxe:2,axe:2},
     note:"Craft iron tools",requiredLevel:2},
   treasure:{label:"Treasures",emoji:"🧰",
@@ -899,10 +960,10 @@ const BUILDINGS={
   improvedMine:{label:"Improved Mine",emoji:"⛏️",
     baseCost:{brick:15,iron:20,improvedPickaxe:1,leather:10},requiredLevel:4,
     note:"+1 coal / 7.5s"},
-  port:{label:"Port",emoji:"⚓",requiredLevel:4,
+  port:{label:"Port",emoji:"⚓",requiredLevel:5,
     baseCost:{oakPlank:25,steel:30,hammer:3,fishingRod:25},
     note:"Sell goods for gold bags · Buy supplies"},
-  house:{label:"House",emoji:"🏠",baseCost:{stone:40,plank:25,hammer:1},
+  house:{label:"House",emoji:"🏠",baseCost:{stoneBlock:8,plank:25,hammer:1},
     note:"Assign Residential or Kitchen",requiredLevel:2}
 };
 const RECIPES={
@@ -912,6 +973,8 @@ const RECIPES={
   fishingRod:{label:"Fishing rod",emoji:"🎣",cost:{wood:10,fish:3},station:"carpenter"},
   plank:{label:"Plank",emoji:"🟫",cost:{wood:3},station:"carpenter",requiredLevel:2},
   iron:{label:"Iron",emoji:"⬜",cost:{stone:20},station:"forge",requiredLevel:2},
+  stoneBlock:{label:"Stone block",emoji:"🪨",cost:{stone:5},station:"stonecutter",requiredLevel:2},
+  gear:{label:"Ordinary gear",emoji:"⚙️",cost:{iron:3},station:"workshop",requiredLevel:3},
   ironAxe:{label:"Iron axe",emoji:"🪓",cost:{plank:10,iron:3},station:"forge",requiredLevel:2},
   ironPickaxe:{label:"Iron pickaxe",emoji:"⛏️",cost:{plank:10,iron:3},station:"forge",requiredLevel:2},
   hammer:{label:"Hammer",emoji:"🔨",cost:{plank:5,iron:5},station:"forge",requiredLevel:2},
@@ -920,7 +983,7 @@ const RECIPES={
   animalFeed:{label:"Animal feed",emoji:"🐾",cost:{carrot:3},station:"farm",requiredLevel:3},
   leather:{label:"Leather",emoji:"🟤",cost:{fur:3},station:"animalPen",requiredLevel:3},
   brick:{label:"Brick",emoji:"🧱",cost:{clay:5},station:"forge",requiredLevel:4},
-  bellows:{label:"Blacksmith bellows",emoji:"💨",cost:{leather:8,plank:50,iron:10},station:"forge",requiredLevel:4},
+  bellows:{label:"Blacksmith bellows",emoji:"💨",cost:{leather:8,plank:50,iron:10},station:"workshop",requiredLevel:4},
   improvedPickaxe:{label:"Improved pickaxe",emoji:"⛏️",
     cost:{leather:3,ironPickaxe:1,clay:5,iron:5},station:"advancedForge",requiredLevel:4},
   improvedAxe:{label:"Improved axe",emoji:"🪓",
@@ -943,9 +1006,9 @@ const PORT_TRADES={
 };
 const AUTOMATION={
   carpenter:{label:"Auto Carpenter",item:"plank",interval:5,
-    upgradeCost:{plank:30,ironAxe:2,hammer:1},recipe:{wood:3,fish:2}},
+    upgradeCost:{plank:30,ironAxe:2,hammer:1,gear:3},recipe:{fish:2}},
   forge:{label:"Auto Forge",item:"iron",interval:45,
-    upgradeCost:{iron:10,plank:20,ironPickaxe:1,hammer:1},recipe:{stone:20,fish:2}}
+    upgradeCost:{iron:10,plank:20,ironPickaxe:1,hammer:1,gear:3},recipe:{fish:2}}
 };
 const HOUSE_MODES={
   residential:{label:"Residential",emoji:"🏡",upkeep:1,limit:10,requiredLevel:2,cost:{},
@@ -977,7 +1040,8 @@ const LEVEL_REQUIREMENTS={
   1:{wood:150,stone:150,fish:75,sawmill:1,mine:1,fishingHut:1,carpenter:1},
   2:{wood:500,stone:500,fish:250,plank:50,iron:30,
     upgradedProducer:1,residential:1},
-  3:{wood:1500,stone:1500,fish:750,farm:3,animalPen:2,leather:10,kitchen:1}
+  3:{wood:1500,stone:1500,fish:750,farm:3,animalPen:2,leather:10,kitchen:1},
+  4:{wood:7500,stone:7500,fish:2000,steel:15,oakPlank:30,jacket:1,gloves:1}
 };
 const EXTRA_GOALS={
   upgradedProducer:{emoji:"📈",label:"Production upgrade 1",verb:"Reach"},
@@ -987,7 +1051,7 @@ const EXTRA_GOALS={
 
 let playerLevel=1,resourcesExpanded=false,craftMultiplier=1,isPaused=false;
 const levelProgress={
-  wood:0,stone:0,fish:0,plank:0,iron:0,
+  wood:0,stone:0,fish:0,plank:0,iron:0,steel:0,oakPlank:0,jacket:0,gloves:0,
   sawmill:0,mine:0,fishingHut:0,carpenter:0,
   upgradedProducer:0,residential:0,kitchen:0,farm:0,animalPen:0,leather:0
 };
@@ -1049,7 +1113,7 @@ function recordProgress(amounts){
   for(const[k,n]of Object.entries(amounts)){
     if(n>0&&has(ITEMS,k))achievements.add(k);
   }
-  if(playerLevel>=4)return;
+  if(playerLevel>=5)return;
   for(const[k,n]of Object.entries(amounts)){
     if(has(levelProgress,k)&&n>0)levelProgress[k]+=n;
   }
@@ -1059,24 +1123,25 @@ function recordProgress(amounts){
     playerLevel++;achievements.add(`level${playerLevel}`);
     for(const k of Object.keys(levelProgress))levelProgress[k]=0;
     showToast(playerLevel===2
-      ?"Level 2 reached! New buildings, crafting and upgrades unlocked."
-      :playerLevel===3?"Level 3 reached! Farming, animals, Kitchens and automation unlocked!"
-      :"Level 4 reached! Bricks, bellows, Advanced Forge, improved tools, oak and coal production unlocked!");
+      ?"Level 2 reached! Forge, Stonecutter, Houses and upgrades unlocked!"
+      :playerLevel===3?"Level 3 reached! Workshop, Farming, animals and automation unlocked!"
+      :playerLevel===4?"Level 4 reached! Advanced Forge, improved tools, oak and coal unlocked!"
+      :"Level 5 reached! The Port is now unlocked!");
     refreshMenus();
   }
   updateLevelHUD();
 }
 function updateLevelHUD(){
-  $("goldIndicator").hidden=playerLevel<4&&!achievements.has("gold");
+  $("goldIndicator").hidden=playerLevel<5&&!achievements.has("gold");
   $("plankIndicator").hidden=playerLevel<2;
   $("ironIndicator").hidden=playerLevel<2;
   $("essenceIndicator").hidden=!achievements.has("essence");
   updateInventoryDrawerState();$("requirements").replaceChildren();
-  if(playerLevel>=4){
-    $("levelName").textContent="Level 4";$("levelPercent").textContent="MAX LEVEL";
+  if(playerLevel>=5){
+    $("levelName").textContent="Level 5";$("levelPercent").textContent="MAX LEVEL";
     $("levelFill").style.width="100%";$("levelTrack").setAttribute("aria-valuenow","100");
     const chip=document.createElement("span");chip.className="requirement done";
-    chip.textContent="Advanced Forge, improved producers, oak planks and steel unlocked";$("requirements").appendChild(chip);
+    chip.textContent="⚓ Port unlocked · All five levels completed";$("requirements").appendChild(chip);
     $("levelUnlock").textContent="Keep exploring the Progress Tree";
     return;
   }
@@ -1091,21 +1156,27 @@ function updateLevelHUD(){
     const chip=document.createElement("span");
     chip.className=`requirement${remaining===0?" done":""}`;
     chip.textContent=remaining===0?`${item.emoji} ${item.label} ✓`:
-      `${verb} ${remaining} ${item.label}`;
+      `${item.emoji} ${verb} ${remaining} ${item.label}`;
     chip.title=`${Math.min(current,n)} / ${n}`;
     if(k==="upgradedProducer"){
       chip.title="Reach production upgrade 1 on a Sawmill or Mine.";
     }
     $("requirements").appendChild(chip);
+    const goalKey=playerLevel+':'+k;
+    if(remaining===0&&!completedGoalAnimations.has(goalKey)){
+      completedGoalAnimations.add(goalKey);
+      if(!matchMedia('(prefers-reduced-motion: reduce)').matches)chip.animate([{transform:'scale(.94)',filter:'brightness(1.2)'},{transform:'scale(1)',filter:'brightness(1)'}],{duration:400,easing:'ease-out'});
+    }
   }
   const p=earned/total*100;
   $("levelPercent").textContent=`${Math.floor(p)}%`;
   $("levelFill").style.width=`${p}%`;
   $("levelTrack").setAttribute("aria-valuenow",String(Math.floor(p)));
   $("levelUnlock").textContent=playerLevel===1
-    ?"Next: Forge, Treasures, Houses and building upgrades"
-    :playerLevel===2?"Next: Farms, Animal pens, Kitchens, Shovels and automation"
-    :"Next: Advanced Forge, improved producers, oak planks and steel";
+    ?"Next: Forge, Stonecutter, Treasures, Houses and upgrades"
+    :playerLevel===2?"Next: Workshop, Farms, Animal pens, Kitchens and automation"
+    :playerLevel===3?"Next: Advanced Forge, improved producers, oak planks and steel"
+    :"Next: Port and global trade";
 }
 function updatePauseUI(){
   $("pauseButton").textContent="⚙ Settings";
@@ -1134,7 +1205,12 @@ function updateInventoryDrawerState(){
   $("inventoryDrawer").setAttribute("aria-hidden",String(!expanded));
 }
 function renderInventoryDrawer(){
-  const container=$("inventoryDrawerItems");container.replaceChildren();
+  const container=$("inventoryDrawerItems");
+  const signature=Object.entries(inventory).filter(([k,n])=>n>0&&!['plank','iron','essence','gold'].includes(k))
+    .map(([k,n])=>k+':'+n).join('|');
+  if(container._inventorySignature===signature){updateInventoryDrawerState();return;}
+  container._inventorySignature=signature;
+  container.replaceChildren();
   for(const[k,n]of Object.entries(inventory)){
     if(n<=0||["plank","iron","essence","gold"].includes(k))continue;
     const item=document.createElement("div");item.className="tool-resource";
@@ -1180,8 +1256,7 @@ function refund(cost){
 function constructionCost(category,type){
   const base=(category==="biome"?BIOMES[type]:BUILDINGS[type]).baseCost;
   const m=PRICE_MULTIPLIER**constructionCounts[category][type];
-  if((category==="biome"&&type==="wasteland")||
-     (category==="building"&&["arena","sorcerer"].includes(type)))return{...base};
+  if(category==="building"&&["arena","sorcerer"].includes(type))return{...base};
   return Object.fromEntries(Object.entries(base).map(([k,n])=>[k,Math.ceil(n*m)]));
 }
 function recipeCost(type){return{...RECIPES[type].cost}}
@@ -1236,11 +1311,93 @@ function craftMissing(plan){
 function buildingLabel(t){
   return t.building==="mine"&&t.upgradeLevel>=2?"Clay Canyon":BUILDINGS[t.building]?.label||"";
 }
+
+const WEATHER={
+ rain:{name:'🌧️ Rain',desc:'Farms, berries and lakes: +30% speed. All stone production: −25%.',track:5},
+ quake:{name:'🌎 Earthquake',desc:'Every second: 1.5% chance to destroy one random building.',track:6},
+ rainbow:{name:'🌈 Rainbow',desc:'All production: +50% speed.',track:7},
+ heat:{name:'☀️ Heatwave',desc:'Wood and farms: −35% speed. All stone production: +25%.',track:8},
+ fog:{name:'🌫️ Fog',desc:'Treasures: 2 rewards per cycle. Fishing: −35% speed.',track:9},
+ wind:{name:'🌬️ Strong wind',desc:'Farms, berries and fishing: 33% chance of an empty cycle. Wood: +25% speed.',track:10},
+ storm:{name:'⛈️ Thunderstorm',desc:'Fury production: +50% speed.',track:11}
+};
+let weather={kind:null,left:150,quakeLeft:1},weatherVisualKey=null;
+function weatherSpeed(t){
+ const p=production(t),wood=p&&['wood','oak'].includes(p.resource),stoneProduction=p?.resource==='stone'||p?.randomClay,farm=t.building==='farm',berry=t.building==='berryBush',fish=p?.resource==='fish';
+ switch(weather.kind){
+ case 'rain':return stoneProduction?.75:(farm||berry||t.biome==='lake'?1.3:1);
+ case 'rainbow':return 1.5;
+ case 'heat':return stoneProduction?1.25:((wood||farm)?.65:1);
+ case 'fog':return fish?.65:1;
+ case 'wind':return wood?1.25:1;
+ case 'storm':return p?.resource==='fury'?1.5:1;
+ default:return 1;
+ }
+}
+function weatherEmptyChance(t){return weather.kind==='wind'&&(t.building==='farm'||t.building==='berryBush'||production(t)?.resource==='fish')?.33:0}
+function weatherSet(data){
+ weather={kind:WEATHER[data?.kind]&&(data.kind!=='storm'||multiplayer.started)?data.kind:null,left:Math.max(.001,Math.min(data?.kind?60:150,Number(data?.left)||150)),quakeLeft:Math.max(.001,Math.min(1,Number(data?.quakeLeft)||1))};
+ weatherUI();
+}
+function weatherBroadcast(){if(multiplayer.started&&multiplayer.host)mpBroadcast({type:'WEATHER',weather:{...weather}})}
+function weatherDestroy(msg){
+ const t=tileMap.get(tileKey(msg.q,msg.r));if(!t||!t.building)return;
+ const name=buildingLabel(t);mpBattleRemoveBuilding(t);if(activeMenu?.tile===t)closeMenu();
+ refreshCraftDock();updateResources();
+ const text=`🌎 Earthquake destroyed ${name} (${msg.q}, ${msg.r})`;
+ showToast(text);$('weatherNotice').textContent=text;$('weatherNotice').hidden=false;
+ if(multiplayer.started&&!multiplayer.host&&mpOwnsTile(t)&&multiplayer.hostConnection?.open)multiplayer.hostConnection.send({type:'TILES',tiles:mpOwnedTiles()});
+}
+function weatherAdvance(dt){
+ weather.left-=dt;
+ if(weather.kind==='quake'){
+  weather.quakeLeft-=dt;
+  if(weather.quakeLeft<=EPS){weather.quakeLeft+=1;
+   if(Math.random()<.015){const candidates=tiles.filter(t=>t.building&&(!multiplayer.started||!multiplayer.battle?.eliminated.has(t.owner)));if(candidates.length){const t=candidates[Math.floor(Math.random()*candidates.length)],msg={type:'WEATHER_DESTROY',q:t.q,r:t.r};weatherDestroy(msg);if(multiplayer.started)mpBroadcast(msg);}}
+  }
+ }
+ if(weather.left<=EPS){
+  if(weather.kind){weather.kind=null;weather.left=150;}
+  else{const kinds=Object.keys(WEATHER).filter(k=>k!=='storm'||multiplayer.started);weather.kind=kinds[Math.floor(Math.random()*kinds.length)];weather.left=60;weather.quakeLeft=1;}
+  weatherUI();weatherBroadcast();
+ }
+}
+function weatherUI(){
+ const def=WEATHER[weather.kind],panel=$('weatherPanel');panel.hidden=!def;
+ if(def){setSameText($('weatherName'),def.name);setSameText($('weatherDescription'),LOCALIZED_WEATHER[preferences.language]?.[weather.kind]||def.desc);const secs=Math.ceil(weather.left);setSameText($('weatherTime'),`${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}`);$('weatherProgress').style.width=(weather.left/60*100)+'%';}
+ if(weatherVisualKey!==weather.kind){
+  weatherVisualKey=weather.kind;$('weatherEdges').dataset.weather=weather.kind||'';
+  if(def&&!matchMedia('(prefers-reduced-motion: reduce)').matches)panel.animate([{opacity:0,transform:'translateX(16px)'},{opacity:1,transform:'translateX(0)'}],{duration:450});
+  if(typeof soundtrack!=='undefined'&&soundtrack.context)musicChange();
+ }
+}
+// Only the host advances multiplayer weather; clients receive its authoritative clock.
+function weatherMultiplayerTick(dt){
+ if(!multiplayer.started||multiplayer.battle?.finished)return;
+ if(multiplayer.host){let rest=dt;while(rest>EPS){const step=Math.min(rest,weather.left,weather.kind==='quake'?weather.quakeLeft:Infinity);weatherAdvance(step);rest-=step;}}
+ else weather.left=Math.max(.001,weather.left-dt);
+}
+function simulate(elapsed,animate=true){
+ if(multiplayer.started){simulateCore(elapsed,animate);return;}
+ if(isPaused||elapsed<=0)return;
+ let rest=elapsed;
+ while(rest>EPS){const step=Math.min(rest,weather.left,weather.kind==='quake'?weather.quakeLeft:Infinity);simulateCore(step,animate);weatherAdvance(step);rest-=step;}
+ weatherUI();
+}
+
 function productionTimeFactor(t,effects=supportEffects()){
   if(!mpOwnsTile(t))return 1;
-  return effects.timeFactor*(t.building==="farm"?(7.5-effects.farmReduction)/7.5:1);
+  return effects.timeFactor/weatherSpeed(t)*(t.building==="farm"?(7.5-effects.farmReduction)/7.5:1);
 }
 function production(t){
+  const cache=t._productionCache;
+  if(cache&&cache.biome===t.biome&&cache.building===t.building&&cache.level===t.upgradeLevel)
+    return cache.value;
+  const value=calculateProduction(t);
+  t._productionCache={biome:t.biome,building:t.building,level:t.upgradeLevel,value};
+  return value;
+}
+function calculateProduction(t){
   if(t.biome==="wasteland")return{resource:"fury",amount:1,
     interval:t.building==="arena"?[20,15,10,5][Math.min(3,t.upgradeLevel)]:30};
   if(t.building==="berryBush")return{resource:"wildBerry",amount:1,interval:25};
@@ -1340,19 +1497,19 @@ function resourceBalancePerMinute(resource){
       const chance=p.randomClay?(resource==="stone"?.8:resource==="clay"?.2:0)
         :p.randomCrop?(resource==="wheat"?.8:resource==="carrot"?.2:0)
         :p.resource===resource?1:0;
-      income+=chance*60*p.amount/(p.interval*productionTimeFactor(t,effects));
+      income+=chance*60*p.amount*(1-weatherEmptyChance(t))/(p.interval*productionTimeFactor(t,effects));
     }
     if(t.building==="treasure"){
       const chance=TREASURE_LOOT[Math.max(1,Math.min(3,t.treasureLevel))]
         .find(([item])=>item===resource)?.[1]||0;
-      income+=60/15/effects.timeFactor*chance/100;
+      income+=60/15/effects.timeFactor*weatherSpeed(t)*chance/100*(weather.kind==='fog'?2:1);
     }
     if(resource==="fish"&&t.building==="house"&&t.houseMode)
       upkeep+=HOUSE_MODES[t.houseMode].upkeep*12;
     const a=automationFor(t);
     // Include recurring demand even if this resource itself is depleted.
     if(a&&Object.entries(a.recipe).every(([k,n])=>k===resource||balance(k)>=n))
-      automation+=(a.recipe[resource]||0)*60/(a.interval*effects.timeFactor);
+      automation+=(a.recipe[resource]||0)*60/(a.interval*effects.timeFactor/weatherSpeed(t));
   }
   income*=1+effects.doubleChance;
   return{income,upkeep,automation,net:income-upkeep-automation};
@@ -1363,9 +1520,10 @@ function updateFishRate(){
     if(resource==="fury"&&worldMode!=="multiplayer")continue;
     const rate=resourceBalancePerMinute(resource),net=isPaused?0:rate.net;
     const rounded=Math.round(net*10)/10,el=$(`${resource}Rate`);
-    el.textContent=`${rounded<0?"−":"+"}${Math.abs(rounded).toLocaleString("en-US",{maximumFractionDigits:1})} / min`;
+    setSameText(el,`${rounded<0?"−":"+"}${Math.abs(rounded).toLocaleString("en-US",{maximumFractionDigits:1})} / min`);
     el.classList.toggle("negative",rounded<0);
-    el.title=isPaused?"Game paused":`Expected ${resource} / min: +${rate.income.toFixed(1)} production, −${rate.upkeep.toFixed(1)} houses, −${rate.automation.toFixed(1)} automation`;
+    const title=isPaused?"Game paused":`Expected ${resource} / min: +${rate.income.toFixed(1)} production, −${rate.upkeep.toFixed(1)} houses, −${rate.automation.toFixed(1)} automation`;
+    if(el.title!==title)el.title=title;
   }
 }
 function updateResources(){
@@ -1373,9 +1531,11 @@ function updateResources(){
   collectAchievements();foodUI();
   $("furyIndicator").hidden=worldMode!=="multiplayer";
   for(const k of["wood","stone","fish","fury","plank","iron","essence","gold"]){
-    $(`${k}Count`).textContent=String(balance(k));
+    setSameText($(`${k}Count`),String(balance(k)));
   }
-  renderInventoryDrawer();refreshMenus();updateLevelHUD();refreshTreeStates();
+  renderInventoryDrawer();refreshMenus();updateLevelHUD();
+  if(treeOpen)refreshTreeStates();
+  if(activeMenu)positionMenus();
 }
 
 /*
@@ -1383,7 +1543,7 @@ function updateResources(){
   Residential bonuses accelerate production, treasures and automation.
   House upkeep remains a fixed 5-second wall-clock interval.
 */
-function simulate(elapsed,animate=true){
+function simulateCore(elapsed,animate=true){
   if(isPaused||elapsed<=0||multiplayer.started&&
     (multiplayer.battle?.eliminated.has(multiplayer.playerId)||multiplayer.battle?.finished))return;
   const gathered={wood:0,stone:0,fish:0};
@@ -1418,12 +1578,12 @@ function simulate(elapsed,animate=true){
       }
       if(t.building==="treasure"){
         tasks.push({t,kind:"treasure"});
-        step=Math.min(step,Math.max(EPS,t.treasureRemaining*effects.timeFactor));
+        step=Math.min(step,Math.max(EPS,t.treasureRemaining*effects.timeFactor/weatherSpeed(t)));
       }
       const a=automationFor(t);
       if(a&&canAfford(a.recipe)){
         tasks.push({t,kind:"auto",a});
-        step=Math.min(step,Math.max(EPS,t.autoRemaining*effects.timeFactor));
+        step=Math.min(step,Math.max(EPS,t.autoRemaining*effects.timeFactor/weatherSpeed(t)));
       }
     }
 
@@ -1431,8 +1591,8 @@ function simulate(elapsed,animate=true){
     for(const t of homes)t.houseRemaining-=step;
     for(const task of tasks){
       if(task.kind==="gather")task.t.productionRemaining-=step/productionTimeFactor(task.t,effects);
-      if(task.kind==="treasure")task.t.treasureRemaining-=work;
-      if(task.kind==="auto")task.t.autoRemaining=Math.max(0,task.t.autoRemaining-work);
+      if(task.kind==="treasure")task.t.treasureRemaining-=work*weatherSpeed(task.t);
+      if(task.kind==="auto")task.t.autoRemaining=Math.max(0,task.t.autoRemaining-work*weatherSpeed(task.t));
     }
     remaining=Math.max(0,remaining-step);
     juiceSeconds=Math.max(0,juiceSeconds-step);
@@ -1457,13 +1617,12 @@ function simulate(elapsed,animate=true){
         t.productionRemaining+=task.p.interval;
         const item=task.p.randomCrop?(Math.random()<.8?"wheat":"carrot"):
           task.p.randomClay?(Math.random()<.8?"stone":"clay"):task.p.resource;
-        give(item,task.p.amount*multiplier(),"gather");
+        if(Math.random()>=weatherEmptyChance(t))give(item,task.p.amount*multiplier(),"gather");
         if(animate)t.flash=1;
       }
       if(task.kind==="treasure"&&t.treasureRemaining<=EPS){
         t.treasureRemaining+=15;
-        const item=treasureRoll(t.treasureLevel);
-        give(item,multiplier(),"gather");
+        for(let roll=0;roll<(weather.kind==='fog'?2:1);roll++){const item=treasureRoll(t.treasureLevel);give(item,multiplier(),"gather");}
         if(animate)t.flash=1;
       }
       if(task.kind==="auto"&&t.autoRemaining<=EPS&&canAfford(task.a.recipe)){
@@ -1484,10 +1643,91 @@ function simulate(elapsed,animate=true){
 }
 function synchronize(animate=true){
   const now=performance.now(),elapsed=Math.max(0,(now-lastSimulation)/1000);
-  lastSimulation=now;if(!isPaused)simulate(elapsed,animate);
+  lastSimulation=now;weatherMultiplayerTick(elapsed);if(!isPaused)simulate(elapsed,animate);weatherUI();
+}
+
+
+let mapDrag=null,suppressMapClickUntil=0,lastDockRefresh=0;
+const completedGoalAnimations=new Set();
+canvas.addEventListener('pointerdown',e=>{
+  if(e.button!==0||treeOpen||document.querySelector('dialog[open]'))return;
+  mapDrag={id:e.pointerId,x:e.clientX,y:e.clientY,cx:camera.x,cy:camera.y,moved:false};
+  resetInput();canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove',e=>{
+  if(!mapDrag||mapDrag.id!==e.pointerId)return;
+  const dx=e.clientX-mapDrag.x,dy=e.clientY-mapDrag.y;
+  if(!mapDrag.moved&&Math.hypot(dx,dy)>6){mapDrag.moved=true;if(!activeMenu?.quick)closeMenu();}
+  if(mapDrag.moved){camera.x=mapDrag.cx-dx;camera.y=mapDrag.cy-dy;camera.vx=0;camera.vy=0;positionMenus();}
+});
+function endMapDrag(e){
+  if(!mapDrag||e&&e.pointerId!==undefined&&mapDrag.id!==e.pointerId)return;
+  const moved=mapDrag.moved,id=mapDrag.id;mapDrag=null;
+  if(moved){suppressMapClickUntil=performance.now()+250;saveGame();}
+  if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);
+}
+canvas.addEventListener('pointerup',endMapDrag);canvas.addEventListener('pointercancel',endMapDrag);canvas.addEventListener('lostpointercapture',endMapDrag);window.addEventListener('blur',()=>endMapDrag());
+const craftStationKeys=new Set(Object.values(RECIPES).map(r=>r.station));
+function craftStations(){
+  const found=new Map();
+  for(const tile of tiles){
+    if(!tile.building||!mpOwnsTile(tile))continue;
+    const key=stationFor(tile);
+    if(!craftStationKeys.has(key))continue;
+    if(!found.has(key))found.set(key,[]);found.get(key).push(tile);
+  }
+  return found;
+}
+function refreshCraftDock(){
+  const dock=$('craftDock');if(!dock)return;
+  const stations=craftStations();
+  if(activeMenu?.quick&&(!stations.get(activeMenu.stationKey)?.includes(activeMenu.tile)))closeMenu();
+  const signature=[...stations].map(([k,v])=>k+':'+v.length).join('|');
+  if(dock.dataset.signature!==signature){
+    dock.dataset.signature=signature;
+    const existing=new Map([...dock.children].map(b=>[b.dataset.station,b]));
+    for(const [key,group]of stations){
+      let button=existing.get(key);existing.delete(key);
+      const def=stationDefinition(key);
+      if(!button){
+        button=document.createElement('button');button.type='button';button.className='dock-button';button.dataset.station=key;
+        const emoji=document.createElement('span');emoji.textContent=def.emoji;const count=document.createElement('span');count.className='dock-count';button.append(emoji,count);
+        button.addEventListener('click',()=>{const list=craftStations().get(key);if(!list?.length)return;const tile=activeMenu?.quick&&activeMenu.stationKey===key?activeMenu.tile:list[0];openMenu(tile,true);});
+        dock.append(button);
+      }
+      button.title=def.label+' · Quick crafting';button.setAttribute('aria-label',def.label+' — open crafts');button.lastChild.textContent=group.length;button.lastChild.hidden=group.length<2;
+    }
+    for(const button of existing.values())button.remove();
+  }
+  for(const button of dock.children)button.setAttribute('aria-pressed',String(!!activeMenu?.quick&&activeMenu.stationKey===button.dataset.station));
+}
+function makeBuildCarousel(menu,panel,tile){
+  const types=[...BIOMES[tile.biome].buildings].filter(t=>multiplayer.started||!BUILDINGS[t].multiplayerOnly).sort((a,b)=>(BUILDINGS[a].requiredLevel||1)-(BUILDINGS[b].requiredLevel||1));
+  const selector=document.createElement('div');selector.className='build-selector';
+  const prev=document.createElement('button'),next=document.createElement('button');
+  prev.className=next.className='build-arrow';prev.textContent='‹';next.textContent='›';prev.setAttribute('aria-label','Previous building');next.setAttribute('aria-label','Next building');
+  const stage=document.createElement('div');stage.className='build-stage';selector.append(prev,stage,next);panel.append(selector);
+  const carousel={index:0};const entries=[];
+  for(const type of types){addBuildButton(menu,stage,tile,type);const entry=menu.buttons[menu.buttons.length-1];entry.carousel=carousel;entry.carouselIndex=entries.length;entries.push(entry);}
+  const counter=document.createElement('div');counter.className='build-counter';counter.setAttribute('aria-live','polite');
+  const shortcuts=document.createElement('div');shortcuts.className='build-shortcuts';shortcuts.setAttribute('aria-label','Choose building');
+  types.forEach((type,index)=>{const def=BUILDINGS[type],button=document.createElement('button');button.className='build-shortcut';button.textContent=def.emoji;button.title=def.label+((def.requiredLevel||1)>playerLevel?' · Level '+def.requiredLevel:'');button.setAttribute('aria-label',button.title);if((def.requiredLevel||1)>playerLevel){const lock=document.createElement('span');lock.className='tiny-lock';lock.textContent='🔒';button.append(lock);}button.onclick=()=>select(index,index>=carousel.index?1:-1);shortcuts.append(button);});
+  function select(index,direction=1,animate=true){
+    carousel.index=(index+types.length)%types.length;
+    for(const entry of entries)refreshButton(entry);
+    [...shortcuts.children].forEach((b,i)=>b.setAttribute('aria-pressed',String(i===carousel.index)));
+    counter.textContent=`${carousel.index+1} / ${types.length} · ${BUILDINGS[types[carousel.index]].label}`;
+    if(animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches){stage.getAnimations().forEach(a=>a.cancel());stage.animate([{opacity:0,transform:`translateX(${direction*15}px) scale(.97)`},{opacity:1,transform:'translateX(0) scale(1)'}],{duration:230,easing:'cubic-bezier(.2,.7,.2,1)'});}
+    positionMenu(menu);
+  }
+  prev.onclick=()=>select(carousel.index-1,-1);next.onclick=()=>select(carousel.index+1,1);
+  panel.append(counter,shortcuts);select(0,1,false);
 }
 
 function drawCost(element,cost){
+  const signature=Object.entries(cost).map(([k,n])=>k+':'+n+':'+balance(k)).join('|');
+  if(element._costSignature===signature)return;
+  element._costSignature=signature;
   element.replaceChildren();
   if(!Object.keys(cost).length){element.textContent="Free";return}
   for(const[k,n]of Object.entries(cost)){
@@ -1583,7 +1823,7 @@ function makeButton(menu,panel,options){
 }
 function refreshButton(e){
   const o=e.options,locked=!!o.locked?.(),maxed=!!o.maxed?.(),blocked=!!o.blocked?.();
-  e.card.hidden=false;
+  e.card.hidden=!!e.carousel && e.carousel.index!==e.carouselIndex;
   const plan=o.plan?.(),cost=plan?plan.cost:o.cost?.()||{};
   const affordable=canAfford(cost)&&(!plan||plan.quantity>0);
   const rest=!isPaused&&!locked&&!maxed&&!blocked&&(!plan||plan.quantity>0)
@@ -1602,8 +1842,8 @@ function refreshButton(e){
     ?plan.note||`Craft +${plan.quantity} · ${craftMultiplier==="all"?"All affordable":`×${craftMultiplier}`} · fixed price`
     :typeof o.note==="function"?o.note():o.note||"";
   e.note.hidden=!e.note.textContent;
-  if(maxed)e.cost.textContent="Fully upgraded";
-  else if(o.detail)e.cost.textContent=o.detail;
+  if(maxed){e.cost._costSignature=null;setSameText(e.cost,"Fully upgraded");}
+  else if(o.detail){e.cost._costSignature=null;setSameText(e.cost,o.detail);}
   else drawCost(e.cost,cost);
   e.ownedCount.hidden=!o.itemType;
   if(o.itemType){
@@ -1631,10 +1871,22 @@ function makeInventory(menu){
 }
 function refreshInventory(menu){
   if(!menu.inventory)return;
-  const{anchor,panel}=menu.inventory;panel.replaceChildren();
+  const{anchor,panel}=menu.inventory;
+  const station=stationFor(menu.tile);
+  // The panel content is static between inventory changes; do not recreate every node.
+  const signature=Object.entries(inventory).filter(([k,n])=>n>0&&(
+    RECIPES[k]?.station===station||
+    station==='farm'&&['wheat','carrot'].includes(k)||
+    station==='animalPen'&&k==='fur'||
+    station==='improvedSawmill'&&k==='oak'||
+    station==='improvedMine'&&k==='coal'||
+    station==='port'&&['gold','oakPlank','steel','jacket','gloves','improvedAxe','improvedPickaxe'].includes(k)
+  )).map(([k,n])=>k+':'+n).join('|');
+  if(panel._inventorySignature===signature)return;
+  panel._inventorySignature=signature;
+  panel.replaceChildren();
   for(const[k,n]of Object.entries(inventory)){
     // A station only displays the items in its own recipe list.
-    const station=stationFor(menu.tile);
     const isOutput=(station==="farm"&&["wheat","carrot"].includes(k))||
       (station==="animalPen"&&k==="fur")||
       (station==="improvedSawmill"&&k==="oak")||
@@ -1670,9 +1922,9 @@ function updateAutomationStatus(menu){
   const t=menu.tile,a=automationFor(t);if(!a)return;
   const running=!isPaused&&canAfford(a.recipe);
   menu.autoStatus.classList.toggle("paused",!running);
-  menu.autoStatus.textContent=isPaused?"⏸ Game paused":running
-    ?`⚙ Auto ${ITEMS[a.item].label}: ${(t.autoRemaining*supportEffects().timeFactor).toFixed(1)}s · ${costText(a.recipe)}`
-    :`⏸ Paused · Needs ${costText(a.recipe)}`;
+  setSameText(menu.autoStatus,isPaused?"⏸ Game paused":running
+    ?`⚙ Auto ${ITEMS[a.item].label}: ${(t.autoRemaining*supportEffects().timeFactor/weatherSpeed(t)).toFixed(1)}s · ${costText(a.recipe)}`
+    :`⏸ Paused · Needs ${costText(a.recipe)}`);
 }
 function refreshMenus(){
   for(const menu of menus){
@@ -1731,17 +1983,17 @@ function addUpgradeButtons(menu,panel,tile){
     }
   });
 }
-function openMenu(tile){
+function openMenu(tile,quick=false){
   if(multiplayer.started&&multiplayer.battle?.eliminated.has(multiplayer.playerId)){
     showToast("You are eliminated. Choose Restart or Singleplayer.");return;
   }
   if(multiplayer.started&&tile.biome&&tile.owner&&tile.owner!==multiplayer.playerId){
     closeMenu();showToast("This tile belongs to another player.");return;
   }
-  if(activeMenu?.tile===tile){closeMenu();return}
+  if(activeMenu?.tile===tile&&!!activeMenu.quick===quick){closeMenu();return}
   closeMenu();
   const menu={
-    tile,panels:[],buttons:[],bulkButtons:[],inventory:null,
+    tile,quick,stationKey:stationFor(tile),panels:[],buttons:[],bulkButtons:[],inventory:null,
     autoStatus:null,closing:false,revealFrame:null
   };
   if(!tile.biome){
@@ -1794,7 +2046,7 @@ function openMenu(tile){
       }
     });
 
-    if(["carpenter","forge","farm","animalPen","advancedForge","tailor","berryBush"].includes(stationFor(tile))){
+    if(["carpenter","forge","stonecutter","workshop","farm","animalPen","advancedForge","tailor","berryBush"].includes(stationFor(tile))){
       const station=stationFor(tile);
       const title=tile.automated
         ?AUTOMATION[tile.building].label:stationDefinition(station).label;
@@ -1824,7 +2076,7 @@ function openMenu(tile){
       for(const[id,trade]of Object.entries(PORT_TRADES)){
         makeButton(menu,right,{
           label:trade.label,emoji:ITEMS[trade.item].emoji,itemType:trade.item,color:"treasure",
-          requiredLevel:4,locked:()=>playerLevel<4,keepOpen:true,
+          requiredLevel:5,locked:()=>playerLevel<5,keepOpen:true,
           plan:()=>tradePlan(trade),
           action(cost,quantity){
             const amount=trade.amount*quantity;
@@ -1892,11 +2144,20 @@ function openMenu(tile){
       }
     }else if(!tile.building){
       const right=makePanel(menu,"right","Build","Choose a building");
-      for(const type of [...BIOMES[tile.biome].buildings].sort((a,b)=>(BUILDINGS[a].requiredLevel||1)-(BUILDINGS[b].requiredLevel||1)))
-        if(multiplayer.started||!BUILDINGS[type].multiplayerOnly)addBuildButton(menu,right,tile,type);
+      makeBuildCarousel(menu,right,tile);
     }
   }
-  menus.add(menu);activeMenu=menu;refreshMenus();positionMenu(menu);
+  if(quick){
+    for(const p of menu.panels){
+      if(p.side==='left')p.anchor.hidden=true;
+      else{
+        p.anchor.classList.add('quick-panel');
+        const close=document.createElement('button');close.className='quick-close';close.textContent='×';close.title='Close crafts';close.setAttribute('aria-label','Close crafts');close.onclick=()=>closeMenu(menu);p.element.prepend(close);
+      }
+    }
+    if(menu.inventory)menu.inventory.anchor.hidden=true;
+  }
+  menus.add(menu);activeMenu=menu;refreshMenus();positionMenu(menu);refreshCraftDock();
   for(const p of menu.panels)void p.anchor.offsetWidth;
   if(menu.inventory)void menu.inventory.anchor.offsetWidth;
   menu.revealFrame=requestAnimationFrame(()=>{
@@ -1912,6 +2173,7 @@ function closeMenu(menu=activeMenu){
   menu.closing=true;
   if(menu.revealFrame!==null)cancelAnimationFrame(menu.revealFrame);
   if(activeMenu===menu)activeMenu=null;
+  refreshCraftDock();
   for(const p of menu.panels){
     if(p.anchor.contains(document.activeElement))document.activeElement.blur();
     p.anchor.inert=true;p.anchor.setAttribute("aria-hidden","true");
@@ -1924,6 +2186,11 @@ function closeMenu(menu=activeMenu){
   },260);
 }
 function positionMenu(menu){
+  if(menu.quick){
+    for(const p of menu.panels){if(p.side==='right')p.anchor.style.transform=`translate(88px,${Math.max(90,Math.min(150,height*.18))}px)`;}
+    if(menu.inventory)menu.inventory.anchor.hidden=true;
+    return;
+  }
   const x=menu.tile.x-camera.x+width/2,y=menu.tile.y-camera.y+height/2;
   for(const p of menu.panels){
     const px=p.side==="left"
@@ -1932,7 +2199,7 @@ function positionMenu(menu){
     if(p.element.classList.contains("station")){
       py=Math.max(10,Math.min(height-p.anchor.offsetHeight-130,py));
     }
-    p.anchor.style.transform=`translate(${px}px,${py}px)`;
+    p.anchor.style.transform=`translate(${Math.max(8,Math.min(width-p.anchor.offsetWidth-8,px))}px,${Math.max(8,Math.min(height-p.anchor.offsetHeight-12,py))}px)`;
   }
   if(menu.inventory&&!menu.inventory.anchor.hidden){
     const a=menu.inventory.anchor;
@@ -1949,6 +2216,7 @@ function tileAt(sx,sy){
   return tileMap.get(tileKey(q,r))||null;
 }
 canvas.addEventListener("click",e=>{
+  if(performance.now()<suppressMapClickUntil)return;
   const t=tileAt(e.clientX,e.clientY);if(t)openMenu(t);else closeMenu();
 });
 canvas.addEventListener("pointermove",e=>{pointer={x:e.clientX,y:e.clientY}});
@@ -1974,7 +2242,7 @@ function resize(){
 }
 window.addEventListener("resize",resize);
 function updateCamera(dt){
-  if(isPaused)return;
+  if(isPaused||mapDrag)return;
   let dx=Number(keys.has("KeyD"))-Number(keys.has("KeyA"));
   let dy=Number(keys.has("KeyS"))-Number(keys.has("KeyW"));
   const length=Math.hypot(dx,dy);if(length){dx/=length;dy/=length}
@@ -2024,12 +2292,25 @@ function drawBuildingBadge(t){
   ctx.font="800 9px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
   ctx.fillStyle="#344b40";ctx.fillText(label,t.x,t.y-24.5);ctx.restore();
 }
+function tileFill(t,dark){
+  const c=t.color;
+  if(t._fillTheme!==dark||t._fillBiome!==t.biome||t._fillR!==c[0]||t._fillG!==c[1]||t._fillB!==c[2]){
+    t._fillTheme=dark;t._fillBiome=t.biome;
+    t._fillR=c[0];t._fillG=c[1];t._fillB=c[2];
+    t._fillColor=dark?(t.biome?`rgb(${c.map(v=>Math.round(v*.55)).join(",")})`:"#24323b"):`rgb(${c.join(",")})`;
+  }
+  return t._fillColor;
+}
 function draw(){
-  ctx.fillStyle=preferences.theme==="dark"?"#141d24":"#fff";ctx.fillRect(0,0,width,height);
+  const dark=preferences.theme==="dark";
+  ctx.fillStyle=dark?"#141d24":"#fff";ctx.fillRect(0,0,width,height);
   ctx.save();ctx.translate(width/2-camera.x,height/2-camera.y);
   const factor=supportEffects().timeFactor;
+  const minX=camera.x-width/2-HEX_WIDTH,maxX=camera.x+width/2+HEX_WIDTH;
+  const minY=camera.y-height/2-HEX_SIZE,maxY=camera.y+height/2+HEX_SIZE;
   for(const t of tiles){
-    ctx.fillStyle=preferences.theme==="dark"?(t.biome?`rgb(${t.color.map(v=>Math.round(v*.55)).join(",")})`:"#24323b"):`rgb(${t.color.join(",")})`;ctx.fill(t.path);
+    if(t.x<minX||t.x>maxX||t.y<minY||t.y>maxY)continue;
+    ctx.fillStyle=tileFill(t,dark);ctx.fill(t.path);
     if(t.flash){ctx.fillStyle=`rgba(255,255,255,${t.flash*.25})`;ctx.fill(t.path)}
   }
   ctx.strokeStyle=preferences.theme==="dark"?"#52616a":"#b5b5b5";ctx.lineWidth=1;
@@ -2041,24 +2322,30 @@ function draw(){
       ctx.lineWidth=2.2;ctx.stroke(t.path);ctx.restore();
     }
   }
+  ctx.font='30px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+  ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#222";
   for(const t of tiles){
+    if(t.x<minX||t.x>maxX||t.y<minY||t.y>maxY)continue;
     const localTile=mpOwnsTile(t);
     const p=localTile?production(t):null,a=localTile?automationFor(t):null;
     const timed=p||a||(localTile&&t.building==="treasure")||(localTile&&t.houseMode&&HOUSE_MODES[t.houseMode].upkeep>0);
     if(t.buildingEmoji&&t.iconOpacity>0){
-      const v=t.iconProgress-1,eased=1+2.70158*v*v*v+1.70158*v*v;
-      const scale=t.building?0.55+eased*.45:.8+t.iconOpacity*.2;
-      ctx.save();ctx.translate(t.x,t.y-(timed?3:0));ctx.scale(scale,scale);
-      ctx.globalAlpha=t.iconOpacity;
-      ctx.font='30px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
-      ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#222";
-      ctx.fillText(t.buildingEmoji,0,0);ctx.restore();
+      if(t.iconOpacity===1&&t.iconProgress===1){
+        // Same text, position, font and scale as the old save/translate/scale path.
+        ctx.fillText(t.buildingEmoji,t.x,t.y-(timed?3:0));
+      }else{
+        const v=t.iconProgress-1,eased=1+2.70158*v*v*v+1.70158*v*v;
+        const scale=t.building?0.55+eased*.45:.8+t.iconOpacity*.2;
+        ctx.save();ctx.translate(t.x,t.y-(timed?3:0));ctx.scale(scale,scale);
+        ctx.globalAlpha=t.iconOpacity;
+        ctx.fillText(t.buildingEmoji,0,0);ctx.restore();
+      }
     }
     drawBuildingBadge(t);
     if(p){const pf=productionTimeFactor(t);drawTimer(t,t.productionRemaining*pf,p.interval*pf)}
-    else if(a)drawTimer(t,t.autoRemaining*factor,a.interval*factor,
+    else if(a)drawTimer(t,t.autoRemaining*factor/weatherSpeed(t),a.interval*factor/weatherSpeed(t),
       canAfford(a.recipe)?null:"Paused");
-    else if(localTile&&t.building==="treasure")drawTimer(t,t.treasureRemaining*factor,15*factor);
+    else if(localTile&&t.building==="treasure")drawTimer(t,t.treasureRemaining*factor/weatherSpeed(t),15*factor/weatherSpeed(t));
     else if(localTile&&t.building==="house"&&t.houseMode&&HOUSE_MODES[t.houseMode].upkeep>0)drawTimer(t,t.houseRemaining,5);
   }
   // Remote players are shown at the world position they are currently viewing.
@@ -2117,6 +2404,8 @@ const treeNodes=[
   {id:"mine",kind:"building",branch:"mountains",x:1460,y:1210},
   {id:"clay",kind:"resource",branch:"mountains",x:1460,y:1500},
   {id:"brick",kind:"recipe",branch:"mountains",x:1460,y:1790},
+  {id:"stonecutter",kind:"building",branch:"mountains",x:1460,y:2170},
+  {id:"stoneBlock",kind:"recipe",branch:"mountains",x:1460,y:2450},
   {id:"improvedMine",kind:"building",branch:"mountains",x:1460,y:4370},
   {id:"coal",kind:"resource",branch:"mountains",x:1460,y:4650},
   {id:"steel",kind:"recipe",branch:"mountains",x:1460,y:4930},
@@ -2129,6 +2418,10 @@ const treeNodes=[
   {id:"ironAxe",kind:"recipe",branch:"forest",x:1800,y:1790},
   {id:"ironPickaxe",kind:"recipe",branch:"mountains",x:2080,y:1790},
   {id:"hammer",kind:"recipe",branch:"meadow",x:2350,y:1790},
+  {id:"workshop",kind:"building",branch:"meadow",x:2040,y:2290},
+  {id:"gear",kind:"recipe",branch:"meadow",x:2040,y:2600},
+  {id:"autoCarpenter",kind:"automation",building:"carpenter",branch:"meadow",x:1710,y:3030},
+  {id:"autoForge",kind:"automation",building:"forge",branch:"meadow",x:1710,y:3330},
   // Farming: Forge -> Shovel -> Farm -> yields -> recipes -> animals
   {id:"shovel",kind:"recipe",branch:"meadow",x:2740,y:1510},
   {id:"farm",kind:"building",branch:"meadow",x:2740,y:1800},
@@ -2158,7 +2451,8 @@ const treeNodes=[
   {id:"level1",kind:"level",level:1,x:3250,y:380},
   {id:"level2",kind:"level",level:2,x:3250,y:650},
   {id:"level3",kind:"level",level:3,x:3250,y:920},
-  {id:"level4",kind:"level",level:4,x:3250,y:1190}
+  {id:"level4",kind:"level",level:4,x:3250,y:1190},
+  {id:"level5",kind:"level",level:5,x:3250,y:1460}
 ];
 // Primary craft chains only: additional ingredients and their prices are listed
 // in the node tooltip. This prevents dozens of crossing lines obscuring branches.
@@ -2176,7 +2470,12 @@ const primaryChains=[
   ["lake","treasure","essence"],
   ["forest","wood","axe","sawmill"],
   ["mountains","stone","pickaxe","mine","clay","brick"],
+  ["stone","stonecutter","stoneBlock","house"],
   ["meadow","carpenter","plank","forge","iron"],
+  ["iron","workshop","gear"],
+  ["carpenter","autoCarpenter"],["forge","autoForge"],
+  ["gear","autoCarpenter"],["gear","autoForge"],
+  ["workshop","bellows"],
   ["forge","ironAxe"],["forge","ironPickaxe"],["forge","hammer"],
   ["forge","shovel","farm","wheat","bread"],
   ["farm","carrot","animalFeed","animalPen","fur","leather"],
@@ -2187,7 +2486,7 @@ const primaryChains=[
   ["brick","advancedForge"],["leather","bellows","advancedForge"],
   ["advancedForge","improvedAxe","improvedSawmill","oak","oakPlank","port","gold"],
   ["advancedForge","improvedPickaxe","improvedMine","coal","steel","port"],
-  ["level1","level2","level3","level4"],
+  ["level1","level2","level3","level4","level5"],
   ["wasteland","fury","arena"],["fury","sorcerer"]
 ];
 for(const chain of primaryChains){for(let i=1;i<chain.length;i++)addTreeEdge(chain[i-1],chain[i]);}
@@ -2219,19 +2518,20 @@ function treeDefinition(n){
   };
 }
 function nodeLevel(n){
-  if(["oak","coal","gold"].includes(n.id))return 4;
+  if(["oak","coal"].includes(n.id))return 4;
+  if(n.id==="gold")return 5;
   if(n.id==="clay")return 2;
   if(["wheat","carrot","fur","wildBerry"].includes(n.id))return 3;
   return n.kind==="level"?n.level:treeDefinition(n).requiredLevel||1;
 }
 function treeUnlocked(n){return playerLevel>=nodeLevel(n)}
 function treeCost(n){
-  if(n.kind==="biome")return constructionCost("biome",n.id);
-  if(n.kind==="building")return constructionCost("building",n.id);
+  if(n.kind==="biome")return {...BIOMES[n.id].baseCost};
+  if(n.kind==="building")return {...BUILDINGS[n.id].baseCost};
   if(n.kind==="recipe")return recipeCost(n.id);
   if(n.kind==="automation")return AUTOMATION[n.building].upgradeCost;
   if(n.kind==="treasureUpgrade")return n.level===3?TREASURE_UPGRADE_3:TREASURE_UPGRADE;
-  if(n.kind==="houseMode")return HOUSE_MODES[n.id].cost;
+  if(n.kind==="houseMode")return {...HOUSE_MODES[n.id].cost};
   return null;
 }
 function buildTree(){
@@ -2386,10 +2686,11 @@ function lootDescription(level){
     ([k,chance])=>`${ITEMS[k].emoji} ${ITEMS[k].label}: ${chance}%`).join("\n");
 }
 function treeDescription(n){
-  if(n.id==="wasteland")return "Multiplayer only. Costs 5 Fury and produces 1 Fury every 30 seconds. Can host an Arena or Sorcerer.";
+  if(preferences.language!=='en')return localizedTreeDescription(n)||'';
+  if(n.id==="wasteland")return "Multiplayer only. Base cost: 5 Fury. Each new Wasteland costs 25% more than the previous one. Produces 1 Fury every 30 seconds. Can host an Arena or Sorcerer.";
   if(n.id==="fury")return "Multiplayer-only resource. Starts with 5 Fury. Produced by Wastelands and Arenas. Spent on spells and upgrades.";
   if(n.id==="arena")return "Multiplayer only. Costs 5 Fury and reduces Wasteland production to 20s. Upgrades cost 15 / 30 / 50 Fury and reduce the interval to 15s / 10s / 5s.";
-  if(n.id==="sorcerer")return "Multiplayer only, available at Level 2. Costs 20 Fury. Slow rival production, remove random rival buildings, or drain half their resources. Each cast raises all spell prices by 30%.";
+  if(n.id==="sorcerer")return "Multiplayer only, available at Level 2. Costs 20 Fury. Slow rival production, remove random rival buildings, or drain half their resources. Each cast raises only the chosen spell's price by 30%.";
   if(n.id==="berryBush")return "Build on a Forest at Level 3 for 10 wheat and 50 wood (before construction scaling). Produces 1 wild berry every 25 base seconds. Craft berry juice here.";
   if(n.id==="wildBerry")return "Berry bushes produce wild berries. Craft 10 berries into 1 berry juice.";
   if(n.id==="berryJuice")return "Craft 10 wild berries into 1 berry juice. Use it in Food for −10% production cooldown for 60 seconds. Extra servings extend the duration. The effect is personal.";
@@ -2398,7 +2699,7 @@ function treeDescription(n){
     forest:"Produces 1 wood every 5 seconds. Supports a Sawmill or, at Level 4, an Improved Sawmill producing oak.",
     mountains:"Produces 1 stone every 5 seconds. Supports a Mine or, at Level 4, an Improved Mine producing coal.",
     lake:"Produces 1 fish every 15 seconds. Supports a Fishing hut or Treasures.",
-    meadow:"Supports one Carpenter, Forge, House, Farm, Animal pen or Advanced Forge per tile."
+    meadow:"Supports one Carpenter, Forge, Stonecutter, Workshop, House, Farm, Animal pen or Advanced Forge per tile."
   }[n.id];
   if(n.kind==="resource")return{
     wood:"Gather from Forests, Sawmills or Treasures. Used for buildings, tools and planks.",
@@ -2413,6 +2714,8 @@ function treeDescription(n){
     fish:"Gather from Lakes, Fishing huts or Treasures. Used for rods, upgrades, automation and house upkeep."
   }[n.id];
   if(n.kind==="building")return{
+    stonecutter:"Level 2. Build on a Meadow with 50 stone, 15 planks, 1 hammer and 1 iron pickaxe. Crafts 1 stone block from 5 stone.",
+    workshop:"Level 3. Build on a Meadow. Crafts ordinary gears from 3 iron and blacksmith bellows. Base cost: 30 planks, 15 iron and 1 hammer.",
     carpenter:"Build on a Meadow. Crafts axes, pickaxes, rods and planks. Its inventory shows only these four item types. Level 3 unlocks Auto Carpenter.",
     forge:"Build on a Meadow at Level 2. Crafts iron, iron axes, iron pickaxes and hammers. Shovels unlock at Level 3, opening the farming branch. Level 3 also unlocks Auto Forge.",
     sawmill:"Build on a Forest. Produces 1 wood every 3.5 seconds before upgrades and residential bonuses.",
@@ -2424,8 +2727,8 @@ function treeDescription(n){
     improvedMine:"Level 4. A separate building on Mountains: 15 bricks, 20 iron, 1 improved pickaxe and 10 leather. Produces 1 coal every 7.5 base seconds instead of stone or clay. Residential speed and Kitchen doubling apply.",
     advancedForge:"Level 4. Build on a Meadow using 25 bricks, 1 blacksmith bellows, 40 iron, 1 hammer and 1 iron pickaxe. Crafts improved axes, improved pickaxes and steel.",
     animalPen:"Level 3. Build on a Meadow. Produces 1 fur every 30 base seconds; crafts 3 fur into 1 leather. Residential speed and Kitchen doubling apply.",
-    port:"Level 4. Build on a Lake for 25 oak planks, 30 steel, 3 hammers and 25 rods. Sell jackets, gloves and improved tools for gold bags. Buy oak planks, steel and fish. Replaces the Lake fish production.",
-    house:"Build on a Meadow at Level 2. Residential assignment is free; Kitchen unlocks at Level 3 and costs 5 bread. Tailor unlocks at Level 4 for 10 leather and 5 fur, and crafts jackets/gloves without upkeep. Assignment is permanent until deletion. Bonuses start after the first successful 5-second upkeep payment."
+    port:"Level 5. Build on a Lake for 25 oak planks, 30 steel, 3 hammers and 25 rods. Sell jackets, gloves and improved tools for gold bags. Buy oak planks, steel and fish. Replaces the Lake fish production.",
+    house:"Build on a Meadow at Level 2. Uses 8 stone blocks (made from 40 stone). Residential assignment is free; Kitchen unlocks at Level 3 and costs 5 bread. Tailor unlocks at Level 4 for 10 leather and 5 fur, and crafts jackets/gloves without upkeep. Assignment is permanent until deletion. Bonuses start after the first successful 5-second upkeep payment."
   }[n.id];
   if(n.kind==="recipe")return{
     axe:"Craft at the Carpenter. Used to build Sawmills, Forges and as a treasure reward.",
@@ -2440,14 +2743,16 @@ function treeDescription(n){
     gloves:"Level 4. Craft at a Tailor house: 15 fur + 3 leather. Sell 3 gloves for 3 gold bags at the Port.",
     steel:"Level 4. Craft at the Advanced Forge: 10 coal + 5 iron for 1 steel.",
     brick:"Level 4. Craft at the Forge: 5 clay.",
-    bellows:"Level 4. Craft at the Forge: 8 leather, 50 planks and 10 iron. Required for the Advanced Forge.",
+    bellows:"Level 4. Craft at the Workshop: 8 leather, 50 planks and 10 iron. Required for the Advanced Forge.",
     improvedPickaxe:"Level 4. Craft at the Advanced Forge: 3 leather, 1 iron pickaxe, 5 clay and 5 iron.",
     improvedAxe:"Level 4. Craft at the Advanced Forge: 3 leather, 1 iron axe, 5 clay and 5 iron.",
     shovel:"Level 3. Craft at the Forge: 5 iron + 10 planks. Required for Farms.",
     bread:"Level 3. Craft at a Farm: 5 wheat. Used to assign a Kitchen.",
     animalFeed:"Level 3. Craft at a Farm: 3 carrots. Used to build Animal pens.",
     leather:"Level 3. Craft at an Animal pen: 3 fur.",
-    hammer:"Craft at the Forge. Used for upgrades, buildings and automation."
+    hammer:"Craft at the Forge. Used for upgrades, buildings and automation.",
+    gear:"Level 3. Craft at the Workshop: 3 iron = 1 ordinary gear. Automation upgrades require 3 gears.",
+    stoneBlock:"Level 2. Craft at the Stonecutter: 5 stone = 1 stone block. Eight blocks are needed for a House."
   }[n.id];
   if(n.kind==="houseMode"){
     if(n.id==="tailor")return "Level 4 house assignment. Costs 10 leather and 5 fur. Crafts jackets and gloves. No recurring upkeep or passive production bonus. Permanent until deletion.";
@@ -2465,12 +2770,13 @@ function treeDescription(n){
   if(n.kind==="automation"){
     const a=AUTOMATION[n.building];
     return`Automatically crafts 1 ${ITEMS[a.item].label} every ${a.interval} base seconds.
-Each craft consumes ${costText(a.recipe)}.
-Pauses without materials. Manual crafting remains available. Residential and Kitchen bonuses apply.`;
+Each cycle consumes only ${costText(a.recipe)}; wood and stone are not consumed.
+Pauses without fish. Manual crafting remains available. Residential and Kitchen bonuses apply.`;
   }
   if(n.kind==="level"){
     if(n.level===1)return"Starting level. Gather resources and build production and crafting stations.";
     if(n.level===2)return"Gather 150 wood, 150 stone and 75 fish. Build 1 Sawmill, Mine, Fishing hut and Carpenter. Unlocks planks, Forge, Treasures, Houses and production upgrades.";
+    if(n.level===5)return "After reaching Level 4: gather 7500 wood, 7500 stone and 2000 fish; craft 15 steel, 30 oak planks, 1 jacket and 1 pair of gloves. Unlocks the Port.";
     if(n.level===4)return "After reaching Level 3: gather 1500 wood, 1500 stone and 750 fish; build 3 Farms and 2 Animal pens; craft 10 leather; assign 1 Kitchen. Unlocks bricks, bellows, Advanced Forge, improved tools, Improved Sawmill and Mine, oak planks and steel.";
     return"After Level 2: gather 500 wood, 500 stone and 250 fish; craft 50 planks and 30 iron; reach production upgrade 1 on a Sawmill or Mine; assign a Residential house. Unlocks Farms, Animal pens, Shovels, Kitchens and automation.";
   }
@@ -2481,6 +2787,7 @@ function showTreeTooltip(n,x,y){
   const tooltip=$("treeTooltip"),d=treeDefinition(n);tooltip.replaceChildren();
   const title=document.createElement("h3");title.textContent=`${d.emoji} ${d.label}`;
   const description=document.createElement("p");description.textContent=treeDescription(n);
+  if(preferences.language!=='en')description.setAttribute('translate','no');
   tooltip.append(title,description);
   const level=document.createElement("span");level.className="tooltip-lock";
   level.textContent=`${treeUnlocked(n)?"":"🔒 "}Unlocks at Level ${nodeLevel(n)}`;
@@ -2489,8 +2796,8 @@ function showTreeTooltip(n,x,y){
   const cost=treeCost(n);
   if(cost){
     const heading=document.createElement("span");
-    heading.textContent=n.kind==="recipe"?"Fixed price · 1 item":
-      n.kind==="houseMode"?(Object.keys(cost).length?"Assignment cost":"Free assignment"):"Current price";
+    heading.textContent=n.kind==="recipe"?"Base crafting cost · 1 item":
+      n.kind==="houseMode"?(Object.keys(cost).length?"Base assignment cost":"Free assignment"):"Base construction / upgrade cost";
     costs.appendChild(heading);
     for(const[k,amount]of Object.entries(cost)){
       const row=document.createElement("span");
@@ -2502,6 +2809,19 @@ function showTreeTooltip(n,x,y){
       const c=producerUpgradeCost(n.building,i);
       const row=document.createElement("span");
       row.textContent=`Upgrade ${i+1}: ${costText(c)}`;costs.appendChild(row);
+    }
+  }
+  if(n.kind==="level"&&n.level>1){
+    const goals=LEVEL_REQUIREMENTS[n.level-1];
+    const heading=document.createElement("span");heading.textContent=`Requirements to reach Level ${n.level}:`;
+    costs.appendChild(heading);
+    for(const [key,amount] of Object.entries(goals)){
+      const def=EXTRA_GOALS[key]||BUILDINGS[key]||ITEMS[key];
+      const action=EXTRA_GOALS[key]?.verb||(BUILDINGS[key]?"Build":RECIPES[key]?"Craft":"Gather");
+      const row=document.createElement("span");
+      row.textContent=`${def.emoji} ${action} ${amount} ${def.label}`+
+        (playerLevel===n.level-1?` (${Math.min(levelProgress[key]||0,amount)}/${amount})`:"");
+      costs.appendChild(row);
     }
   }
   if(costs.childElementCount)tooltip.appendChild(costs);
@@ -2939,7 +3259,7 @@ function mpLocalStats(){
 function mpValidStats(s,id){
   if(!s||typeof s!=="object"||s.id!==id)return null;
   function counts(obj,keys){return Object.fromEntries(keys.map(k=>[k,Math.min(1e12,validCount(obj?.[k]))]))}
-  return{id,name:multiplayer.roster.get(id)||"Player",level:Math.min(4,Math.max(1,validCount(s.level,1))),
+  return{id,name:multiplayer.roster.get(id)||"Player",level:Math.min(5,Math.max(1,validCount(s.level,1))),
     resources:counts(s.resources,Object.keys(resources)),inventory:counts(s.inventory,Object.keys(inventory)),
     biomes:counts(s.biomes,Object.keys(BIOMES)),buildings:counts(s.buildings,Object.keys(BUILDINGS)),
     time:Math.min(1e8,validCount(s.time)),paused:s.paused===true,
@@ -3076,12 +3396,13 @@ const BATTLE_SPELLS={
 const BATTLE_DRAIN_ITEMS=["plank","iron","clay","brick","wheat","carrot","fur","leather",
   "coal","oak","oakPlank","steel","gold","essence","wildBerry"];
 function mpBattleFresh(){return{
-  purchases:0,slowUntil:0,eliminated:new Set(),voters:new Set(),winner:null,finished:false,
+  purchases:0,spellPurchases:Object.fromEntries(Object.keys(BATTLE_SPELLS).map(k=>[k,0])),
+  slowUntil:0,eliminated:new Set(),voters:new Set(),winner:null,finished:false,
   eliminatedBy:new Map(),attacks:0,roundNumber:(multiplayer.roundNumber||0)+1,
   participants:[...multiplayer.roster.keys()],hostPurchases:new Map(),pending:null
 }}
 function mpBattlePrice(kind){const b=multiplayer.battle;
-  return Math.ceil(BATTLE_SPELLS[kind].base*Math.pow(1.3,b?.purchases||0));}
+  return Math.ceil(BATTLE_SPELLS[kind].base*Math.pow(1.3,b?.spellPurchases?.[kind]||0));}
 function mpBattleCount(id){return tiles.filter(t=>t.owner===id&&!!t.building).length;}
 function mpBattleAvailable(){const b=multiplayer.battle;
   return multiplayer.started&&b&&!b.finished&&!b.eliminated.has(multiplayer.playerId)&&
@@ -3091,7 +3412,7 @@ function mpBattleAlivePlayers(){const b=multiplayer.battle;if(!b)return[];
 function mpBattleAddAbilityButtons(menu,panel){
   menu.battleButtons=[];
   const help=document.createElement("div");help.className="auto-status";
-  help.textContent="Casting a spell increases ALL your spell prices by 30%. You cannot target yourself.";
+  help.textContent="Casting a spell increases only that spell's price by 30%. You cannot target yourself.";
   panel.append(help);
   for(const [kind,spell] of Object.entries(BATTLE_SPELLS)){
     const btn=document.createElement("button");btn.type="button";btn.className="battle-ability";
@@ -3138,19 +3459,23 @@ function mpBattleBuy(kind,target){
   if(!mpBattleAvailable()||resources.fury<price||!BATTLE_SPELLS[kind])return;
   if(target&&(target===multiplayer.playerId||!multiplayer.roster.has(target)||battle.eliminated.has(target)))return;
   synchronize();if(resources.fury<price)return;
-  resources.fury-=price;battle.purchases++;updateResources();closeMenu();
+  resources.fury-=price;battle.purchases++;battle.spellPurchases[kind]++;
+  updateResources();closeMenu();
   const msg={type:"BATTLE_ATTACK",kind,target,price};
   if(multiplayer.host)mpBattleHostAttack(multiplayer.playerId,msg);
   else if(multiplayer.hostConnection?.open){
     // Send latest owned buildings before the spell for correct host-side validation.
     multiplayer.hostConnection.send({type:"TILES",tiles:mpOwnedTiles()});
     multiplayer.hostConnection.send(msg);
-  }else mpBattleRefund({price});
+  }else mpBattleRefund({price,kind});
 }
 function mpBattleRefund(msg){
-  if(!multiplayer.battle||!Number.isInteger(msg.price)||msg.price<0)return;
+  if(!multiplayer.battle||!BATTLE_SPELLS[msg.kind]||
+     !Number.isInteger(msg.price)||msg.price<0)return;
   resources.fury+=msg.price;
   multiplayer.battle.purchases=Math.max(0,multiplayer.battle.purchases-1);
+  multiplayer.battle.spellPurchases[msg.kind]=Math.max(0,
+    multiplayer.battle.spellPurchases[msg.kind]-1);
   updateResources();showToast("Spell cancelled; Fury refunded.");
 }
 function mpBattleSendTo(id,msg){
@@ -3171,7 +3496,8 @@ function mpBattleHostAttack(actor,msg){
   if(!spell)return;
   const alive=mpBattleAlivePlayers();
   // A host-maintained price counter prevents out-of-order or underpriced casts.
-  const previous=b.hostPurchases.get(actor)||0;
+  const actorPurchases=b.hostPurchases.get(actor)||{};
+  const previous=actorPurchases[kind]||0;
   const expected=Math.ceil(spell.base*Math.pow(1.3,previous));
   const invalid=b.eliminated.has(actor)||!alive.includes(actor)||
     !Number.isSafeInteger(msg.price)||msg.price!==expected||
@@ -3181,11 +3507,12 @@ function mpBattleHostAttack(actor,msg){
   if(invalid){
     // Never refund unverified prices: only the expected price can be credited.
     const refund=msg.price===expected?expected:0;
-    if(actor!=="host")mpBattleSendTo(actor,{type:"BATTLE_REJECT",price:refund});
-    else if(refund)mpBattleRefund({price:refund});
+    if(actor!=="host")mpBattleSendTo(actor,{type:"BATTLE_REJECT",kind,price:refund});
+    else if(refund)mpBattleRefund({price:refund,kind});
     return;
   }
-  b.hostPurchases.set(actor,previous+1);
+  actorPurchases[kind]=previous+1;
+  b.hostPurchases.set(actor,actorPurchases);
   b.attacks++;
   if(kind==="slow"){
     const until=Date.now()+30000;
@@ -3368,7 +3695,7 @@ function mpStartSync(){
   mpStopSync();multiplayer.lastSnapshot="";multiplayer.lastPosition="";
   multiplayer.syncTimer=setInterval(()=>{
     if(!multiplayer.started)return;
-    mpBattleUpdateHUD();
+    mpBattleUpdateHUD();weatherBroadcast();
     const owned=mpOwnedTiles(),signature=mpRecordsSignature(owned);
     if(signature!==multiplayer.lastSnapshot){
       multiplayer.lastSnapshot=signature;
@@ -3574,7 +3901,9 @@ function mpJoinLobby(){
         if(!welcomed)return;
         mpApplyRoster(msg.roster||mpRosterRecords());mpStartWorld(msg.tiles||[]);
         showToast('Multiplayer started. Separate world loaded.');
-      }else if(msg?.type==='MAP'&&multiplayer.started){mpApplySharedMap(msg.tiles)}
+      }else if(msg?.type==='WEATHER'&&multiplayer.started){weatherSet(msg.weather)}
+      else if(msg?.type==='WEATHER_DESTROY'&&multiplayer.started){weatherDestroy(msg)}
+      else if(msg?.type==='MAP'&&multiplayer.started){mpApplySharedMap(msg.tiles)}
       else if(msg?.type==='POS'&&multiplayer.started&&msg.player){
         if(msg.player.id!==multiplayer.playerId)multiplayer.remotePlayers.set(msg.player.id,msg.player);
       }else if(msg?.type==='STATS'&&multiplayer.started&&msg.stats){
@@ -3679,7 +4008,7 @@ function saveGame(){
   if(!savingAllowed||worldMode!=="singleplayer")return;
   if(!multiplayer.started||multiplayer.host)synchronize(false);collectAchievements();
   const data={
-    version:1,producerUpgradeVersion:2,savedAt:Date.now(),resources,inventory,constructionCounts,craftCounts,
+    weather:{...weather},version:1,producerUpgradeVersion:2,savedAt:Date.now(),resources,inventory,constructionCounts,craftCounts,
     playerLevel,levelProgress,resourcesExpanded,craftMultiplier,isPaused:$("settingsDialog").open?settingsPreviousPause:isPaused,juiceSeconds,
     achievements:[...achievements],camera:{x:camera.x,y:camera.y},
     tiles:tiles.filter(t=>t.biome&&(!multiplayer.started||t.owner===multiplayer.playerId)).map(t=>({
@@ -3706,11 +4035,12 @@ function loadGame(skipOffline=false){
     if(data?.version!==1||!Array.isArray(data.tiles)||!data.resources||!data.inventory){
       throw new Error("Invalid save");
     }
+    weatherSet(data.weather||{});
     juiceSeconds=Number.isFinite(data.juiceSeconds)?Math.max(0,data.juiceSeconds):0;
     for(const k of Object.keys(resources))resources[k]=validCount(data.resources[k],resources[k]);
     for(const k of Object.keys(inventory))inventory[k]=validCount(data.inventory[k]);
     for(const k of Object.keys(craftCounts))craftCounts[k]=validCount(data.craftCounts?.[k]);
-    playerLevel=Math.max(1,Math.min(4,validCount(data.playerLevel,1)));
+    playerLevel=Math.max(1,Math.min(5,validCount(data.playerLevel,1)));
     isPaused=data.isPaused===true;resourcesExpanded=data.resourcesExpanded===true;
     craftMultiplier=[1,5,25,"all"].includes(data.craftMultiplier)?data.craftMultiplier:1;
     const known=new Set(treeNodes.map(n=>n.id));
@@ -3774,7 +4104,7 @@ function loadGame(skipOffline=false){
     if(!skipOffline&&!isPaused&&Number.isFinite(data.savedAt)&&data.savedAt>0){
       simulate(Math.max(0,(Date.now()-data.savedAt)/1000),false);
     }
-    if(playerLevel<4)recordProgress({});
+    if(playerLevel<5)recordProgress({});
   }catch(error){
     savingAllowed=false;
     $("saveWarning").textContent="Saved progress could not be loaded. Reset progress to start again.";
@@ -3782,6 +4112,7 @@ function loadGame(skipOffline=false){
   }
 }
 function clearWorldState(deleteSave=false,notify=false){
+  weatherSet({});$('weatherNotice').hidden=true;
   juiceSeconds=0;
   if(deleteSave&&worldMode==="singleplayer")try{localStorage.removeItem(SAVE_KEY)}catch(e){console.warn(e)}
   for(const m of menus){
@@ -3819,13 +4150,21 @@ document.addEventListener("visibilitychange",()=>{
 });
 window.addEventListener("pagehide",()=>saveGame());
 
+let lastHudRateRefresh=0,lastCursorValue=null;
 function animate(time){
   if(lastFrame===null)lastFrame=time;
   const dt=Math.min(.05,Math.max(0,(time-lastFrame)/1000));lastFrame=time;
-  synchronize();updateCamera(dt);updateTiles(dt);draw();positionMenus();
+  synchronize();
+  // Simulation keeps exact real elapsed time even when the tab is hidden.
+  if(document.hidden){requestAnimationFrame(animate);return;}
+  const oldX=camera.x,oldY=camera.y;
+  updateCamera(dt);updateTiles(dt);draw();
+  if(camera.x!==oldX||camera.y!==oldY)positionMenus();
   if(activeMenu)updateAutomationStatus(activeMenu);
-  updateFishRate();foodUI();
-  if(pointer)canvas.style.cursor=tileAt(pointer.x,pointer.y)?"pointer":"default";
+  if(time-lastHudRateRefresh>=250){updateFishRate();foodUI();lastHudRateRefresh=time;}
+  if(time-lastDockRefresh>350){refreshCraftDock();lastDockRefresh=time;}
+  const cursor=mapDrag?.moved?"grabbing":pointer&&tileAt(pointer.x,pointer.y)?"grab":"default";
+  if(cursor!==lastCursorValue||canvas.style.cursor!==cursor){canvas.style.cursor=cursor;lastCursorValue=cursor;}
   requestAnimationFrame(animate);
 }
 /* Food uses simulation time: pause freezes it; offline simulation consumes it exactly. */
@@ -3833,9 +4172,9 @@ function foodUI(){
   const unlocked=achievements.has('berryBush')||inventory.berryJuice>0||juiceSeconds>EPS;
   $('foodButton').hidden=!unlocked;$('foodBuff').hidden=juiceSeconds<=EPS;
   const secs=Math.ceil(juiceSeconds),time=`${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}`;
-  $('foodBuff').textContent=`🧃 −10% · ${time}${isPaused?' · Paused':''}`;
-  $('juiceCount').textContent=`Owned: ${inventory.berryJuice}`;$('useJuice').disabled=inventory.berryJuice<1;
-  $('foodDuration').textContent=juiceSeconds>EPS?`Active: ${time} remaining. Each juice adds 60 seconds.`:'No active food boost.';
+  setSameText($('foodBuff'),`🧃 −10% · ${time}${isPaused?' · Paused':''}`);
+  setSameText($('juiceCount'),`Owned: ${inventory.berryJuice}`);$('useJuice').disabled=inventory.berryJuice<1;
+  setSameText($('foodDuration'),juiceSeconds>EPS?`Active: ${time} remaining. Each juice adds 60 seconds.`:'No active food boost.');
 }
 function fxOpen(id){const d=$(id);clearTimeout(d.fxTimer);d.classList.remove('closing');resetInput();if(!d.open)d.showModal()}
 function fxClose(id){const d=$(id);if(!d.open)return;d.classList.add('closing');clearTimeout(d.fxTimer);d.fxTimer=setTimeout(()=>{d.close();d.classList.remove('closing')},160)}
@@ -3988,6 +4327,7 @@ const MUSIC_SCORES=[
  {name:'Moonlit Forest',description:'Velvet strings · delicate piano · a quiet nocturnal melody',bpm:60,root:45,mode:[0,2,3,5,7,8,10],chords:[0,3,5,6,0,2,3,4,5,6,2,0,3,5,4,0],melody:[[0,2,4,-1],[3,-1,5,4],[5,7,6,-1],[6,4,2,1],[0,4,6,8],[7,6,4,-1],[3,2,1,2],[0,-1,-1,-1]],tone:3},
  {name:'Quiet Horizon',description:'Slow piano · soft sustained chords · a spacious closing theme',bpm:54,root:46,mode:[0,2,4,5,7,9,11],chords:[0,4,5,3,0,2,1,4,5,4,3,0,1,3,4,0],melody:[[4,-1,2,0],[1,2,4,-1],[5,-1,4,2],[3,5,4,-1],[6,4,2,-1],[2,4,6,8],[7,5,3,1],[2,-1,0,-1]],tone:4}
 ];
+MUSIC_SCORES.push(...[{"name": "Silver Raindrops", "description": "Original weather theme \u00b7 soft piano, warm pads and gentle arpeggios", "bpm": 56, "root": 50, "mode": [0, 2, 3, 5, 7, 9, 10], "chords": [0, 3, 5, 2, 0, 3, 5, 2, 0, 3, 5, 2, 0, 3, 5, 2], "melody": [[6, 4, 2, 4], [7, 5, 3, 5], [8, 6, 4, 6], [6, 4, 2, 4], [7, 5, 3, 5], [8, 6, 4, 6], [6, 4, 2, 4], [7, 5, 3, 5]], "tone": 1}, {"name": "Deep Earth", "description": "Original weather theme \u00b7 soft piano, warm pads and gentle arpeggios", "bpm": 48, "root": 38, "mode": [0, 2, 3, 5, 7, 8, 10], "chords": [0, 5, 3, 0, 0, 5, 3, 0, 0, 5, 3, 0, 0, 5, 3, 0], "melody": [[0, -1, 2, -1], [1, -1, 3, -1], [2, -1, 4, -1], [0, -1, 2, -1], [1, -1, 3, -1], [2, -1, 4, -1], [0, -1, 2, -1], [1, -1, 3, -1]], "tone": 3}, {"name": "Prism Garden", "description": "Original weather theme \u00b7 soft piano, warm pads and gentle arpeggios", "bpm": 74, "root": 48, "mode": [0, 2, 4, 6, 7, 9, 11], "chords": [0, 2, 4, 5, 0, 2, 4, 5, 0, 2, 4, 5, 0, 2, 4, 5], "melody": [[0, 4, 6, 8], [1, 5, 7, 9], [2, 6, 8, 10], [0, 4, 6, 8], [1, 5, 7, 9], [2, 6, 8, 10], [0, 4, 6, 8], [1, 5, 7, 9]], "tone": 0}, {"name": "Golden Haze", "description": "Original weather theme \u00b7 soft piano, warm pads and gentle arpeggios", "bpm": 52, "root": 45, "mode": [0, 2, 4, 5, 7, 9, 10], "chords": [0, 3, 4, 0, 0, 3, 4, 0, 0, 3, 4, 0, 0, 3, 4, 0], "melody": [[4, -1, 2, 0], [5, -1, 3, 1], [6, -1, 4, 2], [4, -1, 2, 0], [5, -1, 3, 1], [6, -1, 4, 2], [4, -1, 2, 0], [5, -1, 3, 1]], "tone": 2}, {"name": "Mist Between Shores", "description": "Original weather theme \u00b7 soft piano, warm pads and gentle arpeggios", "bpm": 46, "root": 47, "mode": [0, 2, 3, 5, 7, 9, 10], "chords": [0, 5, 2, 3, 0, 5, 2, 3, 0, 5, 2, 3, 0, 5, 2, 3], "melody": [[6, -1, 3, -1], [7, -1, 4, -1], [8, -1, 5, -1], [6, -1, 3, -1], [7, -1, 4, -1], [8, -1, 5, -1], [6, -1, 3, -1], [7, -1, 4, -1]], "tone": 4}, {"name": "Leaves in Flight", "description": "Original weather theme \u00b7 soft piano, warm pads and gentle arpeggios", "bpm": 78, "root": 48, "mode": [0, 2, 4, 5, 7, 9, 11], "chords": [0, 4, 3, 5, 0, 4, 3, 5, 0, 4, 3, 5, 0, 4, 3, 5], "melody": [[2, 4, 6, 4], [3, 5, 7, 5], [4, 6, 8, 6], [2, 4, 6, 4], [3, 5, 7, 5], [4, 6, 8, 6], [2, 4, 6, 4], [3, 5, 7, 5]], "tone": 2}, {"name": "Distant Thunder", "description": "Original weather theme \u00b7 soft piano, warm pads and gentle arpeggios", "bpm": 54, "root": 40, "mode": [0, 2, 3, 5, 7, 8, 10], "chords": [0, 3, 5, 4, 0, 3, 5, 4, 0, 3, 5, 4, 0, 3, 5, 4], "melody": [[0, 2, -1, 4], [1, 3, -1, 5], [2, 4, -1, 6], [0, 2, -1, 4], [1, 3, -1, 5], [2, 4, -1, 6], [0, 2, -1, 4], [1, 3, -1, 5]], "tone": 3}]);
 const soundtrack={context:null,bus:null,master:null,timer:null,beat:0,next:0,track:-1};
 function scoreNote(score,degree,octave=0){return score.root+score.mode[((degree%7)+7)%7]+12*Math.floor(degree/7)+octave*12}
 function musicVoice(midi,time,length,kind,velocity=.1,pan=0){
@@ -4033,7 +4373,7 @@ function musicChange(){
  if(old){old.gain.cancelScheduledValues(a.currentTime);old.gain.setValueAtTime(old.gain.value,a.currentTime);old.gain.linearRampToValueAtTime(0,a.currentTime+1.2);setTimeout(()=>old.disconnect(),1600)}
  soundtrack.bus=a.createGain();soundtrack.bus.gain.setValueAtTime(0,a.currentTime);soundtrack.bus.gain.linearRampToValueAtTime(.72,a.currentTime+1.6);soundtrack.bus.connect(soundtrack.master);
  soundtrack.bus.connect(soundtrack.reverbSend);
- soundtrack.track=preferences.track;soundtrack.beat=0;soundtrack.next=a.currentTime+.08;musicSchedule();
+ soundtrack.track=WEATHER[weather.kind]?.track??preferences.track;soundtrack.beat=0;soundtrack.next=a.currentTime+.08;musicSchedule();
 }
 async function musicStart(){
  try{
@@ -4055,7 +4395,7 @@ function preferencesSave(){try{localStorage.setItem('wildlife-settings-v1',JSON.
 function settingsUI(){
  document.documentElement.dataset.theme=preferences.theme;
  $('themeChoice').value=preferences.theme;$('musicVolume').value=preferences.volume;$('musicVolumeLabel').textContent=preferences.volume+'%';$('musicChoice').value=preferences.track;
- const score=MUSIC_SCORES[preferences.track];$('musicTitle').textContent=score.name;$('musicDescription').textContent=score.description;
+ const score=MUSIC_SCORES[WEATHER[weather.kind]?.track??preferences.track];$('musicTitle').textContent=score.name;$('musicDescription').textContent=score.description;
 }
 function openSettings(){
  if($('settingsDialog').open)return;
@@ -4071,6 +4411,232 @@ $('musicChoice').onchange=e=>{preferences.track=Number(e.target.value);settingsU
 document.addEventListener('pointerdown',()=>{if(!soundtrack.context||soundtrack.context.state==='suspended')musicStart()});
 document.addEventListener('keydown',()=>{if(!soundtrack.context||soundtrack.context.state==='suspended')musicStart()},{once:true});
 settingsUI();
+
+
+/* Localized help text is composed from recipes and game data, never stale costs. */
+const LOCALIZED_HELP={
+ uk:{
+  biome:'Біом для розміщення будівель і виробництва ресурсів.',
+  resource:'Ресурс для розвитку світу, крафту, будівництва та покращень.',
+  recipe:'Рецепт крафту',at:'Місце виготовлення',forOne:'Кількість за один крафт: 1.',
+  building:'Будівля',on:'Біом для будівництва',level:'Рівень доступності',
+  levelGoal:'Виконай цілі, показані нижче, щоб досягти цього рівня.',
+  auto:'Автоматизація. Виробляє 1 предмет за цикл. Для кожного циклу потрібна лише риба, без витрат дерева та каменю.',
+  level1:'Початковий рівень. Побудуй виробничі станції та збирай ресурси.',
+  houseMode:'Призначення будинку. Після вибору діє до видалення будинку.',
+  upgrade:'Покращення виробництва збільшує кількість ресурсів і скорочує час їх отримання.',
+  treasure:'Кожен цикл приносить випадковий ресурс. Покращення розширює перелік нагород.',
+  essence:'Есенцію досвіду можна використати замість матеріалів для одного покращення виробництва або автоматизації.',
+  stonecutter:'Каменяр доступний на рівні 2 та будується на галявині. Крафтить один кам’яний блок із п’яти каменів. Базова ціна будівництва показана нижче.',
+  workshop:'Майстерня доступна на рівні 3 та будується на галявині. Крафтить шестерні (3 заліза за штуку) і ковальські міхи. Ковальські міхи більше не виготовляються у кузні.',
+  house:'Будинок доступний на рівні 2 та будується на галявині. Потрібні 8 кам’яних блоків, 25 дощок і молоток. Може стати житловим будинком, кухнею або кравецькою.',
+  carpenter:'Столяр будується на галявині. Виготовляє сокири, кайла, вудки та дошки. На рівні 3 відкривається автоматизація: одна дошка за 5 секунд з витратою лише риби.',
+  forge:'Кузня будується на галявині з рівня 2. Виготовляє залізо, залізні інструменти, молотки, лопати й цеглу. На рівні 3 доступна автоматизація без витрат каменю.',
+  port:'Порт доступний тільки на рівні 5. Будується на озері. У порту можна продавати товари за золото та купувати дубові дошки, сталь і рибу.',
+  sawmill:'Лісопилка будується в лісі. Виробляє дерево. Три покращення збільшують кількість дерева за цикл та зменшують час циклу.',
+  mine:'Шахта будується в горах. Виробляє камінь. На другому покращенні з’являється 20% шанс отримати глину замість каменю.',
+  improvedSawmill:'Покращена лісопилка доступна з рівня 4. Виробляє дуб кожні 7,5 базових секунд.',
+  improvedMine:'Покращена шахта доступна з рівня 4. Виробляє вугілля кожні 7,5 базових секунд.',
+  fishingHut:'Рибальська хатина будується на озері. Ловить рибу. Три покращення збільшують кількість риби й прискорюють улов.',
+  berryBush:'Ягідний кущ будується у лісі з рівня 3. Дає одну ягоду кожні 25 секунд. Із десяти ягід можна скрафтити ягідний сік.',
+  treasureBuilding:'Скарби будуються на озері. Кожні 15 секунд видають випадкову нагороду. Покращення відкривають цінніші предмети.',
+  farm:'Ферма доступна з рівня 3 на галявині. Вирощує пшеницю (80%) або моркву (20%) й виготовляє хліб та корм.',
+  animalPen:'Загін для тварин доступний на рівні 3. Виробляє хутро й дозволяє крафтити шкіру.',
+  advancedForge:'Покращена кузня відкривається на рівні 4. Виготовляє покращені інструменти та сталь.',
+  arena:'Арена доступна тільки в мультиплеєрі на пустоші. Прискорює виробництво люті; має три рівні покращення.',
+  sorcerer:'Чаклун доступний у мультиплеєрі. Використовує лють для здібностей проти суперників. Після застосування здібності лише вона дорожчає на 30%.',
+  residential:'Житлове призначення витрачає одну рибу кожні 5 секунд. Кожен активний будинок прискорює виробництво на 5%, до 50%.',
+  kitchen:'Кухня витрачає три риби кожні 5 секунд. Прискорює ферми й додає шанс подвоєного видобутку.',
+  tailor:'Кравець доступний на рівні 4. Виготовляє куртки та рукавиці й не потребує риби для утримання.'
+ },
+ ru:{
+  biome:'Биом для размещения зданий и производства ресурсов.',
+  resource:'Ресурс для развития мира, крафта, строительства и улучшений.',
+  recipe:'Рецепт крафта',at:'Место изготовления',forOne:'Количество за один крафт: 1.',
+  building:'Здание',on:'Биом для строительства',level:'Уровень доступности',
+  levelGoal:'Выполни перечисленные ниже цели, чтобы достичь этого уровня.',
+  auto:'Автоматизация. Производит 1 предмет за цикл. Каждый цикл расходует только рыбу, без затрат дерева и камня.',
+  level1:'Начальный уровень. Строй производственные станции и собирай ресурсы.',
+  houseMode:'Назначение дома действует до его удаления.',
+  upgrade:'Улучшения производства увеличивают количество ресурсов и сокращают время получения.',
+  treasure:'Каждый цикл приносит случайный ресурс. Улучшения открывают новые награды.',
+  essence:'Эссенцию опыта можно использовать вместо материалов для одного улучшения производства или автоматизации.',
+  stonecutter:'Каменотёс доступен с уровня 2 на лугу. Создаёт один каменный блок из пяти камней. Базовая стоимость строительства показана ниже.',
+  workshop:'Мастерская доступна с уровня 3 на лугу. Создаёт шестерни (3 железа за штуку) и кузнечные меха. Кузнечные меха больше не создаются в кузнице.',
+  house:'Дом доступен с уровня 2 на лугу. Нужны 8 каменных блоков, 25 досок и молоток. Можно назначить жилой дом, кухню или портного.',
+  carpenter:'Столяр строится на лугу. Создаёт топоры, кирки, удочки и доски. С уровня 3 доступна автоматизация: одна доска за 5 секунд с расходом только рыбы.',
+  forge:'Кузница строится на лугу с уровня 2. Создаёт железо, железные инструменты, молотки, лопаты и кирпичи. С уровня 3 доступна автоматизация без затрат камня.',
+  port:'Порт открывается только на уровне 5. Строится на озере. Здесь можно продавать товары за золото и покупать дубовые доски, сталь и рыбу.',
+  sawmill:'Лесопилка строится в лесу. Производит древесину. Три улучшения увеличивают количество за цикл и уменьшают время цикла.',
+  mine:'Шахта строится в горах. Добывает камень. После второго улучшения появляется 20% шанс получить глину вместо камня.',
+  improvedSawmill:'Улучшенная лесопилка открывается на уровне 4. Производит дуб каждые 7,5 базовых секунд.',
+  improvedMine:'Улучшенная шахта открывается на уровне 4. Производит уголь каждые 7,5 базовых секунд.',
+  fishingHut:'Рыбацкая хижина строится на озере. Ловит рыбу. Три улучшения увеличивают улов и ускоряют рыбалку.',
+  berryBush:'Ягодный куст строится в лесу на уровне 3. Приносит одну ягоду каждые 25 секунд. Из десяти ягод создаётся ягодный сок.',
+  treasureBuilding:'Сокровища строятся на озере. Каждые 15 секунд дают случайную награду. Улучшения открывают более ценные предметы.',
+  farm:'Ферма доступна с уровня 3 на лугу. Выращивает пшеницу (80%) или морковь (20%), создаёт хлеб и корм.',
+  animalPen:'Загон для животных доступен с уровня 3. Производит мех и позволяет создавать кожу.',
+  advancedForge:'Улучшенная кузница открывается на уровне 4. Создаёт улучшенные инструменты и сталь.',
+  arena:'Арена доступна только в мультиплеере на пустоши. Ускоряет производство ярости, имеет три уровня улучшения.',
+  sorcerer:'Колдун доступен в мультиплеере. Использует ярость для способностей против соперников. После применения способности только она дорожает на 30%.',
+  residential:'Жилое назначение расходует одну рыбу каждые 5 секунд. Каждый работающий дом ускоряет производство на 5%, до 50%.',
+  kitchen:'Кухня расходует три рыбы каждые 5 секунд. Ускоряет фермы и увеличивает шанс двойной добычи.',
+  tailor:'Портной доступен с уровня 4. Создаёт куртки и перчатки без затрат рыбы на содержание.'
+ },
+ pl:{
+  biome:'Biom służy do stawiania budynków i produkowania surowców.',
+  resource:'Surowiec potrzebny do rozbudowy świata, wytwarzania przedmiotów i ulepszeń.',
+  recipe:'Receptura',at:'Miejsce wytwarzania',forOne:'Liczba sztuk z jednej receptury: 1.',
+  building:'Budynek',on:'Miejsce budowy',level:'Wymagany poziom',
+  levelGoal:'Wykonaj cele wymienione poniżej, aby osiągnąć ten poziom.',
+  auto:'Automatyzacja. Wytwarza 1 przedmiot na cykl. Każdy cykl zużywa wyłącznie ryby, bez kosztu drewna i kamienia.',
+  level1:'Poziom początkowy. Buduj stanowiska produkcyjne i zbieraj zasoby.',
+  houseMode:'Przeznaczenie domu obowiązuje aż do jego usunięcia.',
+  upgrade:'Ulepszenia produkcji zwiększają ilość zasobów i skracają czas oczekiwania.',
+  treasure:'Każdy cykl daje losowy zasób. Ulepszenia odblokowują lepsze nagrody.',
+  essence:'Esencja doświadczenia może zastąpić materiały do jednego ulepszenia produkcji lub automatyzacji.',
+  stonecutter:'Kamieniarz jest dostępny od poziomu 2 i można go zbudować na łące. Wytwarza jeden blok kamienny z pięciu kamieni. Podstawowy koszt budowy pokazano poniżej.',
+  workshop:'Warsztat jest dostępny od poziomu 3 na łące. Wytwarza zębatki (3 sztuki żelaza za jedną) i miechy kowalskie. Miechów nie wytwarza się już w kuźni.',
+  house:'Dom jest dostępny od poziomu 2 na łące. Potrzeba 8 bloków kamiennych, 25 desek i młotka. Może pełnić funkcję domu mieszkalnego, kuchni lub pracowni krawieckiej.',
+  carpenter:'Stolarza buduje się na łące. Wytwarza siekiery, kilofy, wędki i deski. Od poziomu 3 można go zautomatyzować: jedna deska co 5 sekund, kosztem wyłącznie ryb.',
+  forge:'Kuźnia jest dostępna na łące od poziomu 2. Wytwarza żelazo, żelazne narzędzia, młotki, łopaty i cegły. Od poziomu 3 automatyzacja nie zużywa kamienia.',
+  port:'Port odblokowuje się dopiero na poziomie 5. Buduje się go na jeziorze. Pozwala sprzedawać towary za złoto oraz kupować dębowe deski, stal i ryby.',
+  sawmill:'Tartak buduje się w lesie. Produkuje drewno. Trzy ulepszenia zwiększają produkcję na cykl i skracają czas cyklu.',
+  mine:'Kopalnię buduje się w górach. Wydobywa kamień. Od drugiego ulepszenia istnieje 20% szans na uzyskanie gliny zamiast kamienia.',
+  improvedSawmill:'Ulepszony tartak odblokowuje się na poziomie 4. Produkuje dąb co 7,5 sekundy bazowej.',
+  improvedMine:'Ulepszona kopalnia odblokowuje się na poziomie 4. Produkuje węgiel co 7,5 sekundy bazowej.',
+  fishingHut:'Chatę rybacką buduje się nad jeziorem. Łowi ryby. Trzy ulepszenia zwiększają połów i skracają czas łowienia.',
+  berryBush:'Krzew jagodowy buduje się w lesie od poziomu 3. Zapewnia jedną jagodę co 25 sekund. Z dziesięciu jagód można przygotować sok.',
+  treasureBuilding:'Skarby stawia się na jeziorze. Co 15 sekund przyznają losową nagrodę. Ulepszenia pozwalają zdobywać cenniejsze przedmioty.',
+  farm:'Farma jest dostępna od poziomu 3 na łące. Uprawia pszenicę (80%) lub marchew (20%) i wytwarza chleb oraz paszę.',
+  animalPen:'Zagroda dla zwierząt jest dostępna od poziomu 3. Produkuje futro, z którego można wytwarzać skórę.',
+  advancedForge:'Zaawansowana kuźnia odblokowuje się na poziomie 4. Wytwarza ulepszone narzędzia i stal.',
+  arena:'Arena jest dostępna tylko w trybie wieloosobowym na pustkowiu. Przyspiesza produkcję furii i ma trzy poziomy ulepszeń.',
+  sorcerer:'Czarownik jest dostępny w trybie wieloosobowym. Używa furii do rzucania zdolności przeciwko rywalom. Po użyciu zdolności tylko ona drożeje o 30%.',
+  residential:'Dom mieszkalny zużywa jedną rybę co 5 sekund. Każdy działający dom przyspiesza produkcję o 5%, maksymalnie o 50%.',
+  kitchen:'Kuchnia zużywa trzy ryby co 5 sekund. Przyspiesza farmy i zwiększa szansę na podwójne zbiory.',
+  tailor:'Krawiec jest dostępny od poziomu 4. Wytwarza kurtki i rękawice bez kosztu utrzymania w rybach.'
+ }
+};
+function localGameName(raw){return TRANSLATIONS[String(raw).toLowerCase()]?.[preferences.language]||raw}
+function localizedTreeDescription(n){
+ const p=LOCALIZED_HELP[preferences.language];if(!p)return null;
+ if(n.id==='wasteland')return {
+   uk:'Тільки мультиплеєр. Базова ціна: 5 люті. Кожна наступна пустош дорожча за попередню на 25%. Дає 1 лють кожні 30 секунд. Тут можна збудувати арену або чаклуна.',
+   ru:'Только мультиплеер. Базовая цена: 5 ярости. Каждая следующая пустошь на 25% дороже предыдущей. Даёт 1 ярость каждые 30 секунд. Здесь можно построить арену или колдуна.',
+   pl:'Tylko tryb wieloosobowy. Cena podstawowa: 5 furii. Każde następne pustkowie kosztuje o 25% więcej niż poprzednie. Zapewnia 1 furię co 30 sekund. Można tu zbudować arenę lub czarownika.'
+ }[preferences.language];
+ if(n.kind==='level')return n.level===1?p.level1:p.levelGoal;
+ if(n.kind==='automation'){
+   const a=AUTOMATION[n.building];return p.auto+' '+a.interval+' s · '+a.recipe.fish+' 🐟.';
+ }
+ if(n.kind==='essence')return p.essence;
+ if(n.kind==='treasureUpgrade')return p.treasure;
+ if(n.kind==='upgrade')return p.upgrade;
+ if(n.kind==='houseMode')return p[n.id]||p.houseMode;
+ if(n.kind==='biome'){
+   const biome=BIOMES[n.id];
+   return p.biome+' '+biome.buildings.map(k=>localGameName(BUILDINGS[k].label)).join(', ')+'.';
+ }
+ if(n.kind==='building')return p[n.id==='treasure'?'treasureBuilding':n.id]||p.building;
+ if(n.kind==='recipe'){
+   const r=RECIPES[n.id];return `${p.recipe}: ${localGameName(r.label)}. ${p.at}: ${localGameName(stationDefinition(r.station).label)}. ${p.forOne}`;
+ }
+ if(n.kind==='resource')return p.resource;
+ return null;
+}
+const LOCALIZED_WEATHER={
+ uk:{rain:'Ферми, ягоди й озера працюють на 30% швидше. Усе виробництво каменю сповільнюється на 25%.',quake:'Щосекунди є шанс 1,5% зруйнувати одну випадкову будівлю.',rainbow:'Усе виробництво прискорюється на 50%.',heat:'Виробництво дерева та ферми сповільнюються на 35%. Усе виробництво каменю прискорюється на 25%.',fog:'Скарби дають по дві нагороди. Риболовля сповільнюється на 35%.',wind:'Ферми, ягоди й риболовля мають 33% шанс порожнього циклу. Дерево виробляється на 25% швидше.',storm:'Виробництво люті прискорюється на 50%.'},
+ ru:{rain:'Фермы, ягоды и озёра работают на 30% быстрее. Вся добыча камня замедляется на 25%.',quake:'Каждую секунду есть шанс 1,5% разрушить одно случайное здание.',rainbow:'Всё производство ускоряется на 50%.',heat:'Производство дерева и фермы замедляются на 35%. Вся добыча камня ускоряется на 25%.',fog:'Сокровища дают по две награды. Рыбалка замедляется на 35%.',wind:'У ферм, ягод и рыбалки есть 33% шанс пустого цикла. Производство дерева ускоряется на 25%.',storm:'Производство ярости ускоряется на 50%.'},
+ pl:{rain:'Farmy, jagody i jeziora pracują o 30% szybciej. Całe wydobycie kamienia zwalnia o 25%.',quake:'W każdej sekundzie istnieje 1,5% szans na zniszczenie jednego losowego budynku.',rainbow:'Cała produkcja przyspiesza o 50%.',heat:'Produkcja drewna i farmy zwalniają o 35%. Całe wydobycie kamienia przyspiesza o 25%.',fog:'Skarby dają dwie nagrody na cykl. Połów ryb zwalnia o 35%.',wind:'Farmy, jagody i łowienie ryb mają 33% szansy na pusty cykl. Produkcja drewna przyspiesza o 25%.',storm:'Produkcja furii przyspiesza o 50%.'}
+};
+
+/* Four-language UI localization. All game logic uses stable English keys;
+   rendered text, tooltips, SVG nodes, prompts and accessibility labels are localized.
+   The observer also translates UI generated later (menus, events, multiplayer). */
+const TRANSLATIONS={"progress tree":{"uk":"Дерево прогресу","ru":"Дерево прогресса","pl":"Drzewo postępu"},"recipes, resources, buildings and unlock levels":{"uk":"Рецепти, ресурси, будівлі й рівні розблокування","ru":"Рецепты, ресурсы, здания и уровни открытия","pl":"Receptury, zasoby, budynki i poziomy odblokowania"},"settings":{"uk":"Налаштування","ru":"Настройки","pl":"Ustawienia"},"game paused":{"uk":"Гру призупинено","ru":"Игра приостановлена","pl":"Gra wstrzymana"},"pause game":{"uk":"Призупинити гру","ru":"Приостановить игру","pl":"Wstrzymaj grę"},"resume game":{"uk":"Продовжити гру","ru":"Продолжить игру","pl":"Wznów grę"},"your world is paused while this window is open.":{"uk":"Світ призупинено, поки це вікно відкрите.","ru":"Мир приостановлен, пока открыто это окно.","pl":"Świat jest wstrzymany, gdy to okno jest otwarte."},"appearance":{"uk":"Оформлення","ru":"Оформление","pl":"Wygląd"},"choose your preferred palette":{"uk":"Оберіть бажану палітру","ru":"Выберите желаемую палитру","pl":"Wybierz preferowaną paletę"},"music volume":{"uk":"Гучність музики","ru":"Громкость музыки","pl":"Głośność muzyki"},"soundtrack":{"uk":"Музика","ru":"Музыка","pl":"Ścieżka dźwiękowa"},"five original ambient compositions":{"uk":"П’ять оригінальних атмосферних мелодій","ru":"Пять оригинальных атмосферных мелодий","pl":"Pięć oryginalnych utworów ambientowych"},"music starts after your first click.":{"uk":"Музика почнеться після першого натискання.","ru":"Музыка начнётся после первого нажатия.","pl":"Muzyka rozpocznie się po pierwszym kliknięciu."},"settings are saved automatically.":{"uk":"Налаштування зберігаються автоматично.","ru":"Настройки сохраняются автоматически.","pl":"Ustawienia są zapisywane automatycznie."},"return to game":{"uk":"Повернутися до гри","ru":"Вернуться в игру","pl":"Wróć do gry"},"language":{"uk":"Мова","ru":"Язык","pl":"Język"},"change the language of the entire game":{"uk":"Змінити мову всієї гри","ru":"Изменить язык всей игры","pl":"Zmień język całej gry"},"light":{"uk":"Світла","ru":"Светлая","pl":"Jasny"},"dark":{"uk":"Темна","ru":"Тёмная","pl":"Ciemny"},"english":{"uk":"Англійська","ru":"Английский","pl":"Angielski"},"ukrainian":{"uk":"Українська","ru":"Украинский","pl":"Ukraiński"},"russian":{"uk":"Російська","ru":"Русский","pl":"Rosyjski"},"polish":{"uk":"Польська","ru":"Польский","pl":"Polski"},"early game":{"uk":"Початок гри","ru":"Начало игры","pl":"Początek gry"},"fishing":{"uk":"РИБОЛОВЛЯ","ru":"РЫБАЛКА","pl":"WĘDKARSTWO"},"forestry":{"uk":"ЛІСНИЦТВО","ru":"ЛЕСНОЕ ХОЗЯЙСТВО","pl":"LEŚNICTWO"},"mining":{"uk":"ГІРНИЦТВО","ru":"ГОРНОЕ ДЕЛО","pl":"GÓRNICTWO"},"crafting":{"uk":"КРАФТ","ru":"КРАФТ","pl":"RZEMIOSŁO"},"farming":{"uk":"Фермерство","ru":"Фермерство","pl":"Rolnictwo"},"housing":{"uk":"ЖИТЛО","ru":"ЖИЛЬЁ","pl":"MIESZKALNICTWO"},"advanced industry":{"uk":"Розвинена промисловість","ru":"Развитая промышленность","pl":"Zaawansowany przemysł"},"port":{"uk":"Порт","ru":"Порт","pl":"Port"},"fury battles":{"uk":"Битви люті","ru":"Битвы ярости","pl":"Bitwy furii"},"overview":{"uk":"Огляд","ru":"Обзор","pl":"Przegląd"},"game completion":{"uk":"Завершення гри","ru":"Прохождение игры","pl":"Ukończenie gry"},"progress milestone":{"uk":"Етап прогресу","ru":"Этап прогресса","pl":"Etap postępu"},"gathered resource":{"uk":"Здобутий ресурс","ru":"Добытый ресурс","pl":"Pozyskany zasób"},"crafting resource":{"uk":"Ресурс для крафту","ru":"Ресурс для крафта","pl":"Surowiec do wytwarzania"},"production upgrade":{"uk":"Покращити виробництво","ru":"Улучшить производство","pl":"Ulepsz produkcję"},"automatic crafting":{"uk":"Автоматичний крафт","ru":"Автоматическое создание","pl":"Automatyczne wytwarzanie"},"house specialization":{"uk":"Призначення будинку","ru":"Назначение дома","pl":"Przeznaczenie domu"},"improved loot table":{"uk":"Покращені нагороди","ru":"Улучшенные награды","pl":"Ulepszone nagrody"},"select a branch to jump":{"uk":"Оберіть гілку для переходу","ru":"Выберите ветку для перехода","pl":"Wybierz gałąź, aby przejść"},"drag to move":{"uk":"Перетягуйте для переміщення","ru":"Перетаскивайте для перемещения","pl":"Przeciągnij, aby przesunąć"},"scroll to zoom":{"uk":"Прокручуйте для масштабу","ru":"Прокручивайте для масштаба","pl":"Przewiń, aby przybliżyć"},"hover for all required ingredients":{"uk":"Наведіть для перегляду всіх матеріалів","ru":"Наведите для просмотра всех материалов","pl":"Najedź, aby zobaczyć wszystkie składniki"},"achievements are permanent":{"uk":"Досягнення зберігаються назавжди","ru":"Достижения сохраняются навсегда","pl":"Osiągnięcia są trwałe"},"permanently achieved":{"uk":"Досягнуто назавжди","ru":"Достигнуто навсегда","pl":"Zdobyto na stałe"},"base crafting cost":{"uk":"Базова ціна крафту","ru":"Базовая стоимость крафта","pl":"Podstawowy koszt wytworzenia"},"base construction / upgrade cost":{"uk":"Базова вартість будівництва / покращення","ru":"Базовая стоимость строительства / улучшения","pl":"Podstawowy koszt budowy / ulepszenia"},"base assignment cost":{"uk":"Базова ціна призначення","ru":"Базовая стоимость назначения","pl":"Podstawowy koszt przydzielenia"},"free assignment":{"uk":"Безкоштовне призначення","ru":"Бесплатное назначение","pl":"Bezpłatny przydział"},"requirements to reach level":{"uk":"Вимоги для досягнення рівня","ru":"Требования для достижения уровня","pl":"Wymagania do osiągnięcia poziomu"},"unlocks at level":{"uk":"Відкривається на рівні","ru":"Открывается на уровне","pl":"Odblokowuje się na poziomie"},"craft at":{"uk":"Крафт у","ru":"Создать в","pl":"Wytwarzanie w"},"fixed recipes":{"uk":"Незмінні рецепти","ru":"Фиксированные рецепты","pl":"Stałe receptury"},"bulk crafting":{"uk":"масовий крафт","ru":"массовый крафт","pl":"tworzenie seryjne"},"fixed unit prices":{"uk":"Незмінні ціни за одиницю","ru":"Фиксированные цены за единицу","pl":"Stałe ceny jednostkowe"},"craft amount":{"uk":"Кількість крафту","ru":"Количество создания","pl":"Liczba wytwarzanych sztuk"},"all":{"uk":"усе","ru":"всё","pl":"wszystko"},"all affordable":{"uk":"Усе доступне","ru":"Всё доступное","pl":"Wszystko, na co wystarcza zasobów"},"you have":{"uk":"У тебе є","ru":"У тебя есть","pl":"Masz"},"owned":{"uk":"У наявності","ru":"В наличии","pl":"Posiadane"},"free":{"uk":"Безкоштовно","ru":"Бесплатно","pl":"Za darmo"},"fully upgraded":{"uk":"Максимально покращено","ru":"Максимально улучшено","pl":"Maksymalnie ulepszono"},"missing resources or tools":{"uk":"Бракує ресурсів або інструментів","ru":"Не хватает ресурсов или инструментов","pl":"Brak zasobów lub narzędzi"},"craft missing ingredients":{"uk":"Скрафтити відсутні матеріали","ru":"Создать недостающие материалы","pl":"Wytwórz brakujące składniki"},"no items yet":{"uk":"Поки немає предметів","ru":"Пока нет предметов","pl":"Brak przedmiotów"},"each next construction of this type costs 25% more.":{"uk":"Кожна наступна будівля цього типу дорожча на 25%.","ru":"Каждое следующее здание этого типа дороже на 25%.","pl":"Każdy kolejny budynek tego typu kosztuje o 25% więcej."},"build":{"uk":"Побудувати","ru":"Построить","pl":"Zbuduj"},"craft":{"uk":"Скрафтити","ru":"Создать","pl":"Wytwórz"},"gather":{"uk":"Добути","ru":"Добыть","pl":"Zdobądź"},"assign":{"uk":"Призначити","ru":"Назначить","pl":"Przydziel"},"reach":{"uk":"Досягти","ru":"Достичь","pl":"Osiągnij"},"level":{"uk":"рівень","ru":"уровень","pl":"poziom"},"max level":{"uk":"МАКСИМАЛЬНИЙ РІВЕНЬ","ru":"МАКСИМАЛЬНЫЙ УРОВЕНЬ","pl":"MAKSYMALNY POZIOM"},"forest":{"uk":"Ліс","ru":"Лес","pl":"Las"},"mountains":{"uk":"Гори","ru":"Горы","pl":"Góry"},"meadow":{"uk":"Галявина","ru":"Луг","pl":"Łąka"},"lake":{"uk":"Озеро","ru":"Озеро","pl":"Jezioro"},"wasteland":{"uk":"Пустош","ru":"Пустошь","pl":"Pustkowie"},"sawmill":{"uk":"Лісопилка","ru":"Лесопилка","pl":"Tartak"},"improved sawmill":{"uk":"Покращена лісопилка","ru":"Улучшенная лесопилка","pl":"Ulepszony tartak"},"mine":{"uk":"Шахта","ru":"Шахта","pl":"Kopalnia"},"improved mine":{"uk":"Покращена шахта","ru":"Улучшенная шахта","pl":"Ulepszona kopalnia"},"fishing hut":{"uk":"Рибальська хатина","ru":"Рыбацкая хижина","pl":"Chata rybacka"},"carpenter":{"uk":"Столяр","ru":"Столяр","pl":"Stolarz"},"forge":{"uk":"Кузня","ru":"Кузница","pl":"Kuźnia"},"advanced forge":{"uk":"Покращена кузня","ru":"Улучшенная кузница","pl":"Zaawansowana kuźnia"},"stonecutter":{"uk":"Каменяр","ru":"Каменотёс","pl":"Kamieniarz"},"workshop":{"uk":"Майстерня","ru":"Мастерская","pl":"Warsztat"},"house":{"uk":"Будинок","ru":"Дом","pl":"Dom"},"farm":{"uk":"Ферма","ru":"Ферма","pl":"Farma"},"animal pen":{"uk":"Загін для тварин","ru":"Загон для животных","pl":"Zagroda dla zwierząt"},"berry bush":{"uk":"Ягідний кущ","ru":"Ягодный куст","pl":"Krzew jagodowy"},"treasures":{"uk":"Скарби","ru":"Сокровища","pl":"Skarby"},"arena":{"uk":"Арена","ru":"Арена","pl":"Arena"},"sorcerer":{"uk":"Чаклун","ru":"Колдун","pl":"Czarownik"},"residential":{"uk":"Житловий","ru":"Жилой","pl":"Mieszkalny"},"kitchen":{"uk":"Кухня","ru":"Кухня","pl":"Kuchnia"},"tailor":{"uk":"Кравець","ru":"Портной","pl":"Krawiec"},"wood":{"uk":"Дерево","ru":"Дерево","pl":"Drewno"},"stone":{"uk":"Камінь","ru":"Камень","pl":"Kamień"},"fish":{"uk":"Риба","ru":"Рыба","pl":"Ryba"},"fury":{"uk":"лють","ru":"ярость","pl":"furia"},"rod":{"uk":"вудка","ru":"удочка","pl":"wędka"},"axe":{"uk":"сокира","ru":"топор","pl":"siekiera"},"pickaxe":{"uk":"кайло","ru":"кирка","pl":"kilof"},"fishing rod":{"uk":"Вудка","ru":"Удочка","pl":"Wędka"},"plank":{"uk":"дошка","ru":"доска","pl":"deska"},"iron":{"uk":"Залізо","ru":"Железо","pl":"Żelazo"},"iron axe":{"uk":"залізна сокира","ru":"железный топор","pl":"żelazna siekiera"},"iron pickaxe":{"uk":"залізне кайло","ru":"железная кирка","pl":"żelazny kilof"},"hammer":{"uk":"молоток","ru":"молоток","pl":"młotek"},"shovel":{"uk":"лопата","ru":"лопата","pl":"łopata"},"wheat":{"uk":"пшениця","ru":"пшеница","pl":"pszenica"},"carrot":{"uk":"морква","ru":"морковь","pl":"marchew"},"bread":{"uk":"хліб","ru":"хлеб","pl":"chleb"},"animal feed":{"uk":"корм для тварин","ru":"корм для животных","pl":"pasza dla zwierząt"},"fur":{"uk":"хутро","ru":"мех","pl":"futro"},"leather":{"uk":"шкіра","ru":"кожа","pl":"skóra"},"clay":{"uk":"глина","ru":"глина","pl":"glina"},"brick":{"uk":"цегла","ru":"кирпич","pl":"cegła"},"stone block":{"uk":"Кам’яний блок","ru":"Каменный блок","pl":"Blok kamienny"},"ordinary gear":{"uk":"Звичайна шестерня","ru":"Обычная шестерня","pl":"Zwykła zębatka"},"blacksmith bellows":{"uk":"Ковальські міхи","ru":"Кузнечные меха","pl":"Miechy kowalskie"},"bellows":{"uk":"міхи","ru":"меха","pl":"miechy"},"improved pickaxe":{"uk":"покращене кайло","ru":"улучшенная кирка","pl":"ulepszony kilof"},"improved axe":{"uk":"покращена сокира","ru":"улучшенный топор","pl":"ulepszona siekiera"},"coal":{"uk":"вугілля","ru":"уголь","pl":"węgiel"},"oak":{"uk":"дуб","ru":"дуб","pl":"dąb"},"oak plank":{"uk":"Дубова дошка","ru":"Дубовая доска","pl":"Deska dębowa"},"steel":{"uk":"Сталь","ru":"Сталь","pl":"Stal"},"jacket":{"uk":"Куртка","ru":"Куртка","pl":"Kurtka"},"gloves":{"uk":"Рукавиці","ru":"Перчатки","pl":"Rękawice"},"gold bag":{"uk":"мішечок золота","ru":"мешочек золота","pl":"woreczek złota"},"xp essence":{"uk":"есенція досвіду","ru":"эссенция опыта","pl":"esencja doświadczenia"},"wild berry":{"uk":"лісова ягода","ru":"лесная ягода","pl":"dzika jagoda"},"berry juice":{"uk":"Ягідний сік","ru":"Ягодный сок","pl":"Sok jagodowy"},"production upgrade 1":{"uk":"Покращення виробництва 1","ru":"Улучшение производства 1","pl":"Ulepszenie produkcji 1"},"upgrade arena":{"uk":"Покращити арену","ru":"Улучшить арену","pl":"Ulepsz arenę"},"upgrade":{"uk":"покращити","ru":"улучшить","pl":"ulepsz"},"delete":{"uk":"Видалити","ru":"Удалить","pl":"Usuń"},"remove building only":{"uk":"Видалити лише будівлю","ru":"Удалить только здание","pl":"Usuń tylko budynek"},"remove biome":{"uk":"Видалити біом","ru":"Удалить биом","pl":"Usuń biom"},"100% construction and upgrade refund":{"uk":"Повернення 100% вартості будівництва й покращень","ru":"Возврат 100% стоимости строительства и улучшений","pl":"Zwrot 100% kosztów budowy i ulepszeń"},"choose a building":{"uk":"Оберіть будівлю","ru":"Выберите здание","pl":"Wybierz budynek"},"choose a permanent purpose":{"uk":"Оберіть постійне призначення","ru":"Выберите постоянное назначение","pl":"Wybierz stałe przeznaczenie"},"assignment limit reached":{"uk":"Досягнуто ліміту призначень","ru":"Достигнут лимит назначений","pl":"Osiągnięto limit przydziałów"},"quick crafting":{"uk":"Швидкий крафт","ru":"Быстрый крафт","pl":"Szybkie wytwarzanie"},"quick crafting stations":{"uk":"Станції швидкого крафту","ru":"Станции быстрого крафта","pl":"Stacje szybkiego tworzenia"},"close crafts":{"uk":"Закрити крафт","ru":"Закрыть крафт","pl":"Zamknij wytwarzanie"},"next building":{"uk":"Наступна будівля","ru":"Следующее здание","pl":"Następny budynek"},"previous building":{"uk":"Попередня будівля","ru":"Предыдущее здание","pl":"Poprzedni budynek"},"auto carpenter":{"uk":"Автоматичний столяр","ru":"Автоматический столяр","pl":"Automatyczny stolarz"},"auto forge":{"uk":"Автоматична кузня","ru":"Автоматическая кузница","pl":"Automatyczna kuźnia"},"paused":{"uk":"призупинено","ru":"приостановлено","pl":"wstrzymano"},"needs":{"uk":"Потрібно","ru":"Требуется","pl":"Wymaga"},"automation":{"uk":"Автоматизація","ru":"Автоматизация","pl":"Automatyzacja"},"automatic":{"uk":"Автоматичний","ru":"Автоматический","pl":"Automatyczny"},"per harvest":{"uk":"за збір","ru":"за сбор","pl":"na zbiór"},"per cycle":{"uk":"за цикл","ru":"за цикл","pl":"na cykl"},"per second":{"uk":"за секунду","ru":"в секунду","pl":"na sekundę"},"per minute":{"uk":"за хвилину","ru":"в минуту","pl":"na minutę"},"base seconds":{"uk":"базових секунд","ru":"базовых секунд","pl":"sekund bazowych"},"before construction scaling":{"uk":"до подорожчання будівництва","ru":"до удорожания строительства","pl":"przed wzrostem kosztu budowy"},"craft gears and blacksmith bellows":{"uk":"Виготовляє шестерні й ковальські міхи","ru":"Создаёт шестерни и кузнечные меха","pl":"Wytwarza zębatki i miechy kowalskie"},"craft stone blocks from 5 stone":{"uk":"Крафтить кам’яні блоки з 5 каменю","ru":"Создаёт каменные блоки из 5 камня","pl":"Wytwarza bloki kamienne z 5 kamieni"},"craft tools and planks":{"uk":"Виготовляє інструменти й дошки","ru":"Создаёт инструменты и доски","pl":"Wytwarza narzędzia i deski"},"craft iron tools":{"uk":"Виготовляє залізні інструменти","ru":"Создаёт железные инструменты","pl":"Wytwarza żelazne narzędzia"},"craft improved tools and steel":{"uk":"Виготовляє покращені інструменти та сталь","ru":"Создаёт улучшенные инструменты и сталь","pl":"Wytwarza ulepszone narzędzia i stal"},"crafting and support buildings":{"uk":"Крафтові й допоміжні будівлі","ru":"Ремесленные и вспомогательные здания","pl":"Budynki rzemieślnicze i pomocnicze"},"sell goods for gold bags":{"uk":"Продавайте товари за золото","ru":"Продавайте товары за золото","pl":"Sprzedawaj towary za złoto"},"buy supplies":{"uk":"Купуйте матеріали","ru":"Покупайте материалы","pl":"Kupuj materiały"},"random item every":{"uk":"Випадковий предмет кожні","ru":"Случайный предмет каждые","pl":"Losowy przedmiot co"},"sell jackets":{"uk":"Продати куртки","ru":"Продать куртки","pl":"Sprzedaj kurtki"},"sell gloves":{"uk":"Продати рукавиці","ru":"Продать перчатки","pl":"Sprzedaj rękawice"},"sell improved pickaxes":{"uk":"Продати покращені кайла","ru":"Продать улучшенные кирки","pl":"Sprzedaj ulepszone kilofy"},"sell improved axes":{"uk":"Продати покращені сокири","ru":"Продать улучшенные топоры","pl":"Sprzedaj ulepszone siekiery"},"buy oak planks":{"uk":"Купити дубові дошки","ru":"Купить дубовые доски","pl":"Kup deski dębowe"},"buy steel":{"uk":"Купити сталь","ru":"Купить сталь","pl":"Kup stal"},"buy fish":{"uk":"Купити рибу","ru":"Купить рыбу","pl":"Kup ryby"},"reset progress":{"uk":"Скинути прогрес","ru":"Сбросить прогресс","pl":"Zresetuj postęp"},"reset all progress?":{"uk":"Скинути весь прогрес?","ru":"Сбросить весь прогресс?","pl":"Zresetować cały postęp?"},"reset everything":{"uk":"Скинути все","ru":"Сбросить всё","pl":"Zresetuj wszystko"},"cancel":{"uk":"Скасувати","ru":"Отмена","pl":"Anuluj"},"close":{"uk":"Закрити","ru":"Закрыть","pl":"Zamknij"},"this removes your world, resources, items, upgrades, levels and achievements.":{"uk":"Це видалить світ, ресурси, предмети, покращення, рівні та досягнення.","ru":"Это удалит мир, ресурсы, предметы, улучшения, уровни и достижения.","pl":"Usunie to świat, zasoby, przedmioty, ulepszenia, poziomy i osiągnięcia."},"you will start with 5 wood and 5 stone.":{"uk":"Ви почнете з 5 дерева та 5 каменю.","ru":"Вы начнёте с 5 дерева и 5 камня.","pl":"Zaczniesz z 5 drewna i 5 kamieni."},"multiplayer":{"uk":"Мультиплеєр","ru":"Мультиплеер","pl":"Tryb wieloosobowy"},"create lobby":{"uk":"Створити лобі","ru":"Создать лобби","pl":"Utwórz lobby"},"find lobby":{"uk":"Знайти лобі","ru":"Найти лобби","pl":"Znajdź lobby"},"your nickname":{"uk":"Твій нікнейм","ru":"Твой никнейм","pl":"Twój nick"},"enter nickname":{"uk":"Введіть нікнейм","ru":"Введите никнейм","pl":"Wpisz nick"},"lobby code":{"uk":"Код лобі","ru":"Код лобби","pl":"Kod lobby"},"maximum players":{"uk":"Максимум гравців","ru":"Максимум игроков","pl":"Maksymalna liczba graczy"},"players":{"uk":"гравці","ru":"игроки","pl":"gracze"},"you":{"uk":"ти","ru":"ты","pl":"ty"},"host":{"uk":"хост","ru":"хост","pl":"host"},"waiting for players":{"uk":"Очікування гравців","ru":"Ожидание игроков","pl":"Oczekiwanie na graczy"},"start game":{"uk":"Почати гру","ru":"Начать игру","pl":"Rozpocznij grę"},"close lobby":{"uk":"Закрити лобі","ru":"Закрыть лобби","pl":"Zamknij lobby"},"find and join":{"uk":"Знайти й приєднатися","ru":"Найти и присоединиться","pl":"Znajdź i dołącz"},"leave lobby":{"uk":"Вийти з лобі","ru":"Выйти из лобби","pl":"Opuść lobby"},"back":{"uk":"Назад","ru":"Назад","pl":"Wróć"},"connected":{"uk":"підключено","ru":"подключено","pl":"połączono"},"connection":{"uk":"з’єднання","ru":"соединение","pl":"połączenie"},"network":{"uk":"мережа","ru":"сеть","pl":"sieć"},"network & server settings":{"uk":"Налаштування мережі й сервера","ru":"Настройки сети и сервера","pl":"Ustawienia sieci i serwera"},"multiplayer connection mode":{"uk":"Спосіб підключення мультиплеєра","ru":"Режим подключения мультиплеера","pl":"Tryb połączenia wieloosobowego"},"save connection settings on this device":{"uk":"Зберегти налаштування мережі на пристрої","ru":"Сохранить настройки сети на устройстве","pl":"Zapisz ustawienia połączenia na urządzeniu"},"statistics":{"uk":"статистика","ru":"статистика","pl":"statystyki"},"trade":{"uk":"обмін","ru":"обмен","pl":"wymiana"},"add items":{"uk":"Додати предмети","ru":"Добавить предметы","pl":"Dodaj przedmioty"},"your offer":{"uk":"Твоя пропозиція","ru":"Твоё предложение","pl":"Twoja oferta"},"their offer":{"uk":"Їхня пропозиція","ru":"Их предложение","pl":"Oferta drugiej strony"},"accept":{"uk":"Прийняти","ru":"Принять","pl":"Akceptuj"},"decline":{"uk":"Відхилити","ru":"Отклонить","pl":"Odrzuć"},"trade offer":{"uk":"Пропозиція обміну","ru":"Предложение обмена","pl":"Oferta wymiany"},"quantity":{"uk":"кількість","ru":"количество","pl":"ilość"},"add":{"uk":"Додати","ru":"Добавить","pl":"Dodaj"},"food":{"uk":"Їжа","ru":"Еда","pl":"Jedzenie"},"food & boosts":{"uk":"Їжа й підсилення","ru":"Еда и усиления","pl":"Jedzenie i wzmocnienia"},"use":{"uk":"Використати","ru":"Использовать","pl":"Użyj"},"personal effects":{"uk":"Особисті ефекти","ru":"Личные эффекты","pl":"Efekty osobiste"},"extra servings add duration, not strength.":{"uk":"Додаткові порції подовжують дію, але не силу.","ru":"Дополнительные порции продлевают действие, но не силу.","pl":"Dodatkowe porcje wydłużają czas, a nie siłę."},"now playing":{"uk":"Зараз грає","ru":"Сейчас играет","pl":"Teraz odtwarzane"},"muted":{"uk":"Вимкнено звук","ru":"Звук выключен","pl":"Wyciszono"},"morning orchard":{"uk":"Ранковий сад","ru":"Утренний сад","pl":"Poranny sad"},"rain on the lake":{"uk":"Дощ над озером","ru":"Дождь над озером","pl":"Deszcz nad jeziorem"},"amber fields":{"uk":"Бурштинові поля","ru":"Янтарные поля","pl":"Bursztynowe pola"},"moonlit forest":{"uk":"Місячний ліс","ru":"Лунный лес","pl":"Księżycowy las"},"quiet horizon":{"uk":"Тихий обрій","ru":"Тихий горизонт","pl":"Cichy horyzont"},"rain":{"uk":"Дощ","ru":"Дождь","pl":"Deszcz"},"earthquake":{"uk":"Землетрус","ru":"Землетрясение","pl":"Trzęsienie ziemi"},"rainbow":{"uk":"Веселка","ru":"Радуга","pl":"Tęcza"},"heatwave":{"uk":"Спека","ru":"Жара","pl":"Upał"},"fog":{"uk":"Туман","ru":"Туман","pl":"Mgła"},"strong wind":{"uk":"Сильний вітер","ru":"Сильный ветер","pl":"Silny wiatr"},"thunderstorm":{"uk":"Гроза","ru":"Гроза","pl":"Burza"},"all stone production":{"uk":"Усе виробництво каменю","ru":"Вся добыча камня","pl":"Całe wydobycie kamienia"},"farms, berries and lakes":{"uk":"Ферми, ягоди та озера","ru":"Фермы, ягоды и озёра","pl":"Farmy, jagody i jeziora"},"all production":{"uk":"Усе виробництво","ru":"Всё производство","pl":"Cała produkcja"},"wood and farms":{"uk":"Дерево та ферми","ru":"Дерево и фермы","pl":"Drewno i farmy"},"farms, berries and fishing":{"uk":"Ферми, ягоди та риболовля","ru":"Фермы, ягоды и рыбалка","pl":"Farmy, jagody i łowienie"},"chance to destroy one random building":{"uk":"шанс знищити одну випадкову будівлю","ru":"шанс разрушить одно случайное здание","pl":"szansy zniszczenia jednego losowego budynku"},"chance of an empty cycle":{"uk":"шанс порожнього циклу","ru":"шанс пустого цикла","pl":"szansy na pusty cykl"},"every second":{"uk":"Щосекунди","ru":"Каждую секунду","pl":"Co sekundę"},"every":{"uk":"кожні","ru":"каждые","pl":"co"},"speed":{"uk":"швидкість","ru":"скорость","pl":"prędkość"},"production":{"uk":"виробництво","ru":"производство","pl":"produkcja"},"rewards":{"uk":"нагороди","ru":"награды","pl":"nagrody"},"reward":{"uk":"нагорода","ru":"награда","pl":"nagroda"},"stone production":{"uk":"виробництво каменю","ru":"добыча камня","pl":"wydobycie kamienia"},"wood production":{"uk":"виробництво дерева","ru":"производство дерева","pl":"produkcja drewna"},"fury production":{"uk":"Виробництво люті","ru":"Производство ярости","pl":"Produkcja furii"},"unlocked":{"uk":"відкрито","ru":"открыто","pl":"odblokowano"},"next":{"uk":"наступний","ru":"следующий","pl":"następny"},"planks":{"uk":"Дошки","ru":"Доски","pl":"Deski"},"quick crafting station":{"uk":"Станція швидкого крафту","ru":"Станция быстрого крафта","pl":"Stanowisko szybkiego wytwarzania"},"choose building":{"uk":"Оберіть будівлю","ru":"Выберите здание","pl":"Wybierz budynek"},"tile actions":{"uk":"Дії з клітинкою","ru":"Действия с клеткой","pl":"Działania na polu"},"one reward":{"uk":"Одна нагорода","ru":"Одна награда","pl":"Jedna nagroda"},"basic cost":{"uk":"Базова вартість","ru":"Базовая стоимость","pl":"Koszt podstawowy"},"current price":{"uk":"Поточна ціна","ru":"Текущая цена","pl":"Aktualna cena"},"fixed price":{"uk":"Фіксована ціна","ru":"Фиксированная цена","pl":"Stała cena"},"production upgrades":{"uk":"Покращення виробництва","ru":"Улучшения производства","pl":"Ulepszenia produkcji"},"crafting tools":{"uk":"Крафтові інструменти","ru":"Ремесленные инструменты","pl":"Narzędzia rzemieślnicze"},"resources":{"uk":"ресурси","ru":"ресурсы","pl":"zasoby"},"equipment":{"uk":"Обладнання","ru":"Оборудование","pl":"Wyposażenie"},"inventory":{"uk":"Інвентар","ru":"Инвентарь","pl":"Ekwipunek"},"expand inventory":{"uk":"Розгорнути інвентар","ru":"Развернуть инвентарь","pl":"Rozwiń ekwipunek"},"collapse inventory":{"uk":"Згорнути інвентар","ru":"Свернуть инвентарь","pl":"Zwiń ekwipunek"},"achievement":{"uk":"Досягнення","ru":"Достижение","pl":"Osiągnięcie"},"achievements":{"uk":"Досягнення","ru":"Достижения","pl":"Osiągnięcia"},"building":{"uk":"будівля","ru":"здание","pl":"budynek"},"buildings":{"uk":"будівлі","ru":"здания","pl":"budynki"},"biome":{"uk":"біом","ru":"биом","pl":"biom"},"recipe":{"uk":"рецепт","ru":"рецепт","pl":"receptura"},"recipes":{"uk":"рецепти","ru":"рецепты","pl":"receptury"},"materials":{"uk":"матеріали","ru":"материалы","pl":"materiały"},"items":{"uk":"предмети","ru":"предметы","pl":"przedmioty"},"item":{"uk":"предмет","ru":"предмет","pl":"przedmiot"},"crafts":{"uk":"крафтить","ru":"создаёт","pl":"wytwarza"},"station":{"uk":"станція","ru":"станция","pl":"stanowisko"},"stations":{"uk":"станції","ru":"станции","pl":"stanowiska"},"harvest":{"uk":"збір","ru":"сбор","pl":"zbiór"},"collect":{"uk":"зібрати","ru":"собрать","pl":"zbierz"},"costs":{"uk":"коштує","ru":"стоит","pl":"kosztuje"},"cost":{"uk":"вартість","ru":"стоимость","pl":"koszt"},"spent":{"uk":"витрачено","ru":"потрачено","pl":"wydano"},"spend":{"uk":"витратити","ru":"потратить","pl":"wydaj"},"consumes":{"uk":"витрачає","ru":"расходует","pl":"zużywa"},"produces":{"uk":"виробляє","ru":"производит","pl":"produkuje"},"producing":{"uk":"виробляє","ru":"производит","pl":"produkuje"},"produced":{"uk":"вироблено","ru":"произведено","pl":"wyprodukowano"},"available":{"uk":"доступно","ru":"доступно","pl":"dostępne"},"unavailable":{"uk":"недоступно","ru":"недоступно","pl":"niedostępne"},"required":{"uk":"потрібно","ru":"требуется","pl":"wymagane"},"remaining":{"uk":"залишилося","ru":"осталось","pl":"pozostało"},"requires":{"uk":"потребує","ru":"требует","pl":"wymaga"},"from":{"uk":"з","ru":"из","pl":"z"},"with":{"uk":"з","ru":"с","pl":"z"},"without":{"uk":"без","ru":"без","pl":"bez"},"for":{"uk":"для","ru":"для","pl":"dla"},"into":{"uk":"у","ru":"в","pl":"na"},"and":{"uk":"і","ru":"и","pl":"i"},"or":{"uk":"або","ru":"или","pl":"lub"},"per":{"uk":"за","ru":"за","pl":"na"},"only":{"uk":"лише","ru":"только","pl":"tylko"},"one":{"uk":"один","ru":"один","pl":"jeden"},"at":{"uk":"на","ru":"на","pl":"na"},"to":{"uk":"до","ru":"до","pl":"do"},"of":{"uk":" ","ru":" ","pl":" "},"your":{"uk":"твій","ru":"твой","pl":"twój"},"by":{"uk":"через","ru":"через","pl":"przez"},"is":{"uk":"є","ru":"является","pl":"jest"},"are":{"uk":"є","ru":"являются","pl":"są"},"will":{"uk":"буде","ru":"будет","pl":"będzie"},"can":{"uk":"можна","ru":"можно","pl":"można"},"have":{"uk":"маєш","ru":"имеешь","pl":"masz"},"has":{"uk":"має","ru":"имеет","pl":"ma"},"already":{"uk":"вже","ru":"уже","pl":"już"},"permanently":{"uk":"назавжди","ru":"навсегда","pl":"na stałe"},"the":{"uk":" ","ru":" ","pl":" "},"a":{"uk":" ","ru":" ","pl":" "},"an":{"uk":" ","ru":" ","pl":" "},"this":{"uk":"цей","ru":"этот","pl":"ten"},"that":{"uk":"той","ru":"тот","pl":"ten"},"before":{"uk":"до","ru":"до","pl":"przed"},"after":{"uk":"після","ru":"после","pl":"po"},"first":{"uk":"перший","ru":"первый","pl":"pierwszy"},"more":{"uk":"більше","ru":"больше","pl":"więcej"},"more than":{"uk":"більше ніж","ru":"больше чем","pl":"więcej niż"},"less":{"uk":"менше","ru":"меньше","pl":"mniej"},"same":{"uk":"такий самий","ru":"такой же","pl":"taki sam"},"random":{"uk":"випадковий","ru":"случайный","pl":"losowy"},"s":{"uk":"с","ru":"с","pl":"s"},"second":{"uk":"секунда","ru":"секунда","pl":"sekunda"},"seconds":{"uk":"секунд","ru":"секунд","pl":"sekund"},"minute":{"uk":"хвилина","ru":"минута","pl":"minuta"},"minutes":{"uk":"хвилин","ru":"минут","pl":"minut"},"chance":{"uk":"шанс","ru":"шанс","pl":"szansa"},"bonus":{"uk":"бонус","ru":"бонус","pl":"bonus"},"bonuses":{"uk":"бонуси","ru":"бонусы","pl":"bonusy"},"starting":{"uk":"початковий","ru":"начальный","pl":"początkowy"},"starts":{"uk":"починається","ru":"начинается","pl":"rozpoczyna się"},"start":{"uk":"початок","ru":"начало","pl":"początek"},"maximum":{"uk":"максимум","ru":"максимум","pl":"maksimum"},"minimum":{"uk":"мінімум","ru":"минимум","pl":"minimum"},"rate":{"uk":"швидкість","ru":"скорость","pl":"tempo"},"time":{"uk":"час","ru":"время","pl":"czas"},"interval":{"uk":"інтервал","ru":"интервал","pl":"odstęp"},"power":{"uk":"сила","ru":"сила","pl":"moc"},"upkeep":{"uk":"утримання","ru":"содержание","pl":"utrzymanie"},"sell":{"uk":"продати","ru":"продать","pl":"sprzedaj"},"buy":{"uk":"купити","ru":"купить","pl":"kup"},"new":{"uk":"новий","ru":"новый","pl":"nowy"},"world":{"uk":"світ","ru":"мир","pl":"świat"},"singleplayer":{"uk":"Одиночна гра","ru":"Одиночная игра","pl":"Gra jednoosobowa"},"player":{"uk":"гравець","ru":"игрок","pl":"gracz"},"nickname":{"uk":"нікнейм","ru":"никнейм","pl":"pseudonim"},"lobby":{"uk":"лобі","ru":"лобби","pl":"lobby"},"waiting":{"uk":"очікування","ru":"ожидание","pl":"oczekiwanie"},"server":{"uk":"сервер","ru":"сервер","pl":"serwer"},"error":{"uk":"помилка","ru":"ошибка","pl":"błąd"},"failed":{"uk":"не вдалося","ru":"не удалось","pl":"nie udało się"},"success":{"uk":"успіх","ru":"успех","pl":"sukces"},"complete":{"uk":"завершено","ru":"завершено","pl":"ukończono"},"started":{"uk":"почалася","ru":"началась","pl":"rozpoczęto"},"chosen":{"uk":"обрано","ru":"выбрано","pl":"wybrano"},"powered":{"uk":"активний","ru":"работающий","pl":"aktywny"},"empty":{"uk":"порожній","ru":"пустой","pl":"pusty"},"ready":{"uk":"готово","ru":"готово","pl":"gotowe"},"confirmed":{"uk":"підтверджено","ru":"подтверждено","pl":"potwierdzono"},"selected":{"uk":"обрано","ru":"выбрано","pl":"wybrano"},"amount":{"uk":"кількість","ru":"количество","pl":"ilość"},"received":{"uk":"отримано","ru":"получено","pl":"otrzymano"},"receive":{"uk":"отримати","ru":"получить","pl":"otrzymaj"},"check":{"uk":"перевір","ru":"проверь","pl":"sprawdź"},"storage":{"uk":"сховище","ru":"хранилище","pl":"magazyn"},"progress":{"uk":"прогрес","ru":"прогресс","pl":"postęp"},"score":{"uk":"рахунок","ru":"счёт","pl":"wynik"},"update":{"uk":"оновити","ru":"обновить","pl":"aktualizuj"},"upgrades":{"uk":"покращення","ru":"улучшения","pl":"ulepszenia"},"unlock":{"uk":"відкрити","ru":"открыть","pl":"odblokuj"},"unlocks":{"uk":"відкриває","ru":"открывает","pl":"odblokowuje"},"locked":{"uk":"заблоковано","ru":"заблокировано","pl":"zablokowano"},"removed":{"uk":"видалено","ru":"удалено","pl":"usunięto"},"destroyed":{"uk":"зруйновано","ru":"разрушено","pl":"zniszczono"},"earthquake destroyed":{"uk":"Землетрус зруйнував","ru":"Землетрясение разрушило","pl":"Trzęsienie ziemi zniszczyło"},"save":{"uk":"Зберегти","ru":"Сохранить","pl":"Zapisz"},"saving":{"uk":"Збереження","ru":"Сохранение","pl":"Zapisywanie"},"saved":{"uk":"Збережено","ru":"Сохранено","pl":"Zapisano"},"loaded":{"uk":"завантажено","ru":"загружено","pl":"wczytano"},"agriculture":{"uk":"ЗЕМЛЕРОБСТВО","ru":"ЗЕМЛЕДЕЛИЕ","pl":"ROLNICTWO"},"achieved":{"uk":"Досягнуто","ru":"Достигнуто","pl":"Zdobyto"},"milestones reached":{"uk":"етапів досягнуто","ru":"этапов достигнуто","pl":"osiągniętych etapów"},"unlock milestones":{"uk":"Етапи розблокування","ru":"Этапы открытия","pl":"Etapy odblokowania"},"fish, rods & treasure":{"uk":"Риба, вудки та скарби","ru":"Рыба, удочки и сокровища","pl":"Ryby, wędki i skarby"},"wood, tools & oak":{"uk":"Дерево, інструменти й дуб","ru":"Древесина, инструменты и дуб","pl":"Drewno, narzędzia i dąb"},"stone, clay & coal":{"uk":"Камінь, глина та вугілля","ru":"Камень, глина и уголь","pl":"Kamień, glina i węgiel"},"from the carpenter to advanced industry":{"uk":"Від столяра до розвиненої промисловості","ru":"От столяра до развитой промышленности","pl":"Od stolarza do rozwiniętego przemysłu"},"forge → shovel → farm → animal pen":{"uk":"Кузня → лопата → ферма → загін для тварин","ru":"Кузница → лопата → ферма → загон для животных","pl":"Kuźnia → łopata → farma → zagroda"},"homes, kitchens & tailoring":{"uk":"Будинки, кухні та кравецтво","ru":"Дома, кухни и пошив одежды","pl":"Domy, kuchnie i krawiectwo"},"next: forge, stonecutter, treasures, houses and upgrades":{"uk":"Далі: кузня, каменяр, скарби, будинки та покращення","ru":"Далее: кузница, каменотёс, сокровища, дома и улучшения","pl":"Dalej: kuźnia, kamieniarz, skarby, domy i ulepszenia"},"next: workshop, farms, animal pens, kitchens and automation":{"uk":"Далі: майстерня, ферми, загони, кухні та автоматизація","ru":"Далее: мастерская, фермы, загоны, кухни и автоматизация","pl":"Dalej: warsztat, farmy, zagrody, kuchnie i automatyzacja"},"next: advanced forge, improved producers, oak planks and steel":{"uk":"Далі: покращена кузня, виробничі станції, дубові дошки та сталь","ru":"Далее: улучшенная кузница, производственные станции, дубовые доски и сталь","pl":"Dalej: zaawansowana kuźnia, ulepszone stanowiska, deski dębowe i stal"},"next: port and global trade":{"uk":"Далі: порт і світова торгівля","ru":"Далее: порт и мировая торговля","pl":"Dalej: port i handel międzynarodowy"},"keep exploring the progress tree":{"uk":"Досліджуй дерево прогресу","ru":"Продолжай изучать дерево прогресса","pl":"Odkrywaj kolejne gałęzie drzewa postępu"},"create a lobby or join a friend using a 5-digit code. everyone plays in the same shared world.":{"uk":"Створи лобі або приєднайся до друга за п’ятизначним кодом. Усі гравці грають в одному спільному світі.","ru":"Создай лобби или присоединись к другу по пятизначному коду. Все игроки играют в одном общем мире.","pl":"Utwórz lobby lub dołącz do znajomego za pomocą pięciocyfrowego kodu. Wszyscy grają we wspólnym świecie."},"checking multiplayer mode…":{"uk":"Перевірка режиму мультиплеєра…","ru":"Проверка режима мультиплеера…","pl":"Sprawdzanie trybu wieloosobowego…"},"auto (global server if hosted; otherwise peerjs)":{"uk":"Автоматично (глобальний сервер, якщо налаштований; інакше PeerJS)","ru":"Автоматически (глобальный сервер, если настроен; иначе PeerJS)","pl":"Automatycznie (serwer globalny, jeśli dostępny; w przeciwnym razie PeerJS)"},"peerjs cloud (free, direct connection)":{"uk":"PeerJS Cloud (безкоштовне пряме з’єднання)","ru":"PeerJS Cloud (бесплатное прямое соединение)","pl":"PeerJS Cloud (darmowe połączenie bezpośrednie)"},"custom global websocket server":{"uk":"Власний глобальний сервер WebSocket","ru":"Собственный глобальный сервер WebSocket","pl":"Własny globalny serwer WebSocket"},"global websocket url (same for every player)":{"uk":"Глобальна адреса WebSocket (однакова для всіх гравців)","ru":"Глобальный адрес WebSocket (одинаковый для всех игроков)","pl":"Globalny adres WebSocket (taki sam dla każdego gracza)"},"turn and stun settings below apply only to the direct peerjs cloud mode. global relay mode needs no turn settings.":{"uk":"Налаштування TURN і STUN нижче потрібні лише для прямого з’єднання PeerJS Cloud. Глобальний сервер-посередник не потребує TURN.","ru":"Настройки TURN и STUN ниже нужны только для прямого соединения PeerJS Cloud. Глобальному серверу-посреднику TURN не требуется.","pl":"Ustawienia TURN i STUN dotyczą wyłącznie bezpośredniego połączenia PeerJS Cloud. Globalny serwer pośredniczący nie wymaga TURN."},"turn url(s), one per line":{"uk":"Адреси TURN, по одній у рядку","ru":"Адреса TURN, по одному в строке","pl":"Adresy TURN, po jednym w wierszu"},"turn username":{"uk":"Ім’я користувача TURN","ru":"Имя пользователя TURN","pl":"Nazwa użytkownika TURN"},"turn credential / password":{"uk":"Пароль або облікові дані TURN","ru":"Пароль или данные учётной записи TURN","pl":"Dane uwierzytelniające / hasło TURN"},"enter the 5-digit lobby code":{"uk":"Введіть п’ятизначний код лобі","ru":"Введите пятизначный код лобби","pl":"Wpisz pięciocyfrowy kod lobby"},"only currently open lobbies can be joined.":{"uk":"Приєднатися можна лише до відкритого лобі.","ru":"Присоединиться можно только к открытому лобби.","pl":"Możesz dołączyć tylko do otwartego lobby."},"waiting for the host to start the game…":{"uk":"Очікування початку гри від хоста…","ru":"Ожидание запуска игры хостом…","pl":"Oczekiwanie, aż host uruchomi grę…"},"playing in a separate multiplayer world.":{"uk":"Гра у власному мультиплеєрному світі.","ru":"Игра в отдельном многопользовательском мире.","pl":"Grasz w osobnym świecie wieloosobowym."},"disconnect and return to singleplayer":{"uk":"Відключитися й повернутися до одиночної гри","ru":"Отключиться и вернуться к одиночной игре","pl":"Rozłącz i wróć do gry jednoosobowej"},"your offer is on the left. items are reserved until completion or cancellation. changing an offer clears both confirmations.":{"uk":"Твоя пропозиція ліворуч. Предмети зарезервовані до завершення або скасування обміну. Зміна пропозиції скидає обидва підтвердження.","ru":"Твоё предложение слева. Предметы зарезервированы до завершения или отмены обмена. Изменение предложения сбрасывает оба подтверждения.","pl":"Twoja oferta jest po lewej. Przedmioty są zarezerwowane do zakończenia lub anulowania wymiany. Zmiana oferty cofa oba potwierdzenia."},"no active food boost.":{"uk":"Немає активних бонусів їжі.","ru":"Нет активных бонусов еды.","pl":"Brak aktywnego wzmocnienia jedzenia."},"applies only to your own production.":{"uk":"Діє лише на твоє власне виробництво.","ru":"Действует только на твоё производство.","pl":"Działa tylko na twoją produkcję."},"−10% production cooldown for 60 seconds.":{"uk":"Час виробництва скорочується на 10% на 60 секунд.","ru":"Время производства сокращается на 10% на 60 секунд.","pl":"Czas produkcji skraca się o 10% na 60 sekund."},"round complete":{"uk":"Раунд завершено","ru":"Раунд завершён","pl":"Runda zakończona"},"choose a rival":{"uk":"Оберіть суперника","ru":"Выберите соперника","pl":"Wybierz rywala"},"restart":{"uk":"Почати заново","ru":"Начать заново","pl":"Rozpocznij ponownie"},"saved progress could not be loaded. reset progress to start again.":{"uk":"Не вдалося завантажити збереження. Скинь прогрес, щоб почати заново.","ru":"Не удалось загрузить сохранение. Сбрось прогресс, чтобы начать заново.","pl":"Nie udało się wczytać zapisu. Zresetuj postęp, aby zacząć od nowa."},"could not load network settings.":{"uk":"Не вдалося завантажити налаштування мережі.","ru":"Не удалось загрузить настройки сети.","pl":"Nie udało się wczytać ustawień sieci."},"connection: preparing…":{"uk":"З’єднання: підготовка…","ru":"Соединение: подготовка…","pl":"Połączenie: przygotowywanie…"},"warm piano · airy strings · gentle nylon arpeggios":{"uk":"Тепле фортепіано · легкі струнні · м’які перебори","ru":"Тёплое пианино · лёгкие струнные · мягкие переборы","pl":"Ciepłe pianino · lekkie smyczki · delikatne arpeggia"},"levels":{"uk":"РІВНІ","ru":"УРОВНИ","pl":"POZIOMY"},"maximum players (including you)":{"uk":"Максимальна кількість гравців (включно з тобою)","ru":"Максимум игроков (включая тебя)","pl":"Maksymalna liczba graczy (łącznie z tobą)"},"no custom turn server configured.":{"uk":"Власний сервер TURN не налаштовано.","ru":"Собственный сервер TURN не настроен.","pl":"Nie skonfigurowano własnego serwera TURN."},"connected to multiplayer":{"uk":"Підключено до мультиплеєра","ru":"Подключено к мультиплееру","pl":"Połączono z trybem wieloosobowym"},"connected to lobby":{"uk":"Підключено до лобі","ru":"Подключено к лобби","pl":"Połączono z lobby"},"waiting for players…":{"uk":"Очікування гравців…","ru":"Ожидание игроков…","pl":"Oczekiwanie na graczy…"},"now playing · seamless ambient score":{"uk":"Відтворюється атмосферна музика","ru":"Сейчас играет атмосферная музыка","pl":"Odtwarzanie płynnej muzyki ambientowej"}};
+Object.assign(TRANSLATIONS,{
+  "casting a spell increases only that spell's price by 30%. you cannot target yourself.":{
+    uk:"Використання закляття підвищує ціну лише цього закляття на 30%. Не можна вибрати себе за ціль.",
+    ru:"Применение заклинания повышает цену только этого заклинания на 30%. Нельзя выбрать себя целью.",
+    pl:"Użycie zaklęcia zwiększa cenę tylko tego zaklęcia o 30%. Nie możesz wybrać siebie jako celu."
+  }
+});
+const TRANSLATION_PATTERNS=Object.keys(TRANSLATIONS).sort((a,b)=>b.length-a.length);
+function i18nEscape(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+const LOCALE_RE=new RegExp('(?<![\\p{L}\\p{N}])(?:'+TRANSLATION_PATTERNS.map(i18nEscape).join('|')+')(?![\\p{L}\\p{N}])','giu');
+const originalTexts=new WeakMap(),originalAttrs=new WeakMap();
+let translationObserver;
+function translateText(original){
+  if(preferences.language==='en'||!original||!/[a-z]/i.test(original))return original;
+  return original.replace(LOCALE_RE,fragment=>{
+    const word=TRANSLATIONS[fragment.toLowerCase()];
+    if(!word)return fragment;
+    let result=word[preferences.language]||fragment;
+    if(result.trim()&&fragment[0]===fragment[0].toUpperCase()&&fragment[0]!==fragment[0].toLowerCase())
+      result=result[0].toUpperCase()+result.slice(1);
+    return result;
+  });
+}
+function translateNode(node){
+  if(!node||node.nodeType!==Node.TEXT_NODE||node.parentElement?.closest('[translate="no"],script,style,textarea'))return;
+  let saved=originalTexts.get(node);
+  if(!saved){saved={raw:node.nodeValue,shown:node.nodeValue};originalTexts.set(node,saved)}
+  else if(node.nodeValue!==saved.shown)saved.raw=node.nodeValue;
+  const next=translateText(saved.raw);saved.shown=next;
+  if(node.nodeValue!==next)node.nodeValue=next;
+}
+const localizedAttrs=['title','placeholder','aria-label','aria-description'];
+function translateAttributes(el){
+  if(!(el instanceof Element)||el.closest('[translate="no"],script,style,textarea'))return;
+  let attributes=originalAttrs.get(el);
+  if(!attributes){attributes=new Map();originalAttrs.set(el,attributes)}
+  for(const name of localizedAttrs){
+    if(!el.hasAttribute(name))continue;
+    const current=el.getAttribute(name),prev=attributes.get(name);
+    const english=prev&&prev.shown===current?prev.raw:current;
+    const next=translateText(english);
+    attributes.set(name,{raw:english,shown:next});
+    if(next!==current)el.setAttribute(name,next);
+  }
+}
+function translateRoot(root){
+  if(root.nodeType===Node.TEXT_NODE){translateNode(root);return}
+  if(root.nodeType!==Node.ELEMENT_NODE)return;
+  if(root.matches('[translate="no"],script,style,textarea'))return;
+  translateAttributes(root);
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT);
+  while(walker.nextNode()){
+    const child=walker.currentNode;
+    if(child.nodeType===Node.TEXT_NODE)translateNode(child);
+    else translateAttributes(child);
+  }
+}
+function applyGameLanguage(){
+  document.documentElement.lang=preferences.language;
+  $('languageChoice').value=preferences.language;
+  translateRoot(document.body);
+  if(typeof weatherUI==='function')weatherUI();
+  if(typeof hideTreeTooltip==='function')hideTreeTooltip();
+  document.title=preferences.language==='en'?'Hex World — Global Multiplayer':
+   preferences.language==='uk'?'Гексагональний світ — мультиплеєр':
+   preferences.language==='ru'?'Гексагональный мир — мультиплеер':'Świat heksów — multiplayer';
+}
+preferences.language=['en','uk','ru','pl'].includes(preferences.language)?preferences.language:'en';
+$('languageChoice').addEventListener('change',event=>{
+  preferences.language=event.target.value;preferencesSave();applyGameLanguage();
+});
+translationObserver=new MutationObserver(changes=>{
+  if(preferences.language==='en')return;
+  for(const change of changes){
+    if(change.type==='characterData')translateNode(change.target);
+    else if(change.type==='attributes')translateAttributes(change.target);
+    else for(const node of change.addedNodes)translateRoot(node);
+  }
+});
+translationObserver.observe(document.body,{childList:true,subtree:true,characterData:true,
+  attributes:true,attributeFilter:localizedAttrs});
+applyGameLanguage();
 
 loadGame();
 lastSimulation=performance.now();
